@@ -1,0 +1,58 @@
+# Data files (too large for git)
+*.nii.gz
+*.nii
+data/
+Atlas_2/
+
+# Model files (large binary files)
+*.h5
+*.keras
+*.ckpt
+*.pb
+models/*.h5
+models/*.keras
+
+# Logs and temporary files
+logs/*.out
+logs/*.err
+logs/*.log
+*.log
+*.tmp
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Environment files
+.env
+.venv
+env/
+venv/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# SLURM output (keep structure, ignore content)
+slurm-*.out
+
+# TensorBoard logs
+tensorboard/
+tb_logs/
+
+# Temporary model checkpoints (keep final models only)
+callbacks/*/
+!callbacks/README.md

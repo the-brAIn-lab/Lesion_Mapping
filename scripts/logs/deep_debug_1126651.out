@@ -1,0 +1,151 @@
+🔬 DEEP MODEL DEBUG ANALYSIS
+============================
+Purpose: Understand why both orientations give Dice=0.0
+Strategy: Analyze raw model predictions in detail
+Expected findings:
+  A) Model outputs all zeros → Model loading/training issue
+  B) Model outputs tiny values → Under-confident, need lower thresholds
+  C) Model outputs reasonable values → Post-processing issue
+
+Job ID: 1126651
+Node: hggpu9-2
+Start: Sun Jun 22 03:48:42 UTC 2025
+
+Environment configured
+GPU Status:
+NVIDIA RTX 4500 Ada Generation, 24570 MiB, 1 MiB
+
+🚀 Running deep model debug analysis...
+🔬 DEEP MODEL DEBUG ANALYSIS
+================================================================================
+Purpose: Understand why model gives Dice=0.0 for both orientations
+Strategy: Detailed prediction analysis and failure mode detection
+Start time: 2025-06-22 03:49:33
+
+================================================================================
+DEEP MODEL DEBUG ANALYSIS: sub-r048s014_ses-1
+================================================================================
+📂 Loading data...
+  Original shape: (197, 233, 189)
+  True lesion voxels: 1,112
+✅ GPU configured: PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+✅ Mixed precision enabled
+✅ Model loaded: 5,695,045 parameters
+
+📋 MODEL ARCHITECTURE INSPECTION:
+  Input shape: (None, 192, 224, 176, 1)
+  Output shape: (None, 192, 224, 176, 1)
+  Number of layers: 96
+  Final layer: conv3d_30 (Conv3D)
+  Final activation: <function sigmoid at 0x7f835061f560>
+
+🔧 PREPROCESSING:
+  📊 PREPROCESSING DETAILS:
+    Input shape: (197, 233, 189)
+    Input range: [0.000000, 167.835052]
+    Input mean: 14.263987
+    Non-zero voxels: 8,245,013
+    Resizing from (197, 233, 189) to (192, 224, 176)
+    Percentiles: p1=1.177913, p99=78.017382
+    Final range: [0.000000, 1.000000]
+    Final mean: 0.168954
+  Final batch shape: (1, 192, 224, 176, 1)
+
+🚀 RUNNING PREDICTION:
+  Prediction completed in 7.18 seconds
+  Prediction tensor shape: (1, 192, 224, 176, 1)
+  Prediction tensor dtype: <dtype: 'float32'>
+
+🔍 DETAILED PREDICTION ANALYSIS
+==================================================
+  Prediction volume shape: (192, 224, 176)
+  Prediction dtype: float32
+
+  📈 PREDICTION STATISTICS:
+    Min value: 0.00000000
+    Max value: 0.07255995
+    Mean value: 0.00000023
+    Std value: 0.00002693
+    Median value: 0.00000019
+
+  📊 PERCENTILE ANALYSIS:
+     1th percentile: 0.00000001
+     5th percentile: 0.00000005
+    10th percentile: 0.00000008
+    25th percentile: 0.00000013
+    50th percentile: 0.00000019
+    75th percentile: 0.00000025
+    90th percentile: 0.00000032
+    95th percentile: 0.00000040
+    99th percentile: 0.00000069
+
+  🎯 VALUE DISTRIBUTION:
+    Values > 0.001: 10 (0.000%)
+    Values > 0.010: 2 (0.000%)
+    Values > 0.100: 0 (0.000%)
+    Values > 0.200: 0 (0.000%)
+    Values > 0.300: 0 (0.000%)
+    Values > 0.400: 0 (0.000%)
+    Values > 0.500: 0 (0.000%)
+    Values > 0.600: 0 (0.000%)
+    Values > 0.700: 0 (0.000%)
+    Values > 0.800: 0 (0.000%)
+    Values > 0.900: 0 (0.000%)
+
+  🚨 FAILURE MODE ANALYSIS:
+    ⚠️ ISSUE: No confident predictions (max < 0.5)
+       → Model uncertain, may need threshold tuning
+
+🎯 THRESHOLD TESTING
+==============================
+  Threshold 0.0001: Dice=0.000000, Pred=159, True=1,112, Intersect=0
+  Threshold 0.0010: Dice=0.000000, Pred=15, True=1,112, Intersect=0
+  Threshold 0.0100: Dice=0.000000, Pred=6, True=1,112, Intersect=0
+  Threshold 0.0500: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.1000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.2000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.3000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.4000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.5000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.6000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.7000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.8000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+  Threshold 0.9000: Dice=0.000000, Pred=0, True=1,112, Intersect=0
+
+  🏆 Best result: Threshold=0.5000, Dice=0.000000
+
+🎯 DIAGNOSTIC CONCLUSION
+========================================
+Failure mode: low_confidence
+Best achievable Dice: 0.000000
+Best threshold: 0.500000
+
+💡 RECOMMENDATIONS:
+  1. Model works but is uncertain
+  2. Try post-processing with lower thresholds
+  3. Check if training data had similar characteristics
+  4. Consider ensemble methods or model calibration
+
+🏁 FINAL DIAGNOSTIC RESULT
+============================================================
+Test case: sub-r048s014_ses-1
+Failure mode: low_confidence
+Best achievable Dice: 0.000000
+Best threshold: 0.500000
+
+❌ FUNDAMENTAL ISSUE: Model not working properly
+   → Need to investigate model training/loading issues
+
+End time: 2025-06-22 03:49:46
+
+============================================================
+DEEP DEBUG COMPLETED
+============================================================
+Exit code: 1
+End time: Sun Jun 22 03:49:48 UTC 2025
+❌ DEEP DEBUG FAILED
+Check error log for details
+
+Final GPU status:
+memory.used [MiB], memory.total [MiB]
+1 MiB, 24570 MiB

@@ -1,0 +1,32 @@
+Raw Probability Threshold Analysis
+==================================
+
+Test Case: sub-r048s014_ses-1
+Model: /mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/callbacks/sota_20250616_190015/best_model.h5
+Original Shape: (197, 233, 189)
+Model Shape: (192, 224, 176)
+
+Raw Prediction Statistics:
+  Range: [0.000000, 0.990893]
+  Mean: 0.000002
+  Std: 0.001186
+
+Threshold Testing Results:
+  0.001: Dice=0.0000, Predicted=116
+  0.005: Dice=0.0000, Predicted=67
+  0.010: Dice=0.0000, Predicted=52
+  0.020: Dice=0.0000, Predicted=41
+  0.050: Dice=0.0000, Predicted=31
+  0.100: Dice=0.0000, Predicted=26
+  0.150: Dice=0.0000, Predicted=23
+  0.200: Dice=0.0000, Predicted=20
+  0.250: Dice=0.0000, Predicted=17
+  0.300: Dice=0.0000, Predicted=16
+  0.400: Dice=0.0000, Predicted=14
+  0.500: Dice=0.0000, Predicted=12
+
+Optimal Results:
+  Best Threshold: 0.500
+  Best Dice Score: 0.0000
+  True Lesion Voxels: 1,112
+  Predicted Lesion Voxels: 12

@@ -1,0 +1,76 @@
+import tensorflow as tf
+from tensorflow.keras.layers import Conv3D, BatchNormalization, Activation, Conv3DTranspose, Concatenate, Input, Multiply
+from tensorflow.keras.models import Model
+
+def attention_gate(g, s, num_filters):
+    """Attention gate ensuring 5D tensors"""
+    g = Conv3D(num_filters, 1, padding='same', data_format='channels_last')(g)
+    s = Conv3D(num_filters, 1, padding='same', data_format='channels_last')(s)
+    x = tf.add(g, s)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = Conv3D(1, 1, padding='same', data_format='channels_last')(x)
+    x = Activation('sigmoid')(x)
+    return Multiply()([s, x])
+
+def conv_block(x, filters, kernel_size=3, strides=1):
+    """Standard conv block with BN and ReLU"""
+    x = Conv3D(filters, kernel_size, padding='same', strides=strides, data_format='channels_last')(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = Conv3D(filters, kernel_size, padding='same', data_format='channels_last')(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    return x
+
+def build_sota_model(input_shape=(192, 224, 176, 1), base_filters=32):
+    """Build 3D Attention U-Net"""
+    inputs = Input(input_shape)
+
+    # Encoder
+    c1 = conv_block(inputs, base_filters)
+    p1 = Conv3D(base_filters, 3, strides=2, padding='same')(c1)  # Downsample
+
+    c2 = conv_block(p1, base_filters * 2)
+    p2 = Conv3D(base_filters * 2, 3, strides=2, padding='same')(c2)
+
+    c3 = conv_block(p2, base_filters * 4)
+    p3 = Conv3D(base_filters * 4, 3, strides=2, padding='same')(c3)
+
+    c4 = conv_block(p3, base_filters * 8)
+    p4 = Conv3D(base_filters * 8, 3, strides=2, padding='same')(c4)
+
+    c5 = conv_block(p4, base_filters * 16)
+
+    # Bottleneck
+    c6 = conv_block(c5, base_filters * 16)
+
+    # Decoder
+    u4 = Conv3DTranspose(base_filters * 8, 2, strides=2, padding='same')(c6)
+    a4 = attention_gate(c4, u4, base_filters * 8)
+    u4 = Concatenate()([u4, a4])
+    c7 = conv_block(u4, base_filters * 8)
+
+    u3 = Conv3DTranspose(base_filters * 4, 2, strides=2, padding='same')(c7)
+    a3 = attention_gate(c3, u3, base_filters * 4)
+    u3 = Concatenate()([u3, a3])
+    c8 = conv_block(u3, base_filters * 4)
+
+    u2 = Conv3DTranspose(base_filters * 2, 2, strides=2, padding='same')(c8)
+    a2 = attention_gate(c2, u2, base_filters * 2)
+    u2 = Concatenate()([u2, a2])
+    c9 = conv_block(u2, base_filters * 2)
+
+    u1 = Conv3DTranspose(base_filters, 2, strides=2, padding='same')(c9)
+    a1 = attention_gate(c1, u1, base_filters)
+    u1 = Concatenate()([u1, a1])
+    c10 = conv_block(u1, base_filters)
+
+    # Output
+    outputs = Conv3D(1, 1, padding='same', activation='sigmoid')(c10)
+
+    return Model(inputs, outputs, name='SOTA_Attention_UNet')
+
+if __name__ == "__main__":
+    model = build_sota_model()
+    model.summary()

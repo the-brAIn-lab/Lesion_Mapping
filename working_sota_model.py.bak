@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+import tensorflow as tf
+from tensorflow.keras.layers import Conv3D, Conv3DTranspose, BatchNormalization, Activation, Input, Concatenate, Multiply, GlobalAveragePooling3D, Dense, Reshape
+from tensorflow.keras.models import Model
+
+def build_sota_model(input_shape=(192, 224, 176, 1), base_filters=32, depth=5):
+    inputs = Input(input_shape)
+
+    def conv_block(x, filters):
+        x = Conv3D(filters, 3, padding='same')(x)
+        x = BatchNormalization()(x)
+        x = Activation('relu')(x)
+        x = Conv3D(filters, 3, padding='same')(x)
+        x = BatchNormalization()(x)
+        return Activation('relu')(x)
+
+    def attention_gate(g, s, filters):
+        g = Conv3D(filters, 1, padding='same')(g)
+        s = Conv3D(filters, 1, padding='same')(s)
+        att = Activation('relu')(g + s)
+        att = Conv3D(1, 1, padding='same', activation='sigmoid')(att)
+        return Multiply()([s, att])
+
+    # Encoder
+    skip_connections = []
+    x = inputs
+    for i in range(depth):
+        filters = base_filters * (2 ** i)
+        x = conv_block(x, filters)
+        if i < depth - 1:
+            skip_connections.append(x)
+            x = Conv3D(filters, 3, strides=2, padding='same')(x)
+
+    # Bottleneck
+    x = conv_block(x, base_filters * (2 ** (depth - 1)))
+
+    # Decoder
+    for i in range(depth - 1):
+        filters = base_filters * (2 ** (depth - 2 - i))
+        x = Conv3DTranspose(filters, 2, strides=2, padding='same')(x)
+        skip = skip_connections[-(i + 1)]
+        skip = attention_gate(x, skip, filters)
+        x = Concatenate()([x, skip])
+        x = conv_block(x, filters)
+
+    # Output
+    outputs = Conv3D(1, 1, padding='same', activation='sigmoid')(x)
+
+    model = Model(inputs, outputs, name='SOTA_Attention_UNet')
+    return model
+
+if __name__ == "__main__":
+    model = build_sota_model()
+    model.summary()
+    test_input = tf.random.normal((1, 192, 224, 176, 1))
+    output = model(test_input)
+    print("Model created successfully!")
+    print(f"Total parameters: {model.count_params():,}")
+    print(f"Input shape: {test_input.shape}")
+    print(f"Output shape: {output.shape}")

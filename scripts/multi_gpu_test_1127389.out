@@ -1,0 +1,16 @@
+Starting multi_gpu_test.py on hggpu9-2 with $CUDA_VISIBLE_DEVICES
+[2025-06-23 21:58:20] TensorFlow version: 2.15.1
+[2025-06-23 21:58:20] Python executable: /mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/bin/python
+[2025-06-23 21:58:23] Found 2 GPUs:
+  - PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+  - PhysicalDevice(name='/physical_device:GPU:1', device_type='GPU')
+[2025-06-23 21:58:23] Attempting to use tf.distribute.MirroredStrategy...
+[2025-06-23 21:58:23] Number of devices in MirroredStrategy: 2
+[2025-06-23 21:58:24] Simple model created and compiled within strategy scope.
+[2025-06-23 21:58:24] Performing a dummy training step...
+[2025-06-23 21:58:35] Dummy training step successful.
+[2025-06-23 21:58:35] Checking device placement for a tensor addition...
+[2025-06-23 21:58:35] Result of a + b: [5. 7. 9.]
+[2025-06-23 21:58:35] Tensor 'c' is on device: /job:localhost/replica:0/task:0/device:GPU:0
+[2025-06-23 21:58:35] Multi-GPU test script finished.
+Script finished.

@@ -1,0 +1,54 @@
+Backup Information
+==================
+Date: Sat Jun 14 19:06:23 UTC 2025
+Job ID: 1123608
+Model Type: Basic U-Net (Memory Efficient)
+Parameters: ~500K-1M
+Input Size: 128×128×128
+Training Epochs: 50
+Final Accuracy: 99.79%
+Final Val Accuracy: 99.66%
+Final Loss: 0.5590
+Final Val Loss: 0.7560
+
+Environment:
+- Environment: tf215_env
+- TensorFlow: 2.15.1
+- GPU: RTX 4500 Ada Generation (24GB)
+- CUDA: 12.6.3
+- Data: ATLAS 2.0 (655 training samples)
+
+Notes:
+- This is the PROVEN WORKING baseline model
+- No OOM errors with this configuration
+- Successfully completed 50 epochs
+- Good accuracy but possible overfitting (val_loss higher than train_loss)
+
+Directory Structure:
+total 8
+drwxr-xr-x 2 rb194958e GeneralUsers      10 Jun 14 19:06 .
+drwxr-xr-x 3 rb194958e GeneralUsers       1 Jun 14 18:57 ..
+-rw-r--r-- 1 rb194958e GeneralUsers       0 Jun 14 18:57 backup_metadata.txt
+-rw-r--r-- 1 rb194958e GeneralUsers 7050480 Jun 14 14:17 checkpoint_final_working_model.h5
+-rw-r--r-- 1 rb194958e GeneralUsers      69 Jun 14 19:05 checkpoint_final_working_model.h5.md5
+-rw-r--r-- 1 rb194958e GeneralUsers 7050480 Jun 14 14:00 checkpoint_working_model.h5
+-rw-r--r-- 1 rb194958e GeneralUsers      63 Jun 14 19:05 checkpoint_working_model.h5.md5
+-rw-r--r-- 1 rb194958e GeneralUsers 7050480 Jun 14 14:17 final_working_model.h5
+-rw-r--r-- 1 rb194958e GeneralUsers      69 Jun 14 19:05 final_working_model.h5.md5
+-rwxr-xr-x 1 rb194958e GeneralUsers    8512 Jun 14 09:30 final_working_training.sh
+-rw-r--r-- 1 rb194958e GeneralUsers      68 Jun 14 19:05 final_working_training.sh.md5
+-rw-r--r-- 1 rb194958e GeneralUsers    7454 Jun 14 09:30 final_working_train.py
+-rw-r--r-- 1 rb194958e GeneralUsers      57 Jun 14 19:05 final_working_train.py.md5
+-rw-r--r-- 1 rb194958e GeneralUsers 4530285 Jun 14 14:17 training_log.out
+-rw-r--r-- 1 rb194958e GeneralUsers      60 Jun 14 19:05 training_log.out.md5
+-rw-r--r-- 1 rb194958e GeneralUsers 7050480 Jun 14 14:00 working_model.h5
+-rw-r--r-- 1 rb194958e GeneralUsers      63 Jun 14 19:05 working_model.h5.md5
+
+Checksums:
+a0a43cf2f704c6516c438f1d3dc773d0  checkpoints/final_working_model.h5
+8ce491d3eccd96edaf3ae8a17f101564  checkpoints/working_model.h5
+a0a43cf2f704c6516c438f1d3dc773d0  checkpoints/final_working_model.h5
+51c8a537bb6118928547682c7c40c810  scripts/final_working_training.sh
+091cedd991bf86474308415a3f1247d7  final_working_train.py
+d37eccdf830a152e8f643c1d029437fa  logs/training_1123608.out
+8ce491d3eccd96edaf3ae8a17f101564  checkpoints/working_model.h5

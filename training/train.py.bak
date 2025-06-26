@@ -1,0 +1,357 @@
+"""
+train.py - Main training script for stroke lesion segmentation
+Implements self-configuring, multi-GPU training with advanced features
+"""
+import os
+import sys
+import yaml
+import argparse
+import numpy as np
+import tensorflow as tf
+from datetime import datetime
+from pathlib import Path
+
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from models.attention_unet import build_attention_unet, build_deep_supervision_model
+from models.losses import (
+    combined_loss, deep_supervision_loss, dice_coefficient,
+    sensitivity, specificity, precision, AdaptiveLossWeight
+)
+from data.data_loader import StrokeDataGenerator, PatchDataGenerator, create_tf_dataset
+
+
+class AutoConfig:
+    """Self-configuring training parameters based on hardware and data"""
+    
+    def __init__(self, data_dir, gpu_memory_gb=24):
+        self.data_dir = data_dir
+        self.gpu_memory_gb = gpu_memory_gb
+        self.config = {}
+        self._analyze_data()
+        self._configure_training()
+    
+    def _analyze_data(self):
+        """Analyze dataset characteristics"""
+        print("Analyzing dataset...")
+        
+        # Quick scan for data statistics
+        images_dir = os.path.join(self.data_dir, "Images")
+        sample_file = next(f for f in os.listdir(images_dir) if f.endswith('.nii.gz'))
+        
+        import nibabel as nib
+        sample_path = os.path.join(images_dir, sample_file)
+        sample_nii = nib.load(sample_path)
+        
+        self.config['original_shape'] = sample_nii.shape
+        self.config['voxel_size'] = sample_nii.header.get_zooms()
+        
+        print(f"Original shape: {self.config['original_shape']}")
+        print(f"Voxel size: {self.config['voxel_size']}")
+    
+    def _configure_training(self):
+        """Auto-configure training parameters"""
+        # Estimate memory usage and set batch size
+        volume_size_gb = np.prod([192, 224, 176]) * 4 / 1e9  # float32
+        model_memory_gb = 0.5  # Approximate for 20M parameter model
+        
+        # Conservative estimate for batch size
+        available_memory = self.gpu_memory_gb * 0.7  # Leave 30% headroom
+        max_batch_per_gpu = int((available_memory - model_memory_gb) / (volume_size_gb * 2))
+        
+        self.config.update({
+            'batch_size_per_gpu': max(1, min(max_batch_per_gpu, 2)),
+            'target_shape': (192, 224, 176),
+            'patch_shape': (96, 96, 96),
+            'use_patches': self.gpu_memory_gb < 16,
+            'initial_lr': 1e-4,
+            'min_lr': 1e-7,
+            'epochs': 100,
+            'early_stopping_patience': 20,
+            'reduce_lr_patience': 10,
+        })
+        
+        print(f"\nAuto-configured parameters:")
+        for k, v in self.config.items():
+            print(f"  {k}: {v}")
+
+
+def setup_strategy():
+    """Setup distributed training strategy"""
+    # Enable mixed precision for memory efficiency
+    policy = tf.keras.mixed_precision.Policy('mixed_float16')
+    tf.keras.mixed_precision.set_global_policy(policy)
+    
+    # Configure GPUs
+    gpus = tf.config.list_physical_devices('GPU')
+    for gpu in gpus:
+        tf.config.experimental.set_memory_growth(gpu, True)
+    
+    # Setup strategy
+    if len(gpus) > 1:
+        strategy = tf.distribute.MirroredStrategy()
+        print(f"Using MirroredStrategy with {strategy.num_replicas_in_sync} GPUs")
+    else:
+        strategy = tf.distribute.get_strategy()
+        print(f"Using single GPU/CPU strategy")
+    
+    return strategy, len(gpus)
+
+
+def create_callbacks(config, checkpoint_dir):
+    """Create training callbacks"""
+    callbacks = []
+    
+    # Model checkpoint
+    checkpoint_path = os.path.join(checkpoint_dir, 'best_model.h5')
+    callbacks.append(
+        tf.keras.callbacks.ModelCheckpoint(
+            checkpoint_path,
+            monitor='val_dice_coefficient',
+            mode='max',
+            save_best_only=True,
+            save_weights_only=True,
+            verbose=1
+        )
+    )
+    
+    # Reduce learning rate on plateau
+    callbacks.append(
+        tf.keras.callbacks.ReduceLROnPlateau(
+            monitor='val_loss',
+            factor=0.5,
+            patience=config['reduce_lr_patience'],
+            min_lr=config['min_lr'],
+            verbose=1
+        )
+    )
+    
+    # Early stopping
+    callbacks.append(
+        tf.keras.callbacks.EarlyStopping(
+            monitor='val_dice_coefficient',
+            patience=config['early_stopping_patience'],
+            mode='max',
+            restore_best_weights=True,
+            verbose=1
+        )
+    )
+    
+    # TensorBoard
+    log_dir = os.path.join(checkpoint_dir, 'logs')
+    callbacks.append(
+        tf.keras.callbacks.TensorBoard(
+            log_dir=log_dir,
+            histogram_freq=0,
+            write_graph=False,
+            update_freq='epoch'
+        )
+    )
+    
+    # Custom callback for adaptive loss weights
+    callbacks.append(AdaptiveLossWeight(combined_loss(), patience=5))
+    
+    # Custom callback for logging
+    class LoggingCallback(tf.keras.callbacks.Callback):
+        def on_epoch_end(self, epoch, logs=None):
+            logs = logs or {}
+            print(f"\nEpoch {epoch + 1} Summary:")
+            print(f"  Loss: {logs.get('loss', 0):.4f}")
+            print(f"  Dice: {logs.get('dice_coefficient', 0):.4f}")
+            print(f"  Sensitivity: {logs.get('sensitivity', 0):.4f}")
+            print(f"  Specificity: {logs.get('specificity', 0):.4f}")
+            if 'val_dice_coefficient' in logs:
+                print(f"  Val Dice: {logs.get('val_dice_coefficient', 0):.4f}")
+    
+    callbacks.append(LoggingCallback())
+    
+    return callbacks
+
+
+def train(args):
+    """Main training function"""
+    # Auto-configure if not provided
+    if args.auto_config:
+        auto_config = AutoConfig(args.data_dir, args.gpu_memory)
+        config = auto_config.config
+    else:
+        # Load config from file
+        with open(args.config, 'r') as f:
+            config = yaml.safe_load(f)
+    
+    # Setup distributed strategy
+    strategy, num_gpus = setup_strategy()
+    
+    # Adjust batch size for multi-GPU
+    global_batch_size = config['batch_size_per_gpu'] * num_gpus
+    
+    # Create data generators
+    print(f"\nCreating data generators...")
+    
+    if config.get('use_patches', False):
+        train_gen = PatchDataGenerator(
+            data_dir=os.path.join(args.data_dir, 'Training'),
+            batch_size=global_batch_size,
+            target_shape=config['target_shape'],
+            patch_shape=config['patch_shape'],
+            augment=True,
+            shuffle=True,
+            lesion_sampling_rate=0.7,
+            cache_size=50
+        )
+    else:
+        train_gen = StrokeDataGenerator(
+            data_dir=os.path.join(args.data_dir, 'Training'),
+            batch_size=global_batch_size,
+            target_shape=config['target_shape'],
+            augment=True,
+            shuffle=True,
+            lesion_sampling_rate=0.7,
+            cache_size=50
+        )
+    
+    # Validation generator (no augmentation)
+    val_gen = StrokeDataGenerator(
+        data_dir=os.path.join(args.data_dir, 'Training'),
+        batch_size=global_batch_size,
+        target_shape=config['target_shape'],
+        augment=False,
+        shuffle=False,
+        cache_size=20
+    )
+    
+    # Create model within strategy scope
+    print(f"\nBuilding model...")
+    with strategy.scope():
+        # Build base model
+        model = build_attention_unet(
+            input_shape=(*config['target_shape'], 1),
+            filters=[32, 64, 128, 256, 512],
+            dropout_rate=0.3,
+            use_se_blocks=True
+        )
+        
+        # Add deep supervision if requested
+        if args.deep_supervision:
+            model, supervision_weights = build_deep_supervision_model(model)
+            loss_fn = deep_supervision_loss(weights=supervision_weights)
+        else:
+            loss_fn = combined_loss(
+                dice_weight=1.0,
+                focal_weight=1.0,
+                boundary_weight=0.5,
+                use_generalized_dice=True,
+                focal_alpha=0.25,
+                focal_gamma=3.0
+            )
+        
+        # Compile model
+        optimizer = tf.keras.optimizers.Adam(
+            learning_rate=config['initial_lr'],
+            clipnorm=1.0  # Gradient clipping
+        )
+        
+        # Scale learning rate for mixed precision
+        optimizer = tf.keras.mixed_precision.LossScaleOptimizer(optimizer)
+        
+        model.compile(
+            optimizer=optimizer,
+            loss=loss_fn,
+            metrics=[
+                dice_coefficient,
+                sensitivity,
+                specificity,
+                precision
+            ]
+        )
+        
+        print(f"Model compiled successfully!")
+        print(f"Total parameters: {model.count_params():,}")
+    
+    # Create checkpoint directory
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    checkpoint_dir = os.path.join(args.output_dir, f"run_{timestamp}")
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    # Save config
+    config_path = os.path.join(checkpoint_dir, 'config.yaml')
+    with open(config_path, 'w') as f:
+        yaml.dump(config, f)
+    
+    # Create callbacks
+    callbacks = create_callbacks(config, checkpoint_dir)
+    
+    # Train model
+    print(f"\nStarting training...")
+    print(f"Training samples: {len(train_gen) * global_batch_size}")
+    print(f"Validation samples: {len(val_gen) * global_batch_size}")
+    
+    # Calculate steps
+    steps_per_epoch = len(train_gen)
+    validation_steps = min(len(val_gen), 20)  # Limit validation for speed
+    
+    # Create TF datasets for better performance
+    if args.use_tf_data:
+        train_dataset = create_tf_dataset(train_gen, repeat=True)
+        val_dataset = create_tf_dataset(val_gen, repeat=True)
+        
+        history = model.fit(
+            train_dataset,
+            steps_per_epoch=steps_per_epoch,
+            validation_data=val_dataset,
+            validation_steps=validation_steps,
+            epochs=config['epochs'],
+            callbacks=callbacks,
+            verbose=1
+        )
+    else:
+        history = model.fit(
+            train_gen,
+            validation_data=val_gen,
+            validation_steps=validation_steps,
+            epochs=config['epochs'],
+            callbacks=callbacks,
+            verbose=1,
+            workers=4,
+            use_multiprocessing=True
+        )
+    
+    # Save final model
+    final_path = os.path.join(checkpoint_dir, 'final_model.h5')
+    model.save_weights(final_path)
+    
+    print(f"\nTraining completed!")
+    print(f"Models saved to: {checkpoint_dir}")
+    
+    return history
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Train stroke segmentation model')
+    parser.add_argument('--data-dir', type=str, required=True,
+                        help='Path to data directory containing Training')
+    parser.add_argument('--output-dir', type=str, default='./outputs',
+                        help='Output directory for models and logs')
+    parser.add_argument('--config', type=str, default=None,
+                        help='Path to config file (YAML)')
+    parser.add_argument('--auto-config', action='store_true',
+                        help='Use auto-configuration')
+    parser.add_argument('--gpu-memory', type=int, default=24,
+                        help='GPU memory in GB (for auto-config)')
+    parser.add_argument('--deep-supervision', action='store_true',
+                        help='Use deep supervision')
+    parser.add_argument('--use-tf-data', action='store_true',
+                        help='Use tf.data pipeline')
+    
+    args = parser.parse_args()
+    
+    # Set default data directory if not provided
+    if not args.data_dir:
+        args.data_dir = '/mnt/beegfs/hellgate/home/rb194958e/Atlas_2'
+    
+    train(args)
+
+
+if __name__ == '__main__':
+    main()

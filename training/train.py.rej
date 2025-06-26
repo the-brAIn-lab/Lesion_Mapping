@@ -1,0 +1,11 @@
+--- train.py.orig
++++ train.py
+@@ -180,7 +180,7 @@
+     strategy, num_gpus = setup_strategy()
+     
+     # Adjust batch size for multi-GPU
+-    global_batch_size = config['batch_size_per_gpu'] * num_gpus
++    global_batch_size = config['batch_size_per_gpu'] * max(1, num_gpus)
+ 
+ 
+ 

@@ -1,0 +1,610 @@
+2025-07-02 17:32:56.393887: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-07-02 17:32:56.394692: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-07-02 17:32:56.515073: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-07-02 17:32:56.762547: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-07-02 17:33:03.315807: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-07-02 17:33:18.327635: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-07-02 17:33:18.328348: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-07-02 17:33:18.329126: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-07-02 17:33:18.330094: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-07-02 17:33:18.330538: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-07-02 17:33:18.331180: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-07-02 17:33:18.331883: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-07-02 17:33:18.332316: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-07-02 17:33:18.332950: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-07-02 17:33:18.333794: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-07-02 17:33:18.334235: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-07-02 17:33:18.334834: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+2025-07-02 17:33:25.268919: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-07-02 17:33:25.269673: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-07-02 17:33:25.384845: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-07-02 17:33:46,129 - INFO - 🎉 SOTA 2025: FINAL BULLETPROOF VERSION - TRAINING STARTUP
+INFO:tensorflow:Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-07-02 17:33:50,310 - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+INFO:tensorflow:Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-07-02 17:33:50,559 - INFO - Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-07-02 17:33:50,595 - INFO - 🚀 MirroredStrategy with 4 devices
+2025-07-02 17:33:55,614 - INFO - Found 655 image files using pattern '*_T1w.nii.gz'.
+2025-07-02 17:33:55,618 - INFO - Found 655 mask files using pattern '*_mask.nii.gz'.
+2025-07-02 17:33:55,620 - INFO - Successfully created 655 image/mask pairs.
+2025-07-02 17:33:55,623 - INFO - 🏗️ Building Final Model...
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:55,783 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:55,789 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:55,829 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:55,929 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:56,077 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:56,083 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:56,122 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:56,127 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:56,982 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:33:56,988 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-02 17:34:01,641 - INFO - ✅ Model built: 24,164,458 parameters
+2025-07-02 17:34:01,679 - INFO - 🚀 Starting training...
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:34:01,932 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:34:02,026 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r005s075_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:34:02,231 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:34:02,323 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r052s014_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:34:02,511 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:34:02,607 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r038s082_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:34:02,857 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:34:02,949 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r040s015_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+INFO:tensorflow:Collective all_reduce tensors: 392 all_reduces, num_devices = 4, group_size = 4, implementation = CommunicationImplementation.NCCL, num_packs = 1
+2025-07-02 17:34:29,167 - INFO - Collective all_reduce tensors: 392 all_reduces, num_devices = 4, group_size = 4, implementation = CommunicationImplementation.NCCL, num_packs = 1
+INFO:tensorflow:Collective all_reduce tensors: 392 all_reduces, num_devices = 4, group_size = 4, implementation = CommunicationImplementation.NCCL, num_packs = 1
+2025-07-02 17:35:38,711 - INFO - Collective all_reduce tensors: 392 all_reduces, num_devices = 4, group_size = 4, implementation = CommunicationImplementation.NCCL, num_packs = 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:48,779 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:48,872 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r040s028_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:49,169 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:49,268 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r011s033_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:49,522 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:49,614 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r002s009_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:49,855 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:49,943 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r038s028_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:50,096 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:50,378 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:50,466 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r048s002_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:50,749 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:50,837 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r040s032_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:51,041 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:51,130 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r031s009_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:51,336 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:51,422 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r034s026_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:51,692 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:51,781 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r031s029_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:51,976 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:52,063 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r015s008_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:52,273 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:52,361 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r014s008_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:52,630 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:52,721 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r046s006_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:53,095 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:53,182 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r040s001_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:53,414 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:53,500 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r038s043_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:53,736 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:53,824 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r018s001_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:54,075 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:54,162 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r038s064_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:54,604 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:54,695 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r011s012_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:54,932 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:55,022 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r027s009_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:55,336 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:55,424 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r011s010_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:55,476 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:55,686 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:55,773 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r038s035_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:56,149 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:56,237 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r011s032_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:56,475 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:56,567 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r001s028_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+2025-07-02 17:36:58,941 - ERROR - ❌ Training pipeline failed: Graph execution error:
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+5 root error(s) found.
+  (0) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+	 [[gradient_tape/replica_3/model/s2/final_bulletproof_sam2_attention/up_sampling3d/transpose_1/_735]]
+  (1) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+	 [[Func/replica_1/model/final_working_advanced_conv_block_2/final_bulletproof_sam2_attention_6/working_adaptive_pooling3d_6/cond/else/_881/input/_9351/_5274]]
+	 [[replica_1/model/s4/final_bulletproof_sam2_attention_2/working_adaptive_pooling3d_2/LessEqual/_1820]]
+	 [[Func/model/s4/final_bulletproof_sam2_attention_2/working_adaptive_pooling3d_2/cond/else/_193/model/s4/final_bulletproof_sam2_attention_2/working_adaptive_pooling3d_2/cond/cond/else/_23313/input/_24002/_1876]]
+  (2) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+	 [[Func/replica_1/model/final_working_advanced_conv_block_2/final_bulletproof_sam2_attention_6/working_adaptive_pooling3d_6/cond/else/_881/input/_9351/_5274]]
+	 [[replica_1/model/s4/final_bulletproof_sam2_attention_2/working_adaptive_pooling3d_2/LessEqual/_1820]]
+  (3) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+	 [[Func/replica_1/model/final_working_advanced_conv_block_2/final_bulletproof_sam2_attention_6/working_adaptive_pooling3d_6/cond/else/_881/input/_9351/_5274]]
+  (4) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+0 successful operations.
+0 derived errors ignored. [Op:__inference_train_function_338334]
+Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 308, in train_main
+    model.fit(train_gen, validation_data=val_gen, epochs=cfg.EPOCHS, callbacks=callbacks, verbose=1)
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/eager/execute.py", line 59, in quick_execute
+    except TypeError as e:
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Graph execution error:
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+Detected at node replica_2/model/s2/final_bulletproof_sam2_attention/add_2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 195, in call
+
+5 root error(s) found.
+  (0) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+	 [[gradient_tape/replica_3/model/s2/final_bulletproof_sam2_attention/up_sampling3d/transpose_1/_735]]
+  (1) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+	 [[Func/replica_1/model/final_working_advanced_conv_block_2/final_bulletproof_sam2_attention_6/working_adaptive_pooling3d_6/cond/else/_881/input/_9351/_5274]]
+	 [[replica_1/model/s4/final_bulletproof_sam2_attention_2/working_adaptive_pooling3d_2/LessEqual/_1820]]
+	 [[Func/model/s4/final_bulletproof_sam2_attention_2/working_adaptive_pooling3d_2/cond/else/_193/model/s4/final_bulletproof_sam2_attention_2/working_adaptive_pooling3d_2/cond/cond/else/_23313/input/_24002/_1876]]
+  (2) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+	 [[Func/replica_1/model/final_working_advanced_conv_block_2/final_bulletproof_sam2_attention_6/working_adaptive_pooling3d_6/cond/else/_881/input/_9351/_5274]]
+	 [[replica_1/model/s4/final_bulletproof_sam2_attention_2/working_adaptive_pooling3d_2/LessEqual/_1820]]
+  (3) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+	 [[Func/replica_1/model/final_working_advanced_conv_block_2/final_bulletproof_sam2_attention_6/working_adaptive_pooling3d_6/cond/else/_881/input/_9351/_5274]]
+  (4) INVALID_ARGUMENT:  required broadcastable shapes
+	 [[{{node replica_2/model/s2/final_bulletproof_sam2_attention/add_2}}]]
+0 successful operations.
+0 derived errors ignored. [Op:__inference_train_function_338334]
+
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:59,080 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:59,168 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r009s013_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:59,452 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-02 17:36:59,539 - ERROR - DataGen Error for /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Images/sub-r040s020_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz: output shape not correct
+2025-07-02 17:36:59,648 - ERROR - ❌❌❌ TRAINING FAILED! ❌❌❌

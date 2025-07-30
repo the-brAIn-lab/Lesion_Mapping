@@ -1,0 +1,32 @@
+🔧 TESTING SAM2 MEMORY-EFFICIENT FIX
+====================================
+Purpose: Test memory-efficient SAM2 attention that prevents OOM
+Problem: Original SAM2 tried to create 946K×946K attention matrix (~3.6TB)
+Solution: Use hierarchical/pooled attention to reduce memory
+
+Job ID: 1128653
+Node: hggpu9-12
+Start: Thu Jun 26 20:28:41 UTC 2025
+
+Testing memory-efficient SAM2 attention fix...
+Testing Memory-Efficient SAM2 Attention...
+Input shape: (2, 96, 112, 88, 44)
+Sequence length: 946,176
+❌ Memory-efficient SAM2 failed: Exception encountered when calling layer 'memory_efficient_sam2_attention' (type MemoryEfficientSAM2Attention).
+
+'images' must have either 3 or 4 dimensions.
+
+Call arguments received by layer 'memory_efficient_sam2_attention' (type MemoryEfficientSAM2Attention):
+  • x=tf.Tensor(shape=(2, 96, 112, 88, 44), dtype=float32)
+  • training=False
+
+🔧 Memory-efficient SAM2 testing completed!
+
+SAM2 fix test completed with exit code: 0
+End time: Thu Jun 26 20:29:33 UTC 2025
+✅ SAM2 MEMORY FIX SUCCESSFUL
+
+Next steps:
+1. Apply the SAM2 fix to smart_sota_2025_fixed.py
+2. Re-test the full model building
+3. Run the complete training

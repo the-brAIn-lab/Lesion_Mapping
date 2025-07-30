@@ -1,0 +1,1885 @@
+=== SLURM RESOURCE CHECK ===
+Node: hggpu9-4
+Job ID: 1160118
+Start time: Sat Jul 19 23:40:09 UTC 2025
+Allocated GPUs: 
+Allocated CPUs: 16
+Allocated memory: 307200 MB
+Available memory:               total        used        free      shared  buff/cache   available
+Mem:          503Gi       5.0Gi       480Gi       4.2Gi        17Gi       491Gi
+Swap:            0B          0B          0B
+GPU 0: NVIDIA RTX 4500 Ada Generation (UUID: GPU-dd7817bb-79b3-62f7-9c38-9b86485d5e99)
+GPU 1: NVIDIA RTX 4500 Ada Generation (UUID: GPU-82339fee-8caa-848e-d280-be95bbebecf7)
+GPU 2: NVIDIA RTX 4500 Ada Generation (UUID: GPU-3a5593a8-cdba-6706-b35e-ef0d5165c9ff)
+GPU 3: NVIDIA RTX 4500 Ada Generation (UUID: GPU-dc2667b5-78bc-efa9-cb8a-a994f66c42aa)
+memory.total [MiB], memory.used [MiB], memory.free [MiB]
+24570 MiB, 1 MiB, 24217 MiB
+24570 MiB, 1 MiB, 24217 MiB
+24570 MiB, 1 MiB, 24217 MiB
+24570 MiB, 1 MiB, 24217 MiB
+=== ENVIRONMENT SETUP ===
+CUDA_VISIBLE_DEVICES: 0,1,2,3
+=== PYTHON ENVIRONMENT TEST ===
+Python: 3.11.13 | packaged by conda-forge | (main, Jun  4 2025, 14:48:23) [GCC 13.3.0]
+TensorFlow: 2.15.1
+Initial CPU Memory: 5.19GB
+Visible GPUs: 4
+GPU 0: PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+GPU 1: PhysicalDevice(name='/physical_device:GPU:1', device_type='GPU')
+GPU 2: PhysicalDevice(name='/physical_device:GPU:2', device_type='GPU')
+GPU 3: PhysicalDevice(name='/physical_device:GPU:3', device_type='GPU')
+✅ Environment check passed
+=== DATA DIRECTORY CHECK ===
+✅ Data directory exists: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training
+Images directory:
+total 6815746
+drwxr-x---  2 rb194958e ChurchLab      655 Mar 20 20:39 .
+drwxr-x--- 39 rb194958e ChurchLab       39 Jul 19 20:46 ..
+-rwxr-x---  1 rb194958e ChurchLab 13574443 Mar 20 20:37 sub-r001s001_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz
+-rwxr-x---  1 rb194958e ChurchLab 13481953 Mar 20 20:39 sub-r001s002_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz
+Masks directory:
+total 10313
+drwxr-x---  2 rb194958e ChurchLab   655 Mar 20 20:49 .
+drwxr-x--- 39 rb194958e ChurchLab    39 Jul 19 20:46 ..
+-rwxr-x---  1 rb194958e ChurchLab 51731 Mar 20 20:50 sub-r001s001_ses-1_space-MNI152NLin2009aSym_label-L_desc-T1lesion_mask.nii.gz
+-rwxr-x---  1 rb194958e ChurchLab 57629 Mar 20 20:50 sub-r001s002_ses-1_space-MNI152NLin2009aSym_label-L_desc-T1lesion_mask.nii.gz
+Found 655 image files and 655 mask files
+=== SCRIPT CHECK ===
+✅ Training script found
+Script size: 28K	smart_sota_2025_claude.py
+Script permissions: -rw-r--r-- 1 rb194958e GeneralUsers 45615 Jul 19 23:37 smart_sota_2025_claude.py
+=== PRE-TRAINING MEMORY CHECK ===
+              total        used        free      shared  buff/cache   available
+Mem:          503Gi       5.0Gi       480Gi       4.2Gi        17Gi       491Gi
+Swap:            0B          0B          0B
+memory.used [MiB], memory.free [MiB]
+1 MiB, 24217 MiB
+1 MiB, 24217 MiB
+1 MiB, 24217 MiB
+1 MiB, 24217 MiB
+=== STARTING TRAINING ===
+Training start time: Sat Jul 19 23:41:14 UTC 2025
+2025-07-19 23:41:21.450007: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-07-19 23:41:21.450652: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-07-19 23:41:21.647537: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-07-19 23:41:50,458 - SmartSOTA - INFO - ✅ All imports successful
+2025-07-19 23:41:50,481 - SmartSOTA - INFO - TensorFlow eager execution: True
+2025-07-19 23:41:54,791 - SmartSOTA - INFO - Environment verified:
+- Python 3.11.13 | packaged by conda-forge | (main, Jun  4 2025, 14:48:23) [GCC 13.3.0]
+- TF 2.15.1
+- NumPy 1.26.4
+- GPU devices: 4
+2025-07-19 23:41:54,801 - SmartSOTA - INFO - 🔍 DEBUGGING: Main function started
+2025-07-19 23:41:54,802 - SmartSOTA - INFO - 🔍 DEBUGGING: Current working directory: /mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota
+2025-07-19 23:41:54,808 - SmartSOTA - INFO - 🔧 Using memory-optimized training configuration
+2025-07-19 23:41:55,055 - SmartSOTA - INFO - Memory at initialization_start: CPU=0.60GB | GPU0: 0.00GB | GPU1: 0.00GB | GPU2: 0.00GB | GPU3: 0.00GB | Disk: 245.7GB free
+2025-07-19 23:41:55,057 - SmartSOTA - WARNING - ⚠️ GPU setup issue: Physical devices cannot be modified after being initialized
+2025-07-19 23:41:55,059 - tensorflow - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-07-19 23:41:55,060 - SmartSOTA - INFO - ✅ Mixed precision (float16) enabled
+2025-07-19 23:41:55,061 - tensorflow - INFO - Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-07-19 23:41:55,097 - SmartSOTA - INFO - ✅ Distribution strategy initialized: 4 replicas
+2025-07-19 23:41:55,098 - SmartSOTA - INFO - Memory at strategy_setup_complete: CPU=0.99GB | GPU0: 0.00GB | GPU1: 0.00GB | GPU2: 0.00GB | GPU3: 0.00GB | Disk: 245.7GB free
+2025-07-19 23:41:55,099 - SmartSOTA - INFO - 🔄 Loading and preparing dataset...
+2025-07-19 23:41:55,100 - SmartSOTA - INFO - Memory at generator_creation_start: CPU=0.99GB | GPU0: 0.00GB | GPU1: 0.00GB | GPU2: 0.00GB | GPU3: 0.00GB | Disk: 245.7GB free
+2025-07-19 23:41:55,101 - SmartSOTA - INFO - 📚 Loading dataset...
+2025-07-19 23:41:55,102 - SmartSOTA - INFO - Memory at dataset_load_start: CPU=0.99GB | GPU0: 0.00GB | GPU1: 0.00GB | GPU2: 0.00GB | GPU3: 0.00GB | Disk: 245.7GB free
+2025-07-19 23:41:55,113 - SmartSOTA - INFO - ✅ Found 655 images with pattern: *_T1w.nii.gz
+2025-07-19 23:41:55,125 - SmartSOTA - INFO - ✅ Found 655 masks with pattern: *_mask.nii.gz
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:55,132 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:55,337 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:55,544 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:55,742 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:55,941 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:56,138 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:56,328 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:56,522 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:56,718 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:56,911 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:57,107 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:57,300 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:57,495 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:57,690 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:57,885 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:58,073 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:58,262 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:58,458 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:58,651 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:58,846 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:59,041 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:59,236 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:59,432 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:59,627 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:41:59,820 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:00,016 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:00,212 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:00,407 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:00,603 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:00,803 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:01,005 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:01,201 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:01,398 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:01,592 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:01,787 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:01,979 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:02,173 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:02,367 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:02,556 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:02,749 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:02,936 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:03,131 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:03,326 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:03,520 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:03,714 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:03,907 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:04,102 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:04,290 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:04,478 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:04,673 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:04,866 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:05,060 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:05,253 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:05,448 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:05,636 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:05,825 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:06,014 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:06,205 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:06,399 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:06,595 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:06,789 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:06,979 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:07,170 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:07,364 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:07,560 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:07,755 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:07,947 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:08,141 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:08,334 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:08,526 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:08,720 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:08,917 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:09,113 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:09,307 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:09,502 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:09,712 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:09,911 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:10,107 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:10,301 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:10,492 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:10,681 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:10,875 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:11,068 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:11,262 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:11,458 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:11,656 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:11,852 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:12,045 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:12,235 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:12,430 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:12,624 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:12,819 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:13,012 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:13,204 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:13,404 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:13,599 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:13,795 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:13,990 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:14,173 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:14,369 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:14,559 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:14,752 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:14,946 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:15,143 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:15,337 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:15,527 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:15,719 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:15,912 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:16,100 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:16,292 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:16,473 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:16,669 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:16,864 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:17,059 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:17,254 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:17,449 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:17,644 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:17,839 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:18,043 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:18,234 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:18,426 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:18,620 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:18,809 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:19,000 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:19,195 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:19,388 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:19,583 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:19,771 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:19,965 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:20,156 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:20,351 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:20,545 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:20,740 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:20,934 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:21,128 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:21,323 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:21,519 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:21,714 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:21,908 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:22,102 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:22,294 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:22,508 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:22,704 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:22,894 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:23,089 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:23,281 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:23,470 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:23,665 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:23,860 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:24,055 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:24,247 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:24,441 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:24,636 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:24,829 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:25,018 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:25,210 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:25,405 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:25,599 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:25,794 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:25,988 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:26,181 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:26,376 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:26,565 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:26,759 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:26,950 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:27,145 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:27,337 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:27,530 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:27,724 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:27,913 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:28,107 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:28,300 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:28,502 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:28,702 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:28,898 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:29,093 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:29,286 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:29,474 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:29,670 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:29,864 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:30,057 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:30,254 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:30,445 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:30,640 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:30,825 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:31,020 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:31,214 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:31,411 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:31,604 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:31,804 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:32,001 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:32,197 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:32,388 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:32,583 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:32,776 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:32,973 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:33,165 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:33,352 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:33,544 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:33,738 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:33,920 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:34,110 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:34,303 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:34,498 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:34,703 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:34,897 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:35,092 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:35,285 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:35,479 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:35,667 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:35,856 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:36,049 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:36,243 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:36,437 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:36,629 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:36,823 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:37,016 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:37,211 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:37,405 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:37,599 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:37,786 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:37,980 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:38,171 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:38,362 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:38,557 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:38,751 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:38,948 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:39,142 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:39,335 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:39,524 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:39,713 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:39,904 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:40,097 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:40,291 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:40,489 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:40,682 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:40,876 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:41,070 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:41,266 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:41,458 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:41,646 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:41,837 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:42,031 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:42,225 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:42,422 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:42,616 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:42,808 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:43,003 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:43,193 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:43,379 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:43,575 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:43,768 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:43,961 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:44,149 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:44,334 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:44,528 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:44,720 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:44,913 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:45,107 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:45,296 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:45,491 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:45,682 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:45,876 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:46,069 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:46,263 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:46,456 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:46,652 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:46,845 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:47,039 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:47,227 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:47,414 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:47,607 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:47,801 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:47,995 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:48,189 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:48,380 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:48,571 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:48,765 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:48,955 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:49,148 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:49,343 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:49,537 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:49,730 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:49,921 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:50,120 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:50,330 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:50,524 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:50,716 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:50,908 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:51,101 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:51,290 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:51,484 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:51,679 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:51,872 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:52,066 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:52,258 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:52,452 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:52,641 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:52,836 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:53,029 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:53,222 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:53,415 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:53,608 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:53,798 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:53,993 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:54,187 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:54,379 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:54,573 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:54,767 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:54,961 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:55,155 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:55,348 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:55,538 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:55,729 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:55,923 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:56,115 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:56,303 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:56,495 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:56,690 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:56,883 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:57,078 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:57,271 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:57,464 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:57,657 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:57,851 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:58,045 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:58,240 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:58,429 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:58,625 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:58,818 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:59,011 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:59,203 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:59,397 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:59,591 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:59,785 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:42:59,978 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:00,166 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:00,357 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:00,545 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:00,736 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:00,931 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:01,126 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:01,320 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:01,513 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:01,707 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:01,896 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:02,088 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:02,286 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:02,487 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:02,687 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:02,879 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:03,068 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:03,262 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:03,457 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:03,648 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:03,833 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:04,027 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:04,221 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:04,408 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:04,602 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:04,796 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:04,990 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:05,176 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:05,362 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:05,555 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:05,749 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:05,942 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:06,136 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:06,323 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:06,515 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:06,708 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:06,901 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:07,094 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:07,287 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:07,480 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:07,674 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:07,868 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:08,062 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:08,254 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:08,449 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:08,643 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:08,833 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:09,019 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:09,207 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:09,399 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:09,586 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:09,777 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:09,968 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:10,161 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:10,348 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:10,563 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:10,754 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:10,945 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:11,132 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:11,319 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:11,510 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:11,700 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:11,888 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:12,077 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:12,268 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:12,455 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:12,642 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:12,825 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:13,012 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:13,204 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:13,394 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:13,586 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:13,778 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:13,964 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:14,146 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:14,338 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:14,524 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:14,709 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:14,896 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:15,087 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:15,275 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:15,466 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:15,657 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:15,847 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:16,040 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:16,230 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:16,422 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:16,612 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:16,805 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:16,998 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:17,187 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:17,371 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:17,564 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:17,755 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:17,947 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:18,140 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:18,332 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:18,526 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:18,712 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:18,904 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:19,096 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:19,284 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:19,474 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:19,666 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:19,856 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:20,048 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:20,239 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:20,433 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:20,624 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:20,812 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:21,003 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:21,194 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:21,386 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:21,581 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:21,771 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:21,958 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:22,151 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:22,342 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:22,531 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:22,723 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:22,915 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:23,103 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:23,292 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:23,484 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:23,670 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:23,863 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:24,052 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:24,242 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:24,434 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:24,625 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:24,815 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:25,008 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:25,199 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:25,389 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:25,582 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:25,771 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:25,964 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:26,157 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:26,349 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:26,539 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:26,725 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:26,909 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:27,099 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:27,289 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:27,481 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:27,671 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:27,855 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:28,045 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:28,237 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:28,424 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:28,615 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:28,807 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:29,000 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:29,194 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:29,385 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:29,577 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:29,762 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:29,953 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:30,143 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:30,335 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:30,526 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:30,713 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:30,905 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:31,097 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:31,287 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:31,475 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:31,666 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:31,858 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:32,050 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:32,236 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:32,427 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:32,613 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:32,806 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:32,991 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:33,184 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:33,382 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:33,571 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:33,761 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:33,949 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:34,143 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:34,324 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:34,512 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:34,702 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:34,894 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:35,085 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:35,272 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:35,463 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:35,671 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:35,860 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:36,042 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:36,227 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:36,420 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:36,602 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:36,794 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:36,984 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:37,173 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:37,364 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:37,556 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:37,741 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:37,933 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:38,125 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:38,314 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:38,507 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:38,694 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:38,881 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:39,070 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:39,260 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:39,452 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:39,643 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:39,831 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:40,020 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:40,208 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:40,396 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:40,586 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:40,777 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:40,967 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:41,158 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:41,350 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:41,542 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:41,734 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:41,925 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:42,118 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:42,301 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:42,491 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:42,682 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:42,872 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:43,063 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:43,255 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:43,446 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:43,636 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:43,822 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:44,009 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:44,200 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:44,392 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:44,580 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:44,765 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:44,956 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:45,148 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:45,340 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:45,527 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:45,715 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:45,907 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:46,098 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:46,289 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:46,479 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:46,665 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:46,854 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:47,044 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:47,231 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:47,423 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:47,604 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:47,796 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:47,987 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:48,184 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:48,379 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:48,567 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:48,759 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:48,951 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:49,143 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:49,329 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:49,521 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:49,712 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:49,901 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:50,092 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:50,283 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:50,475 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:50,660 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:50,852 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:51,045 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:51,239 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:51,425 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:51,611 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:51,803 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:51,990 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:52,181 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:52,374 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:52,566 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:52,760 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:52,952 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:53,139 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:53,330 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:53,522 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:53,711 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:53,900 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:54,091 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:54,283 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:54,472 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:54,665 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:54,856 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:55,048 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:55,239 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:55,431 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:55,620 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:55,803 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:55,996 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:56,182 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:56,373 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:56,565 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:56,756 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:56,949 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:57,141 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:57,329 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:57,522 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:57,714 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:57,906 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:58,098 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:58,290 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:58,482 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:58,672 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:58,855 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:59,047 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:59,238 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:59,430 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:59,616 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:59,807 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:43:59,998 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:00,191 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:00,376 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:00,564 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:00,762 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:00,953 - SmartSOTA - INFO - 📊 Created 655 image-mask pairs
+2025-07-19 23:44:00,955 - SmartSOTA - INFO - 🧠 Class balance: 100.00% contain lesions
+2025-07-19 23:44:00,956 - SmartSOTA - INFO - Memory at dataset_load_end: CPU=1.01GB | GPU0: 0.00GB | GPU1: 0.00GB | GPU2: 0.00GB | GPU3: 0.00GB | Disk: 245.7GB free
+2025-07-19 23:44:00,957 - SmartSOTA - INFO - 🧮 Dataset split: Train=557 (85.0%), Validation=98 (15.0%)
+2025-07-19 23:44:00,959 - SmartSOTA - INFO - ⚖️ Lesion representation: Train=100.0%, Validation=100.0%
+2025-07-19 23:44:00,961 - SmartSOTA - INFO - 🔧 Data generator initialized: 524 samples, cache=enabled
+2025-07-19 23:44:00,962 - SmartSOTA - INFO - 🔧 Data generator initialized: 98 samples, cache=enabled
+2025-07-19 23:44:00,964 - SmartSOTA - INFO - Memory at generator_creation_end: CPU=1.01GB | GPU0: 0.00GB | GPU1: 0.00GB | GPU2: 0.00GB | GPU3: 0.00GB | Disk: 245.7GB free
+2025-07-19 23:44:00,964 - SmartSOTA - INFO - ✅ Created optimized generators: Train=262 batches, Val=49 batches
+2025-07-19 23:44:00,966 - SmartSOTA - INFO - 🧪 Testing data generators...
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:01,799 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:01,827 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:02,238 - SmartSOTA - INFO - ✅ Generator test successful: X shape: (2, 192, 224, 176, 1), Y shape: (2, 192, 224, 176, 1)
+2025-07-19 23:44:02,302 - SmartSOTA - INFO - Memory at data_loading_complete: CPU=1.12GB | GPU0: 0.00GB | GPU1: 0.00GB | GPU2: 0.00GB | GPU3: 0.00GB | Disk: 245.7GB free
+2025-07-19 23:44:02,304 - SmartSOTA - INFO - 🏗️ Building model...
+2025-07-19 23:44:02,484 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,489 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,536 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,541 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,573 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,578 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,634 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,639 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,684 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:02,689 - tensorflow - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-19 23:44:04,452 - SmartSOTA - INFO - ✅ Built model with 5.13M parameters
+2025-07-19 23:44:04,491 - SmartSOTA - INFO - ✅ Model compiled: 5.13M parameters
+2025-07-19 23:44:04,493 - SmartSOTA - INFO - Memory at model_build_complete: CPU=1.18GB | GPU0: 0.02GB | GPU1: 0.02GB | GPU2: 0.02GB | GPU3: 0.02GB | Disk: 245.7GB free
+2025-07-19 23:44:04,502 - SmartSOTA - INFO - ✅ Configured 7 callbacks
+2025-07-19 23:44:04,504 - SmartSOTA - INFO - 🚀 Starting training...
+2025-07-19 23:44:04,505 - SmartSOTA - INFO - Memory at training_start: CPU=1.18GB | GPU0: 0.02GB | GPU1: 0.02GB | GPU2: 0.02GB | GPU3: 0.02GB | Disk: 245.7GB free
+2025-07-19 23:44:04,506 - SmartSOTA - INFO - 🔍 Running pre-training validation...
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:05,168 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:06,059 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:06,887 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:07,152 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:07,593 - tensorflow - WARNING - Using MirroredStrategy eagerly has significant overhead currently. We will be working on improving this in the future, but for now please wrap `call_for_each_replica` or `experimental_run` or `run` inside a tf.function to get the best performance.
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:08,266 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:09,183 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:10,237 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:11,161 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:12,190 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:13,120 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:14,157 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:15,195 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:16,261 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:17,159 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:18,192 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:19,046 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+ 1/49 [..............................] - ETA: 11:06 - loss: 2.3790 - dice_coefficient: 0.50112025-07-19 23:44:20,492 - tensorflow - WARNING - Using MirroredStrategy eagerly has significant overhead currently. We will be working on improving this in the future, but for now please wrap `call_for_each_replica` or `experimental_run` or `run` inside a tf.function to get the best performance.
+ 2/49 [>.............................] - ETA: 23s - loss: 2.3761 - dice_coefficient: 0.5026  2025-07-19 23:44:20,996 - tensorflow - WARNING - Using MirroredStrategy eagerly has significant overhead currently. We will be working on improving this in the future, but for now please wrap `call_for_each_replica` or `experimental_run` or `run` inside a tf.function to get the best performance.
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:21,368 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+ 3/49 [>.............................] - ETA: 23s - loss: 2.3766 - dice_coefficient: 0.50242025-07-19 23:44:21,512 - tensorflow - WARNING - Using MirroredStrategy eagerly has significant overhead currently. We will be working on improving this in the future, but for now please wrap `call_for_each_replica` or `experimental_run` or `run` inside a tf.function to get the best performance.
+ 4/49 [=>............................] - ETA: 23s - loss: 2.3724 - dice_coefficient: 0.50452025-07-19 23:44:22,025 - tensorflow - WARNING - Using MirroredStrategy eagerly has significant overhead currently. We will be working on improving this in the future, but for now please wrap `call_for_each_replica` or `experimental_run` or `run` inside a tf.function to get the best performance.
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:22,414 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+ 5/49 [==>...........................] - ETA: 22s - loss: 2.3741 - dice_coefficient: 0.5036 6/49 [==>...........................] - ETA: 22s - loss: 2.3733 - dice_coefficient: 0.5040pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:23,469 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+ 7/49 [===>..........................] - ETA: 22s - loss: 2.3722 - dice_coefficient: 0.5045 8/49 [===>..........................] - ETA: 21s - loss: 2.3714 - dice_coefficient: 0.5049pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:24,525 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+ 9/49 [====>.........................] - ETA: 24s - loss: 2.3719 - dice_coefficient: 0.5047pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:25,678 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:26,635 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+10/49 [=====>........................] - ETA: 30s - loss: 2.3728 - dice_coefficient: 0.5043pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:27,820 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:28,771 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+11/49 [=====>........................] - ETA: 34s - loss: 2.3735 - dice_coefficient: 0.5039pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:29,892 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:30,881 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+12/49 [======>.......................] - ETA: 37s - loss: 2.3735 - dice_coefficient: 0.5039pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:32,059 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:33,039 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+13/49 [======>.......................] - ETA: 40s - loss: 2.3739 - dice_coefficient: 0.5037pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:34,225 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:35,213 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+14/49 [=======>......................] - ETA: 42s - loss: 2.3743 - dice_coefficient: 0.5035pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:36,387 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:37,344 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+15/49 [========>.....................] - ETA: 43s - loss: 2.3711 - dice_coefficient: 0.5051pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:38,522 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:39,478 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+16/49 [========>.....................] - ETA: 43s - loss: 2.3715 - dice_coefficient: 0.5049pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:40,641 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:41,615 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+17/49 [=========>....................] - ETA: 44s - loss: 2.3721 - dice_coefficient: 0.5046pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:42,871 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:43,856 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+18/49 [==========>...................] - ETA: 44s - loss: 2.3726 - dice_coefficient: 0.5044pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:45,007 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:45,962 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+19/49 [==========>...................] - ETA: 43s - loss: 2.3724 - dice_coefficient: 0.5044pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:47,154 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:48,195 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+20/49 [===========>..................] - ETA: 43s - loss: 2.3728 - dice_coefficient: 0.5042pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:49,390 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:50,393 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+21/49 [===========>..................] - ETA: 43s - loss: 2.3730 - dice_coefficient: 0.5042pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:51,588 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:52,601 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+22/49 [============>.................] - ETA: 42s - loss: 2.3732 - dice_coefficient: 0.5040pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:53,875 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:54,946 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+23/49 [=============>................] - ETA: 41s - loss: 2.3736 - dice_coefficient: 0.5039pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:56,124 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:57,163 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+24/49 [=============>................] - ETA: 40s - loss: 2.3717 - dice_coefficient: 0.5048pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:58,382 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:44:59,397 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+25/49 [==============>...............] - ETA: 39s - loss: 2.3716 - dice_coefficient: 0.5049pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:00,582 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:01,603 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+26/49 [==============>...............] - ETA: 38s - loss: 2.3714 - dice_coefficient: 0.5049pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:02,778 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:03,743 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+27/49 [===============>..............] - ETA: 37s - loss: 2.3717 - dice_coefficient: 0.5048pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:04,957 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:05,268 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:06,020 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+28/49 [================>.............] - ETA: 36s - loss: 2.3718 - dice_coefficient: 0.5048pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:07,204 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:08,187 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+29/49 [================>.............] - ETA: 34s - loss: 2.3720 - dice_coefficient: 0.5047pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:09,437 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:10,468 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+30/49 [=================>............] - ETA: 33s - loss: 2.3722 - dice_coefficient: 0.5045pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:11,662 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:12,676 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+31/49 [=================>............] - ETA: 31s - loss: 2.3724 - dice_coefficient: 0.5044pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:13,895 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:14,963 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+32/49 [==================>...........] - ETA: 30s - loss: 2.3724 - dice_coefficient: 0.5045pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:16,094 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:17,122 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+33/49 [===================>..........] - ETA: 28s - loss: 2.3722 - dice_coefficient: 0.5045pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:18,321 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:19,341 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+34/49 [===================>..........] - ETA: 27s - loss: 2.3725 - dice_coefficient: 0.5044pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:20,529 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:21,539 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+35/49 [====================>.........] - ETA: 25s - loss: 2.3727 - dice_coefficient: 0.5043pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:22,845 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:23,878 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+36/49 [=====================>........] - ETA: 23s - loss: 2.3729 - dice_coefficient: 0.5042pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:25,083 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:26,119 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+37/49 [=====================>........] - ETA: 22s - loss: 2.3730 - dice_coefficient: 0.5042pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:27,374 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:28,348 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+38/49 [======================>.......] - ETA: 20s - loss: 2.3732 - dice_coefficient: 0.5041pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:29,555 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:30,524 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+39/49 [======================>.......] - ETA: 18s - loss: 2.3732 - dice_coefficient: 0.5041pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:31,626 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:32,612 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+40/49 [=======================>......] - ETA: 16s - loss: 2.3731 - dice_coefficient: 0.5041pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:33,763 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:34,691 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+41/49 [========================>.....] - ETA: 15s - loss: 2.3733 - dice_coefficient: 0.5040pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:35,866 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:36,853 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+42/49 [========================>.....] - ETA: 13s - loss: 2.3730 - dice_coefficient: 0.5041pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:38,002 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:39,014 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+43/49 [=========================>....] - ETA: 11s - loss: 2.3732 - dice_coefficient: 0.5040pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:40,208 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:41,187 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+44/49 [=========================>....] - ETA: 9s - loss: 2.3734 - dice_coefficient: 0.5040 pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:42,271 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:43,249 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+45/49 [==========================>...] - ETA: 7s - loss: 2.3735 - dice_coefficient: 0.5039pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:44,462 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:45,413 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+46/49 [===========================>..] - ETA: 5s - loss: 2.3737 - dice_coefficient: 0.5038pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:46,623 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:47,586 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+47/49 [===========================>..] - ETA: 3s - loss: 2.3738 - dice_coefficient: 0.5038pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:48,721 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:49,709 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+48/49 [============================>.] - ETA: 1s - loss: 2.3738 - dice_coefficient: 0.5037pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:50,826 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:51,866 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+49/49 [==============================] - ETA: 0s - loss: 2.3738 - dice_coefficient: 0.50382025-07-19 23:45:52,819 - SmartSOTA - INFO - 🧹 Cache cleared for memory optimization
+49/49 [==============================] - 106s 2s/step - loss: 2.3738 - dice_coefficient: 0.5038
+2025-07-19 23:45:52,828 - SmartSOTA - INFO - Pre-training validation: {'loss': 2.3737642765045166, 'dice_coefficient': 0.5037628412246704}
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:52,840 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:52,840 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:54,190 - SmartSOTA - INFO - 🔥 Epoch 1: LR = 2.50e-06
+2025-07-19 23:45:54,192 - SmartSOTA - INFO - Memory at epoch_0_start: CPU=2.88GB | GPU0: 0.76GB | GPU1: 0.76GB | GPU2: 0.02GB | GPU3: 0.02GB | Disk: 245.7GB free
+Epoch 1/200
+2025-07-19 23:45:54,194 - SmartSOTA - INFO - Memory at batch_0: CPU=2.88GB | GPU0: 0.76GB | GPU1: 0.76GB | GPU2: 0.02GB | GPU3: 0.02GB | Disk: 245.7GB free
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:54,978 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:54,991 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:57,108 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:57,169 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:59,122 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:59,125 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:00,341 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:00,399 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:01,574 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:01,598 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:03,290 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:03,394 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:04,622 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:04,629 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:22,589 - tensorflow - INFO - Error reported to Coordinator: {{function_node __wrapped__Conv3DBackpropFilterV2_device_/job:localhost/replica:0/task:0/device:GPU:2}} Conv3DBackpropFilterOp: out_backprop must be 5-dimensional [Op:Conv3DBackpropFilterV2] name: 
+Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/training/coordinator.py", line 293, in stop_on_exception
+    yield
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/distribute/mirrored_run.py", line 387, in run
+    self.main_result = self.main_fn(*self.main_args, **self.main_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/autograph/impl/api.py", line 596, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+    outputs = model.train_step(data)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1154, in train_step
+    self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 543, in minimize
+    grads_and_vars = self.compute_gradients(loss, var_list, tape)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/mixed_precision/loss_scale_optimizer.py", line 1259, in compute_gradients
+    grads_and_vars = self._optimizer.compute_gradients(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 276, in compute_gradients
+    grads = tape.gradient(loss, var_list)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/eager/backprop.py", line 1066, in gradient
+    flat_grad = imperative_grad.imperative_grad(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/eager/imperative_grad.py", line 67, in imperative_grad
+    return pywrap_tfe.TFE_Py_TapeGradient(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/eager/backprop.py", line 148, in _gradient_function
+    return grad_fn(mock_op, *out_grads)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/ops/nn_grad.py", line 162, in _Conv3DGrad
+    gen_nn_ops.conv3d_backprop_filter_v2(
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/ops/gen_nn_ops.py", line 2456, in conv3d_backprop_filter_v2
+    _ops.raise_from_not_ok_status(e, name)
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 5883, in raise_from_not_ok_status
+    raise core._status_to_exception(e) from None  # pylint: disable=protected-access
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InvalidArgumentError: {{function_node __wrapped__Conv3DBackpropFilterV2_device_/job:localhost/replica:0/task:0/device:GPU:2}} Conv3DBackpropFilterOp: out_backprop must be 5-dimensional [Op:Conv3DBackpropFilterV2] name: 
+2025-07-19 23:46:22,920 - SmartSOTA - ERROR - ❌ Training failed: {{function_node __wrapped__Conv3DBackpropFilterV2_device_/job:localhost/replica:0/task:0/device:GPU:2}} Conv3DBackpropFilterOp: out_backprop must be 5-dimensional [Op:Conv3DBackpropFilterV2] name: 
+Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_claude.py", line 1115, in main
+    history = model.fit(
+              ^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 5883, in raise_from_not_ok_status
+    raise core._status_to_exception(e) from None  # pylint: disable=protected-access
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InvalidArgumentError: {{function_node __wrapped__Conv3DBackpropFilterV2_device_/job:localhost/replica:0/task:0/device:GPU:2}} Conv3DBackpropFilterOp: out_backprop must be 5-dimensional [Op:Conv3DBackpropFilterV2] name: 
+2025-07-19 23:46:22,928 - SmartSOTA - INFO - Memory at training_failed: CPU=3.58GB | GPU0: 0.82GB | GPU1: 0.82GB | GPU2: 0.07GB | GPU3: 0.06GB | Disk: 245.7GB free
+2025-07-19 23:46:23,777 - SmartSOTA - INFO - 💾 Emergency model save: models/production/emergency_save_20250719_234154.keras
+Training end time: Sat Jul 19 23:46:26 UTC 2025
+Python exit code: 1
+=== IMMEDIATE POST-RUN ANALYSIS ===
+Checking if training started...
+✅ Training initialization detected
+Checking for common errors...
+Number of training epochs detected: 1
+=== DETAILED ERROR ANALYSIS ===
+❌ Training failed with exit code: 1
+Last 100 lines of training output:
+2025-07-19 23:45:48,721 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:49,709 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+48/49 [============================>.] - ETA: 1s - loss: 2.3738 - dice_coefficient: 0.5037pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:50,826 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:51,866 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+49/49 [==============================] - ETA: 0s - loss: 2.3738 - dice_coefficient: 0.50382025-07-19 23:45:52,819 - SmartSOTA - INFO - 🧹 Cache cleared for memory optimization
+49/49 [==============================] - 106s 2s/step - loss: 2.3738 - dice_coefficient: 0.5038
+2025-07-19 23:45:52,828 - SmartSOTA - INFO - Pre-training validation: {'loss': 2.3737642765045166, 'dice_coefficient': 0.5037628412246704}
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:52,840 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:52,840 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:54,190 - SmartSOTA - INFO - 🔥 Epoch 1: LR = 2.50e-06
+2025-07-19 23:45:54,192 - SmartSOTA - INFO - Memory at epoch_0_start: CPU=2.88GB | GPU0: 0.76GB | GPU1: 0.76GB | GPU2: 0.02GB | GPU3: 0.02GB | Disk: 245.7GB free
+Epoch 1/200
+2025-07-19 23:45:54,194 - SmartSOTA - INFO - Memory at batch_0: CPU=2.88GB | GPU0: 0.76GB | GPU1: 0.76GB | GPU2: 0.02GB | GPU3: 0.02GB | Disk: 245.7GB free
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:54,978 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:54,991 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:57,108 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:57,169 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:59,122 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:45:59,125 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:00,341 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:00,399 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:01,574 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:01,598 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:03,290 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:03,394 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:04,622 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:04,629 - nibabel.global - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-07-19 23:46:22,589 - tensorflow - INFO - Error reported to Coordinator: {{function_node __wrapped__Conv3DBackpropFilterV2_device_/job:localhost/replica:0/task:0/device:GPU:2}} Conv3DBackpropFilterOp: out_backprop must be 5-dimensional [Op:Conv3DBackpropFilterV2] name: 
+Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/training/coordinator.py", line 293, in stop_on_exception
+    yield
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/distribute/mirrored_run.py", line 387, in run
+    self.main_result = self.main_fn(*self.main_args, **self.main_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/autograph/impl/api.py", line 596, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+    outputs = model.train_step(data)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1154, in train_step
+    self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 543, in minimize
+    grads_and_vars = self.compute_gradients(loss, var_list, tape)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/mixed_precision/loss_scale_optimizer.py", line 1259, in compute_gradients
+    grads_and_vars = self._optimizer.compute_gradients(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 276, in compute_gradients
+    grads = tape.gradient(loss, var_list)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/eager/backprop.py", line 1066, in gradient
+    flat_grad = imperative_grad.imperative_grad(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/eager/imperative_grad.py", line 67, in imperative_grad
+    return pywrap_tfe.TFE_Py_TapeGradient(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/eager/backprop.py", line 148, in _gradient_function
+    return grad_fn(mock_op, *out_grads)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/ops/nn_grad.py", line 162, in _Conv3DGrad
+    gen_nn_ops.conv3d_backprop_filter_v2(
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/ops/gen_nn_ops.py", line 2456, in conv3d_backprop_filter_v2
+    _ops.raise_from_not_ok_status(e, name)
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 5883, in raise_from_not_ok_status
+    raise core._status_to_exception(e) from None  # pylint: disable=protected-access
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InvalidArgumentError: {{function_node __wrapped__Conv3DBackpropFilterV2_device_/job:localhost/replica:0/task:0/device:GPU:2}} Conv3DBackpropFilterOp: out_backprop must be 5-dimensional [Op:Conv3DBackpropFilterV2] name: 
+2025-07-19 23:46:22,920 - SmartSOTA - ERROR - ❌ Training failed: {{function_node __wrapped__Conv3DBackpropFilterV2_device_/job:localhost/replica:0/task:0/device:GPU:2}} Conv3DBackpropFilterOp: out_backprop must be 5-dimensional [Op:Conv3DBackpropFilterV2] name: 
+Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_claude.py", line 1115, in main
+    history = model.fit(
+              ^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 5883, in raise_from_not_ok_status
+    raise core._status_to_exception(e) from None  # pylint: disable=protected-access
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InvalidArgumentError: {{function_node __wrapped__Conv3DBackpropFilterV2_device_/job:localhost/replica:0/task:0/device:GPU:2}} Conv3DBackpropFilterOp: out_backprop must be 5-dimensional [Op:Conv3DBackpropFilterV2] name: 
+2025-07-19 23:46:22,928 - SmartSOTA - INFO - Memory at training_failed: CPU=3.58GB | GPU0: 0.82GB | GPU1: 0.82GB | GPU2: 0.07GB | GPU3: 0.06GB | Disk: 245.7GB free
+2025-07-19 23:46:23,777 - SmartSOTA - INFO - 💾 Emergency model save: models/production/emergency_save_20250719_234154.keras
+Last 50 lines of error log:
+2025-07-19 23:40:39.275233: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-07-19 23:40:39.276347: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-07-19 23:40:39.470957: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Checking for specific error patterns:
+=== FINAL SYSTEM STATE ===
+Final memory usage:
+              total        used        free      shared  buff/cache   available
+Mem:          503Gi       5.0Gi       480Gi       4.2Gi        17Gi       491Gi
+Swap:            0B          0B          0B
+memory.used [MiB]
+1 MiB
+1 MiB
+1 MiB
+1 MiB
+Checking for OOM events:
+SLURM memory accounting:
+1160118            300G              00:06:23    RUNNING 
+1160118.bat+                         00:06:23    RUNNING 
+1160118.ext+                         00:06:23    RUNNING 
+=== OUTPUT FILE CHECK ===
+Checking for generated files...
+Model directory contents:
+models/full_retrain_20250622_074312.h5
+models/comprehensive_fixed/config.json
+models/comprehensive_fixed/smart_sota_20250706_030326.keras
+models/proven_enhanced_20250625_192140.h5
+models/smart_sota_2025_dropout_only_20250627_194038.h5
+models/correct_full_20250622_222712.h5
+models/comprehensive/config.json
+models/fine_tuned_20250624_220018.h5
+models/smart_sota_2025_dropout_only_20250628_192551.h5
+models/sota_final_20250616_190015.h5
+Log files generated:
+-rw-r--r--  1 rb194958e GeneralUsers      967 Jul 19 23:43 memory_usage_1160118.log
+-rw-r--r--  1 rb194958e GeneralUsers      635 Jul 19 23:37 smart_sota_1160118.err
+-rw-r--r--  1 rb194958e GeneralUsers   176868 Jul 19 23:43 smart_sota_1160118.out
+-rw-r--r--  1 rb194958e GeneralUsers   161550 Jul 19 23:43 training_output_1160118.log
+=== FINAL SUMMARY ===
+Job duration: 00:06:24
+❌ Training failed - check error logs above
+Job completed at: Sat Jul 19 23:46:32 UTC 2025
+Cleaning up at: Sat Jul 19 23:46:32 UTC 2025

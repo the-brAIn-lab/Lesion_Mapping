@@ -1,0 +1,534 @@
+🔧 Setting up TensorFlow Environment for Stroke Segmentation
+==========================================================
+Job ID: 1123597
+Node: hggpu9-1
+Memory: 128GB
+Time: Sat Jun 14 04:16:16 UTC 2025
+🗑️  Removing existing stroke_sota environment...
+
+Remove all packages in environment /mnt/beegfs/hellgate/home/rb194958e/.conda/envs/stroke_sota:
+
+🆕 Creating new stroke_sota environment...
+Channels:
+ - defaults
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /mnt/beegfs/hellgate/home/rb194958e/.conda/envs/stroke_sota
+
+  added / updated specs:
+    - python=3.10
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    _libgcc_mutex-0.1          |             main           3 KB
+    _openmp_mutex-5.1          |            1_gnu          21 KB
+    ca-certificates-2025.2.25  |       h06a4308_0         129 KB
+    libgcc-ng-11.2.0           |       h1234567_1         5.3 MB
+    libgomp-11.2.0             |       h1234567_1         474 KB
+    libstdcxx-ng-11.2.0        |       h1234567_1         4.7 MB
+    openssl-3.0.16             |       h5eee18b_0         5.2 MB
+    pip-25.1                   |     pyhc872135_2         1.3 MB
+    pthread-stubs-0.3          |       h0ce48e5_1           5 KB
+    zlib-1.2.13                |       h5eee18b_1         111 KB
+    ------------------------------------------------------------
+                                           Total:        17.3 MB
+
+The following NEW packages will be INSTALLED:
+
+  _libgcc_mutex      pkgs/main/linux-64::_libgcc_mutex-0.1-main 
+  _openmp_mutex      pkgs/main/linux-64::_openmp_mutex-5.1-1_gnu 
+  bzip2              pkgs/main/linux-64::bzip2-1.0.8-h5eee18b_6 
+  ca-certificates    pkgs/main/linux-64::ca-certificates-2025.2.25-h06a4308_0 
+  expat              pkgs/main/linux-64::expat-2.7.1-h6a678d5_0 
+  ld_impl_linux-64   pkgs/main/linux-64::ld_impl_linux-64-2.40-h12ee557_0 
+  libffi             pkgs/main/linux-64::libffi-3.4.4-h6a678d5_1 
+  libgcc-ng          pkgs/main/linux-64::libgcc-ng-11.2.0-h1234567_1 
+  libgomp            pkgs/main/linux-64::libgomp-11.2.0-h1234567_1 
+  libstdcxx-ng       pkgs/main/linux-64::libstdcxx-ng-11.2.0-h1234567_1 
+  libuuid            pkgs/main/linux-64::libuuid-1.41.5-h5eee18b_0 
+  libxcb             pkgs/main/linux-64::libxcb-1.17.0-h9b100fa_0 
+  ncurses            pkgs/main/linux-64::ncurses-6.4-h6a678d5_0 
+  openssl            pkgs/main/linux-64::openssl-3.0.16-h5eee18b_0 
+  pip                pkgs/main/noarch::pip-25.1-pyhc872135_2 
+  pthread-stubs      pkgs/main/linux-64::pthread-stubs-0.3-h0ce48e5_1 
+  python             pkgs/main/linux-64::python-3.10.18-h1a3bd86_0 
+  readline           pkgs/main/linux-64::readline-8.2-h5eee18b_0 
+  setuptools         pkgs/main/linux-64::setuptools-78.1.1-py310h06a4308_0 
+  sqlite             pkgs/main/linux-64::sqlite-3.45.3-h5eee18b_0 
+  tk                 pkgs/main/linux-64::tk-8.6.14-h993c535_1 
+  tzdata             pkgs/main/noarch::tzdata-2025b-h04d1e81_0 
+  wheel              pkgs/main/linux-64::wheel-0.45.1-py310h06a4308_0 
+  xorg-libx11        pkgs/main/linux-64::xorg-libx11-1.8.12-h9b100fa_1 
+  xorg-libxau        pkgs/main/linux-64::xorg-libxau-1.0.12-h9b100fa_0 
+  xorg-libxdmcp      pkgs/main/linux-64::xorg-libxdmcp-1.1.5-h9b100fa_0 
+  xorg-xorgproto     pkgs/main/linux-64::xorg-xorgproto-2024.1-h5eee18b_1 
+  xz                 pkgs/main/linux-64::xz-5.6.4-h5eee18b_1 
+  zlib               pkgs/main/linux-64::zlib-1.2.13-h5eee18b_1 
+
+
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+#
+# To activate this environment, use
+#
+#     $ conda activate stroke_sota
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+🐍 Activating environment...
+🔗 Installing CUDA and cuDNN libraries...
+Channels:
+ - nvidia
+ - conda-forge
+ - defaults
+Platform: linux-64
+Collecting package metadata (repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /mnt/beegfs/hellgate/home/rb194958e/.conda/envs/stroke_sota
+
+  added / updated specs:
+    - cuda-toolkit=12.2
+    - cudnn=8.9
+    - h5py
+    - matplotlib
+    - nibabel
+    - numpy
+    - scikit-image
+    - scipy
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    binutils_impl_linux-64-2.40|       h5293946_0         8.7 MB
+    binutils_linux-64-2.40     |       hb3c18ed_9          29 KB  conda-forge
+    cached-property-1.5.2      |       hd8ed1ab_1           4 KB  conda-forge
+    contourpy-1.3.2            |  py310h3788b33_0         255 KB  conda-forge
+    cuda-command-line-tools-12.9.1|                0          17 KB  nvidia
+    cuda-compiler-12.9.1       |                0          17 KB  nvidia
+    cuda-cudart-12.9.79        |                0          17 KB  nvidia
+    cuda-cudart-dev-12.9.79    |                0          17 KB  nvidia
+    cuda-cudart-static-12.9.79 |                0          17 KB  nvidia
+    cuda-driver-dev-12.9.79    |                0          17 KB  nvidia
+    cuda-libraries-12.9.1      |                0          17 KB  nvidia
+    cuda-libraries-dev-12.9.1  |                0          17 KB  nvidia
+    cuda-libraries-static-12.9.1|                0          17 KB  nvidia
+    cuda-nsight-compute-12.4.1 |                0           2 KB  nvidia
+    cuda-nvcc-12.9.86          |                0          17 KB  nvidia
+    cuda-nvcc-impl-12.9.86     |                0          19 KB  nvidia
+    cuda-nvvm-dev_linux-64-12.9.86|                0          18 KB  nvidia
+    cuda-toolkit-12.2.2        |                0           1 KB  nvidia
+    cuda-tools-12.4.1          |                0           2 KB  nvidia
+    cuda-version-12.9          |                3          17 KB  nvidia
+    cuda-visual-tools-12.4.1   |                0           2 KB  nvidia
+    dbus-1.13.18               |       hb2f20db_0         504 KB
+    fonts-conda-ecosystem-1    |                0           4 KB  conda-forge
+    fonts-conda-forge-1        |                0           4 KB  conda-forge
+    fonttools-4.58.4           |  py310h89163eb_0         2.3 MB  conda-forge
+    glib-2.84.0                |       h07242d1_0         593 KB  conda-forge
+    glib-tools-2.84.0          |       h4833e2c_0         114 KB  conda-forge
+    h5py-3.14.0                |nompi_py310hea1e86d_100         1.2 MB  conda-forge
+    harfbuzz-11.0.0            |       h76408a6_0         1.6 MB  conda-forge
+    imagecodecs-2025.3.30      |  py310h481ba9f_0         1.8 MB  conda-forge
+    kiwisolver-1.4.7           |  py310h3788b33_0          70 KB  conda-forge
+    libblas-3.9.0              |31_h59b9bed_openblas          16 KB  conda-forge
+    libcblas-3.9.0             |31_he106b2a_openblas          16 KB  conda-forge
+    libegl-1.7.0               |       ha4b6fd6_2          44 KB  conda-forge
+    libfreetype-2.13.3         |       ha770c72_1           8 KB  conda-forge
+    libgcc-ng-15.1.0           |       h69a702a_2          34 KB  conda-forge
+    libgfortran-15.1.0         |       h69a702a_2          34 KB  conda-forge
+    libglib-2.84.0             |       h2ff4ddf_0         3.8 MB  conda-forge
+    liblapack-3.9.0            |31_h7ac8fdf_openblas          16 KB  conda-forge
+    libllvm20-20.1.7           |       he9d0ab4_0        41.0 MB  conda-forge
+    liblzma-devel-5.8.1        |       hb9d3cd8_2         430 KB  conda-forge
+    libstdcxx-ng-15.1.0        |       h4852527_2          34 KB  conda-forge
+    matplotlib-3.10.3          |  py310hff52083_0          17 KB  conda-forge
+    matplotlib-base-3.10.3     |  py310h68603db_0         7.0 MB  conda-forge
+    mysql-common-9.0.1         |       h266115a_6         602 KB  conda-forge
+    mysql-libs-9.0.1           |       he0572af_6         1.3 MB  conda-forge
+    networkx-3.4.2             |     pyh267e887_2         1.2 MB  conda-forge
+    nibabel-5.3.2              |     pyha770c72_1         2.6 MB  conda-forge
+    nsight-compute-2025.2.0.11 |                0       321.3 MB  nvidia
+    numpy-2.2.6                |  py310hefbff90_0         7.5 MB  conda-forge
+    opencl-headers-2025.06.13  |       h5888daf_0          54 KB  conda-forge
+    pcre2-10.44                |       hc749103_2         934 KB  conda-forge
+    pillow-11.2.1              |  py310h7e6dc6c_0        40.5 MB  conda-forge
+    pyside6-6.9.0              |  py310hfd10a26_0         9.6 MB  conda-forge
+    python-3.10.18             |hd6af730_0_cpython        23.9 MB  conda-forge
+    python_abi-3.10            |          7_cp310           7 KB  conda-forge
+    pywavelets-1.8.0           |  py310hf462985_0         3.5 MB  conda-forge
+    qt6-main-6.9.0             |       h6441bc3_0        49.5 MB  conda-forge
+    scikit-image-0.25.2        |  py310h5eaa309_1        10.0 MB  conda-forge
+    scipy-1.15.2               |  py310h1d65ade_0        15.7 MB  conda-forge
+    sqlite-3.50.1              |       h9eae976_0         878 KB  conda-forge
+    tifffile-2025.5.10         |     pyhd8ed1ab_0         175 KB  conda-forge
+    tornado-6.5.1              |  py310ha75aee5_0         644 KB  conda-forge
+    typing_extensions-4.14.0   |     pyhe01879c_0          50 KB  conda-forge
+    unicodedata2-16.0.0        |  py310ha75aee5_0         395 KB  conda-forge
+    xz-5.8.1                   |       hbcc6ac9_2          23 KB  conda-forge
+    xz-gpl-tools-5.8.1         |       hbcc6ac9_2          33 KB  conda-forge
+    xz-tools-5.8.1             |       hb9d3cd8_2          94 KB  conda-forge
+    ------------------------------------------------------------
+                                           Total:       560.1 MB
+
+The following NEW packages will be INSTALLED:
+
+  alsa-lib           conda-forge/linux-64::alsa-lib-1.2.14-hb9d3cd8_0 
+  aom                conda-forge/linux-64::aom-3.9.1-hac33072_0 
+  binutils_impl_lin~ pkgs/main/linux-64::binutils_impl_linux-64-2.40-h5293946_0 
+  binutils_linux-64  conda-forge/linux-64::binutils_linux-64-2.40-hb3c18ed_9 
+  blosc              conda-forge/linux-64::blosc-1.21.6-he440d0b_1 
+  brotli             conda-forge/linux-64::brotli-1.1.0-hb9d3cd8_3 
+  brotli-bin         conda-forge/linux-64::brotli-bin-1.1.0-hb9d3cd8_3 
+  brunsli            conda-forge/linux-64::brunsli-0.1-h9c3ff4c_0 
+  c-ares             conda-forge/linux-64::c-ares-1.34.5-hb9d3cd8_0 
+  c-blosc2           conda-forge/linux-64::c-blosc2-2.17.1-h3122c55_0 
+  cached-property    conda-forge/noarch::cached-property-1.5.2-hd8ed1ab_1 
+  cached_property    conda-forge/noarch::cached_property-1.5.2-pyha770c72_1 
+  cairo              conda-forge/linux-64::cairo-1.18.4-h3394656_0 
+  charls             conda-forge/linux-64::charls-2.4.2-h59595ed_0 
+  contourpy          conda-forge/linux-64::contourpy-1.3.2-py310h3788b33_0 
+  cuda-cccl_linux-64 nvidia/linux-64::cuda-cccl_linux-64-12.9.27-0 
+  cuda-command-line~ nvidia/linux-64::cuda-command-line-tools-12.9.1-0 
+  cuda-compiler      nvidia/linux-64::cuda-compiler-12.9.1-0 
+  cuda-crt-dev_linu~ nvidia/noarch::cuda-crt-dev_linux-64-12.9.86-0 
+  cuda-crt-tools     nvidia/linux-64::cuda-crt-tools-12.9.86-0 
+  cuda-cudart        nvidia/linux-64::cuda-cudart-12.9.79-0 
+  cuda-cudart-dev    nvidia/linux-64::cuda-cudart-dev-12.9.79-0 
+  cuda-cudart-dev_l~ nvidia/noarch::cuda-cudart-dev_linux-64-12.9.79-0 
+  cuda-cudart-static nvidia/linux-64::cuda-cudart-static-12.9.79-0 
+  cuda-cudart-stati~ nvidia/noarch::cuda-cudart-static_linux-64-12.9.79-0 
+  cuda-cudart_linux~ nvidia/noarch::cuda-cudart_linux-64-12.9.79-0 
+  cuda-cuobjdump     nvidia/linux-64::cuda-cuobjdump-12.9.82-1 
+  cuda-cupti         nvidia/linux-64::cuda-cupti-12.9.79-0 
+  cuda-cupti-dev     nvidia/linux-64::cuda-cupti-dev-12.9.79-0 
+  cuda-cuxxfilt      nvidia/linux-64::cuda-cuxxfilt-12.9.82-1 
+  cuda-documentation nvidia/linux-64::cuda-documentation-12.4.127-0 
+  cuda-driver-dev    nvidia/linux-64::cuda-driver-dev-12.9.79-0 
+  cuda-driver-dev_l~ nvidia/noarch::cuda-driver-dev_linux-64-12.9.79-0 
+  cuda-gdb           nvidia/linux-64::cuda-gdb-12.9.79-1 
+  cuda-libraries     nvidia/linux-64::cuda-libraries-12.9.1-0 
+  cuda-libraries-dev nvidia/linux-64::cuda-libraries-dev-12.9.1-0 
+  cuda-libraries-st~ nvidia/linux-64::cuda-libraries-static-12.9.1-0 
+  cuda-nsight        nvidia/linux-64::cuda-nsight-12.9.79-0 
+  cuda-nsight-compu~ nvidia/linux-64::cuda-nsight-compute-12.4.1-0 
+  cuda-nvcc          nvidia/linux-64::cuda-nvcc-12.9.86-0 
+  cuda-nvcc-dev_lin~ nvidia/noarch::cuda-nvcc-dev_linux-64-12.9.86-0 
+  cuda-nvcc-impl     nvidia/linux-64::cuda-nvcc-impl-12.9.86-0 
+  cuda-nvcc-tools    nvidia/linux-64::cuda-nvcc-tools-12.9.86-0 
+  cuda-nvcc_linux-64 nvidia/linux-64::cuda-nvcc_linux-64-12.9.86-0 
+  cuda-nvdisasm      nvidia/linux-64::cuda-nvdisasm-12.9.88-1 
+  cuda-nvml-dev      nvidia/linux-64::cuda-nvml-dev-12.9.79-1 
+  cuda-nvprof        nvidia/linux-64::cuda-nvprof-12.9.79-0 
+  cuda-nvprune       nvidia/linux-64::cuda-nvprune-12.9.82-1 
+  cuda-nvrtc         nvidia/linux-64::cuda-nvrtc-12.9.86-0 
+  cuda-nvrtc-dev     nvidia/linux-64::cuda-nvrtc-dev-12.9.86-0 
+  cuda-nvrtc-static  nvidia/linux-64::cuda-nvrtc-static-12.9.86-0 
+  cuda-nvtx          nvidia/linux-64::cuda-nvtx-12.9.79-0 
+  cuda-nvvm-dev_lin~ nvidia/noarch::cuda-nvvm-dev_linux-64-12.9.86-0 
+  cuda-nvvm-impl     nvidia/linux-64::cuda-nvvm-impl-12.9.86-0 
+  cuda-nvvm-tools    nvidia/linux-64::cuda-nvvm-tools-12.9.86-0 
+  cuda-nvvp          nvidia/linux-64::cuda-nvvp-12.9.79-1 
+  cuda-opencl        nvidia/linux-64::cuda-opencl-12.9.19-0 
+  cuda-opencl-dev    nvidia/linux-64::cuda-opencl-dev-12.9.19-0 
+  cuda-profiler-api  nvidia/linux-64::cuda-profiler-api-12.9.79-0 
+  cuda-sanitizer-api nvidia/linux-64::cuda-sanitizer-api-12.9.79-1 
+  cuda-toolkit       nvidia/linux-64::cuda-toolkit-12.2.2-0 
+  cuda-tools         nvidia/linux-64::cuda-tools-12.4.1-0 
+  cuda-version       nvidia/noarch::cuda-version-12.9-3 
+  cuda-visual-tools  nvidia/linux-64::cuda-visual-tools-12.4.1-0 
+  cudnn              conda-forge/linux-64::cudnn-8.9.7.29-h092f7fd_3 
+  cycler             conda-forge/noarch::cycler-0.12.1-pyhd8ed1ab_1 
+  cyrus-sasl         conda-forge/linux-64::cyrus-sasl-2.1.27-h54b06d7_7 
+  dav1d              conda-forge/linux-64::dav1d-1.2.1-hd590300_0 
+  dbus               pkgs/main/linux-64::dbus-1.13.18-hb2f20db_0 
+  double-conversion  conda-forge/linux-64::double-conversion-3.3.1-h5888daf_0 
+  font-ttf-dejavu-s~ conda-forge/noarch::font-ttf-dejavu-sans-mono-2.37-hab24e00_0 
+  font-ttf-inconsol~ conda-forge/noarch::font-ttf-inconsolata-3.000-h77eed37_0 
+  font-ttf-source-c~ conda-forge/noarch::font-ttf-source-code-pro-2.038-h77eed37_0 
+  font-ttf-ubuntu    conda-forge/noarch::font-ttf-ubuntu-0.83-h77eed37_3 
+  fontconfig         conda-forge/linux-64::fontconfig-2.15.0-h7e30c49_1 
+  fonts-conda-ecosy~ conda-forge/noarch::fonts-conda-ecosystem-1-0 
+  fonts-conda-forge  conda-forge/noarch::fonts-conda-forge-1-0 
+  fonttools          conda-forge/linux-64::fonttools-4.58.4-py310h89163eb_0 
+  freetype           conda-forge/linux-64::freetype-2.13.3-ha770c72_1 
+  gcc_impl_linux-64  conda-forge/linux-64::gcc_impl_linux-64-13.3.0-h1e990d8_2 
+  gcc_linux-64       conda-forge/linux-64::gcc_linux-64-13.3.0-h6f18a23_11 
+  gds-tools          nvidia/linux-64::gds-tools-1.14.1.1-4 
+  giflib             conda-forge/linux-64::giflib-5.2.2-hd590300_0 
+  glib               conda-forge/linux-64::glib-2.84.0-h07242d1_0 
+  glib-tools         conda-forge/linux-64::glib-tools-2.84.0-h4833e2c_0 
+  gmp                conda-forge/linux-64::gmp-6.3.0-hac33072_2 
+  graphite2          conda-forge/linux-64::graphite2-1.3.13-h59595ed_1003 
+  gxx_impl_linux-64  conda-forge/linux-64::gxx_impl_linux-64-13.3.0-hae580e1_2 
+  gxx_linux-64       conda-forge/linux-64::gxx_linux-64-13.3.0-hb14504d_11 
+  h5py               conda-forge/linux-64::h5py-3.14.0-nompi_py310hea1e86d_100 
+  harfbuzz           conda-forge/linux-64::harfbuzz-11.0.0-h76408a6_0 
+  hdf5               conda-forge/linux-64::hdf5-1.14.6-nompi_h2d575fe_101 
+  icu                conda-forge/linux-64::icu-75.1-he02047a_0 
+  imagecodecs        conda-forge/linux-64::imagecodecs-2025.3.30-py310h481ba9f_0 
+  imageio            conda-forge/noarch::imageio-2.37.0-pyhfb79c49_0 
+  importlib-metadata conda-forge/noarch::importlib-metadata-8.7.0-pyhe01879c_1 
+  importlib_resourc~ conda-forge/noarch::importlib_resources-6.5.2-pyhd8ed1ab_0 
+  jxrlib             conda-forge/linux-64::jxrlib-1.1-hd590300_3 
+  kernel-headers_li~ conda-forge/noarch::kernel-headers_linux-64-3.10.0-he073ed8_18 
+  keyutils           conda-forge/linux-64::keyutils-1.6.1-h166bdaf_0 
+  kiwisolver         conda-forge/linux-64::kiwisolver-1.4.7-py310h3788b33_0 
+  krb5               conda-forge/linux-64::krb5-1.21.3-h659f571_0 
+  lazy-loader        conda-forge/noarch::lazy-loader-0.4-pyhd8ed1ab_2 
+  lcms2              conda-forge/linux-64::lcms2-2.17-h717163a_0 
+  lerc               conda-forge/linux-64::lerc-4.0.0-h0aef613_1 
+  libaec             conda-forge/linux-64::libaec-1.1.3-h59595ed_0 
+  libavif16          conda-forge/linux-64::libavif16-1.3.0-h766b0b6_0 
+  libblas            conda-forge/linux-64::libblas-3.9.0-31_h59b9bed_openblas 
+  libbrotlicommon    conda-forge/linux-64::libbrotlicommon-1.1.0-hb9d3cd8_3 
+  libbrotlidec       conda-forge/linux-64::libbrotlidec-1.1.0-hb9d3cd8_3 
+  libbrotlienc       conda-forge/linux-64::libbrotlienc-1.1.0-hb9d3cd8_3 
+  libcblas           conda-forge/linux-64::libcblas-3.9.0-31_he106b2a_openblas 
+  libclang-cpp20.1   conda-forge/linux-64::libclang-cpp20.1-20.1.6-default_h1df26ce_0 
+  libclang13         conda-forge/linux-64::libclang13-20.1.6-default_he06ed0a_0 
+  libcublas          nvidia/linux-64::libcublas-12.9.1.4-0 
+  libcublas-dev      nvidia/linux-64::libcublas-dev-12.9.1.4-0 
+  libcublas-static   nvidia/linux-64::libcublas-static-12.9.1.4-0 
+  libcufft           nvidia/linux-64::libcufft-11.4.1.4-0 
+  libcufft-dev       nvidia/linux-64::libcufft-dev-11.4.1.4-0 
+  libcufft-static    nvidia/linux-64::libcufft-static-11.4.1.4-0 
+  libcufile          nvidia/linux-64::libcufile-1.14.1.1-4 
+  libcufile-dev      nvidia/linux-64::libcufile-dev-1.14.1.1-4 
+  libcufile-static   nvidia/linux-64::libcufile-static-1.14.1.1-4 
+  libcups            conda-forge/linux-64::libcups-2.3.3-h4637d8d_4 
+  libcurand          nvidia/linux-64::libcurand-10.3.10.19-0 
+  libcurand-dev      nvidia/linux-64::libcurand-dev-10.3.10.19-0 
+  libcurand-static   nvidia/linux-64::libcurand-static-10.3.10.19-0 
+  libcurl            conda-forge/linux-64::libcurl-8.14.1-h332b0f4_0 
+  libcusolver        nvidia/linux-64::libcusolver-11.7.5.82-0 
+  libcusolver-dev    nvidia/linux-64::libcusolver-dev-11.7.5.82-0 
+  libcusolver-static nvidia/linux-64::libcusolver-static-11.7.5.82-0 
+  libcusparse        nvidia/linux-64::libcusparse-12.5.10.65-0 
+  libcusparse-dev    nvidia/linux-64::libcusparse-dev-12.5.10.65-0 
+  libcusparse-static nvidia/linux-64::libcusparse-static-12.5.10.65-0 
+  libdeflate         conda-forge/linux-64::libdeflate-1.24-h86f0d12_0 
+  libdrm             conda-forge/linux-64::libdrm-2.4.124-hb9d3cd8_0 
+  libedit            conda-forge/linux-64::libedit-3.1.20250104-pl5321h7949ede_0 
+  libegl             conda-forge/linux-64::libegl-1.7.0-ha4b6fd6_2 
+  libev              conda-forge/linux-64::libev-4.33-hd590300_2 
+  libexpat           conda-forge/linux-64::libexpat-2.7.0-h5888daf_0 
+  libfreetype        conda-forge/linux-64::libfreetype-2.13.3-ha770c72_1 
+  libfreetype6       conda-forge/linux-64::libfreetype6-2.13.3-h48d6fc4_1 
+  libgcc             conda-forge/linux-64::libgcc-15.1.0-h767d61c_2 
+  libgcc-devel_linu~ conda-forge/noarch::libgcc-devel_linux-64-13.3.0-hc03c837_102 
+  libgfortran        conda-forge/linux-64::libgfortran-15.1.0-h69a702a_2 
+  libgfortran5       conda-forge/linux-64::libgfortran5-15.1.0-hcea5267_2 
+  libgl              conda-forge/linux-64::libgl-1.7.0-ha4b6fd6_2 
+  libglib            conda-forge/linux-64::libglib-2.84.0-h2ff4ddf_0 
+  libglvnd           conda-forge/linux-64::libglvnd-1.7.0-ha4b6fd6_2 
+  libglx             conda-forge/linux-64::libglx-1.7.0-ha4b6fd6_2 
+  libhwy             conda-forge/linux-64::libhwy-1.2.0-hf40a0c7_0 
+  libiconv           conda-forge/linux-64::libiconv-1.18-h4ce23a2_1 
+  libjpeg-turbo      conda-forge/linux-64::libjpeg-turbo-3.1.0-hb9d3cd8_0 
+  libjxl             conda-forge/linux-64::libjxl-0.11.1-h7b0646d_2 
+  liblapack          conda-forge/linux-64::liblapack-3.9.0-31_h7ac8fdf_openblas 
+  libllvm20          conda-forge/linux-64::libllvm20-20.1.7-he9d0ab4_0 
+  liblzma            conda-forge/linux-64::liblzma-5.8.1-hb9d3cd8_2 
+  liblzma-devel      conda-forge/linux-64::liblzma-devel-5.8.1-hb9d3cd8_2 
+  libnghttp2         conda-forge/linux-64::libnghttp2-1.64.0-h161d5f1_0 
+  libnpp             nvidia/linux-64::libnpp-12.4.1.87-0 
+  libnpp-dev         nvidia/linux-64::libnpp-dev-12.4.1.87-0 
+  libnpp-static      nvidia/linux-64::libnpp-static-12.4.1.87-0 
+  libnsl             conda-forge/linux-64::libnsl-2.0.1-hd590300_0 
+  libntlm            conda-forge/linux-64::libntlm-1.8-hb9d3cd8_0 
+  libnvfatbin        nvidia/linux-64::libnvfatbin-12.9.82-0 
+  libnvfatbin-dev    nvidia/linux-64::libnvfatbin-dev-12.9.82-0 
+  libnvfatbin-static nvidia/linux-64::libnvfatbin-static-12.9.82-0 
+  libnvjitlink       nvidia/linux-64::libnvjitlink-12.9.86-0 
+  libnvjitlink-dev   nvidia/linux-64::libnvjitlink-dev-12.9.86-0 
+  libnvjitlink-stat~ nvidia/linux-64::libnvjitlink-static-12.9.86-0 
+  libnvjpeg          nvidia/linux-64::libnvjpeg-12.4.0.76-0 
+  libnvjpeg-dev      nvidia/linux-64::libnvjpeg-dev-12.4.0.76-0 
+  libnvjpeg-static   nvidia/linux-64::libnvjpeg-static-12.4.0.76-0 
+  libopenblas        conda-forge/linux-64::libopenblas-0.3.29-pthreads_h94d23a6_0 
+  libopengl          conda-forge/linux-64::libopengl-1.7.0-ha4b6fd6_2 
+  libpciaccess       conda-forge/linux-64::libpciaccess-0.18-hd590300_0 
+  libpng             conda-forge/linux-64::libpng-1.6.47-h943b412_0 
+  libpq              conda-forge/linux-64::libpq-17.5-h27ae623_0 
+  libsanitizer       conda-forge/linux-64::libsanitizer-13.3.0-he8ea267_2 
+  libsqlite          conda-forge/linux-64::libsqlite-3.50.1-hee588c1_0 
+  libssh2            conda-forge/linux-64::libssh2-1.11.1-hcf80075_0 
+  libstdcxx          conda-forge/linux-64::libstdcxx-15.1.0-h8f9b012_2 
+  libstdcxx-devel_l~ conda-forge/noarch::libstdcxx-devel_linux-64-13.3.0-hc03c837_102 
+  libtiff            conda-forge/linux-64::libtiff-4.7.0-hf01ce69_5 
+  libwebp-base       conda-forge/linux-64::libwebp-base-1.5.0-h851e524_0 
+  libxcrypt          conda-forge/linux-64::libxcrypt-4.4.36-hd590300_1 
+  libxkbcommon       conda-forge/linux-64::libxkbcommon-1.10.0-h65c71a3_0 
+  libxml2            conda-forge/linux-64::libxml2-2.13.8-h4bc477f_0 
+  libxslt            conda-forge/linux-64::libxslt-1.1.39-h76b75d6_0 
+  libzlib            conda-forge/linux-64::libzlib-1.3.1-hb9d3cd8_2 
+  libzopfli          conda-forge/linux-64::libzopfli-1.0.3-h9c3ff4c_0 
+  lz4-c              conda-forge/linux-64::lz4-c-1.10.0-h5888daf_1 
+  matplotlib         conda-forge/linux-64::matplotlib-3.10.3-py310hff52083_0 
+  matplotlib-base    conda-forge/linux-64::matplotlib-base-3.10.3-py310h68603db_0 
+  munkres            conda-forge/noarch::munkres-1.1.4-pyh9f0ad1d_0 
+  mysql-common       conda-forge/linux-64::mysql-common-9.0.1-h266115a_6 
+  mysql-libs         conda-forge/linux-64::mysql-libs-9.0.1-he0572af_6 
+  networkx           conda-forge/noarch::networkx-3.4.2-pyh267e887_2 
+  nibabel            conda-forge/noarch::nibabel-5.3.2-pyha770c72_1 
+  nsight-compute     nvidia/linux-64::nsight-compute-2025.2.0.11-0 
+  nspr               conda-forge/linux-64::nspr-4.36-h5888daf_0 
+  nss                conda-forge/linux-64::nss-3.112-h159eef7_0 
+  numpy              conda-forge/linux-64::numpy-2.2.6-py310hefbff90_0 
+  ocl-icd            conda-forge/linux-64::ocl-icd-2.3.3-hb9d3cd8_0 
+  opencl-headers     conda-forge/linux-64::opencl-headers-2025.06.13-h5888daf_0 
+  openjpeg           conda-forge/linux-64::openjpeg-2.5.3-h5fbd93e_0 
+  openldap           conda-forge/linux-64::openldap-2.6.10-he970967_0 
+  packaging          conda-forge/noarch::packaging-25.0-pyh29332c3_1 
+  pcre2              conda-forge/linux-64::pcre2-10.44-hc749103_2 
+  pillow             conda-forge/linux-64::pillow-11.2.1-py310h7e6dc6c_0 
+  pixman             conda-forge/linux-64::pixman-0.46.2-h29eaf8c_0 
+  pyparsing          conda-forge/noarch::pyparsing-3.2.3-pyhd8ed1ab_1 
+  pyside6            conda-forge/linux-64::pyside6-6.9.0-py310hfd10a26_0 
+  python-dateutil    conda-forge/noarch::python-dateutil-2.9.0.post0-pyhff2d567_1 
+  python_abi         conda-forge/noarch::python_abi-3.10-7_cp310 
+  pywavelets         conda-forge/linux-64::pywavelets-1.8.0-py310hf462985_0 
+  qhull              conda-forge/linux-64::qhull-2020.2-h434a139_5 
+  qt6-main           conda-forge/linux-64::qt6-main-6.9.0-h6441bc3_0 
+  rav1e              conda-forge/linux-64::rav1e-0.7.1-h8fae777_3 
+  scikit-image       conda-forge/linux-64::scikit-image-0.25.2-py310h5eaa309_1 
+  scipy              conda-forge/linux-64::scipy-1.15.2-py310h1d65ade_0 
+  six                conda-forge/noarch::six-1.17.0-pyhd8ed1ab_0 
+  snappy             conda-forge/linux-64::snappy-1.2.1-h8bd8927_1 
+  svt-av1            conda-forge/linux-64::svt-av1-3.0.2-h5888daf_0 
+  sysroot_linux-64   conda-forge/noarch::sysroot_linux-64-2.17-h0157908_18 
+  tifffile           conda-forge/noarch::tifffile-2025.5.10-pyhd8ed1ab_0 
+  tornado            conda-forge/linux-64::tornado-6.5.1-py310ha75aee5_0 
+  typing_extensions  conda-forge/noarch::typing_extensions-4.14.0-pyhe01879c_0 
+  unicodedata2       conda-forge/linux-64::unicodedata2-16.0.0-py310ha75aee5_0 
+  wayland            conda-forge/linux-64::wayland-1.23.1-h3e06ad9_0 
+  xcb-util           conda-forge/linux-64::xcb-util-0.4.1-hb711507_2 
+  xcb-util-cursor    conda-forge/linux-64::xcb-util-cursor-0.1.5-hb9d3cd8_0 
+  xcb-util-image     conda-forge/linux-64::xcb-util-image-0.4.0-hb711507_2 
+  xcb-util-keysyms   conda-forge/linux-64::xcb-util-keysyms-0.4.1-hb711507_0 
+  xcb-util-renderut~ conda-forge/linux-64::xcb-util-renderutil-0.3.10-hb711507_0 
+  xcb-util-wm        conda-forge/linux-64::xcb-util-wm-0.4.2-hb711507_0 
+  xkeyboard-config   conda-forge/linux-64::xkeyboard-config-2.45-hb9d3cd8_0 
+  xorg-libice        conda-forge/linux-64::xorg-libice-1.1.2-hb9d3cd8_0 
+  xorg-libsm         conda-forge/linux-64::xorg-libsm-1.2.6-he73a12e_0 
+  xorg-libxcomposite conda-forge/linux-64::xorg-libxcomposite-0.4.6-hb9d3cd8_2 
+  xorg-libxcursor    conda-forge/linux-64::xorg-libxcursor-1.2.3-hb9d3cd8_0 
+  xorg-libxdamage    conda-forge/linux-64::xorg-libxdamage-1.1.6-hb9d3cd8_0 
+  xorg-libxext       conda-forge/linux-64::xorg-libxext-1.3.6-hb9d3cd8_0 
+  xorg-libxfixes     conda-forge/linux-64::xorg-libxfixes-6.0.1-hb9d3cd8_0 
+  xorg-libxi         conda-forge/linux-64::xorg-libxi-1.8.2-hb9d3cd8_0 
+  xorg-libxrandr     conda-forge/linux-64::xorg-libxrandr-1.5.4-hb9d3cd8_0 
+  xorg-libxrender    conda-forge/linux-64::xorg-libxrender-0.9.12-hb9d3cd8_0 
+  xorg-libxtst       conda-forge/linux-64::xorg-libxtst-1.2.5-hb9d3cd8_3 
+  xorg-libxxf86vm    conda-forge/linux-64::xorg-libxxf86vm-1.1.6-hb9d3cd8_0 
+  xz-gpl-tools       conda-forge/linux-64::xz-gpl-tools-5.8.1-hbcc6ac9_2 
+  xz-tools           conda-forge/linux-64::xz-tools-5.8.1-hb9d3cd8_2 
+  zfp                conda-forge/linux-64::zfp-1.0.1-h5888daf_2 
+  zipp               conda-forge/noarch::zipp-3.23.0-pyhd8ed1ab_0 
+  zlib-ng            conda-forge/linux-64::zlib-ng-2.2.4-h7955e40_0 
+  zstd               conda-forge/linux-64::zstd-1.5.7-hb8e6e7a_2 
+
+The following packages will be UPDATED:
+
+  ca-certificates    pkgs/main/linux-64::ca-certificates-2~ --> conda-forge/noarch::ca-certificates-2025.4.26-hbd8a1cb_0 
+  libgcc-ng          pkgs/main::libgcc-ng-11.2.0-h1234567_1 --> conda-forge::libgcc-ng-15.1.0-h69a702a_2 
+  libgomp              pkgs/main::libgomp-11.2.0-h1234567_1 --> conda-forge::libgomp-15.1.0-h767d61c_2 
+  libstdcxx-ng       pkgs/main::libstdcxx-ng-11.2.0-h12345~ --> conda-forge::libstdcxx-ng-15.1.0-h4852527_2 
+  libuuid              pkgs/main::libuuid-1.41.5-h5eee18b_0 --> conda-forge::libuuid-2.38.1-h0b41bf4_0 
+  ncurses                 pkgs/main::ncurses-6.4-h6a678d5_0 --> conda-forge::ncurses-6.5-h2d0b736_3 
+  openssl              pkgs/main::openssl-3.0.16-h5eee18b_0 --> conda-forge::openssl-3.5.0-h7b32b05_1 
+  sqlite                pkgs/main::sqlite-3.45.3-h5eee18b_0 --> conda-forge::sqlite-3.50.1-h9eae976_0 
+  xz                         pkgs/main::xz-5.6.4-h5eee18b_1 --> conda-forge::xz-5.8.1-hbcc6ac9_2 
+  zlib                    pkgs/main::zlib-1.2.13-h5eee18b_1 --> conda-forge::zlib-1.3.1-hb9d3cd8_2 
+
+The following packages will be SUPERSEDED by a higher-priority channel:
+
+  expat                   pkgs/main::expat-2.7.1-h6a678d5_0 --> conda-forge::expat-2.7.0-h5888daf_0 
+  python               pkgs/main::python-3.10.18-h1a3bd86_0 --> conda-forge::python-3.10.18-hd6af730_0_cpython 
+  tk                        pkgs/main::tk-8.6.14-h993c535_1 --> conda-forge::tk-8.6.13-noxft_hd72426e_102 
+
+
+
+Downloading and Extracting Packages: ...working... done
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... By downloading and using the cuDNN conda packages, you accept the terms and conditions of the NVIDIA cuDNN EULA -
+  https://docs.nvidia.com/deeplearning/cudnn/sla/index.html
+
+done
+📦 Installing TensorFlow...
+Defaulting to user installation because normal site-packages is not writeable
+📚 Installing additional packages...
+Defaulting to user installation because normal site-packages is not writeable
+Collecting einops
+  Using cached einops-0.8.1-py3-none-any.whl.metadata (13 kB)
+Requirement already satisfied: tqdm in /opt/conda/lib/python3.12/site-packages (4.66.2)
+Collecting pyyaml
+  Downloading PyYAML-6.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+Collecting opencv-python
+  Downloading opencv_python-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+Collecting scikit-learn
+  Downloading scikit_learn-1.7.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (17 kB)
+Collecting numpy>=1.21.2 (from opencv-python)
+  Downloading numpy-2.3.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (62 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.1/62.1 kB 781.5 kB/s eta 0:00:00
+Collecting scipy>=1.8.0 (from scikit-learn)
+  Downloading scipy-1.15.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.0/62.0 kB 529.4 kB/s eta 0:00:00
+Collecting joblib>=1.2.0 (from scikit-learn)
+  Using cached joblib-1.5.1-py3-none-any.whl.metadata (5.6 kB)
+Collecting threadpoolctl>=3.1.0 (from scikit-learn)
+  Using cached threadpoolctl-3.6.0-py3-none-any.whl.metadata (13 kB)
+Using cached einops-0.8.1-py3-none-any.whl (64 kB)
+Downloading PyYAML-6.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (767 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 767.5/767.5 kB 7.0 MB/s eta 0:00:00
+Downloading opencv_python-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (63.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 63.0/63.0 MB 32.4 MB/s eta 0:00:00
+Downloading scikit_learn-1.7.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.5/12.5 MB 55.6 MB/s eta 0:00:00
+Using cached joblib-1.5.1-py3-none-any.whl (307 kB)
+Downloading numpy-2.3.0-cp312-cp312-manylinux_2_28_x86_64.whl (16.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.6/16.6 MB 46.4 MB/s eta 0:00:00
+Downloading scipy-1.15.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (37.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 37.3/37.3 MB 39.6 MB/s eta 0:00:00
+Using cached threadpoolctl-3.6.0-py3-none-any.whl (18 kB)
+Installing collected packages: threadpoolctl, pyyaml, numpy, joblib, einops, scipy, opencv-python, scikit-learn
+Successfully installed einops-0.8.1 joblib-1.5.1 numpy-2.3.0 opencv-python-4.11.0.86 pyyaml-6.0.2 scikit-learn-1.7.0 scipy-1.15.3 threadpoolctl-3.6.0
+✅ Verifying installation...
+Python: 3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]
+TensorFlow import failed: No module named 'tensorflow'
+Package import failed: No module named 'nibabel'
+🔬 Testing GPU detection...
+📄 Creating activation script...
+
+🎉 Environment setup completed!
+
+📋 Summary:
+- Environment: stroke_sota
+- Python: 3.10
+- TensorFlow: 2.15.1 with CUDA support
+- Libraries: CUDA 12.2, cuDNN 8.9
+
+🚀 To use this environment:
+1. source activate_stroke_env.sh
+2. Or manually: conda activate stroke_sota && export LD_LIBRARY_PATH=...
+
+✅ Ready for GPU training!
+Setup completed at: Sat Jun 14 04:31:03 UTC 2025

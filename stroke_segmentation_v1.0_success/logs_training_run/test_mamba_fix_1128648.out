@@ -1,0 +1,45 @@
+🔧 TESTING VISION MAMBA FIX
+============================
+Purpose: Test if the fixed Vision Mamba can build a model without errors
+
+Job ID: 1128648
+Node: hggpu9-12
+Start: Thu Jun 26 20:16:55 UTC 2025
+
+Testing if Smart SOTA 2025 can build model after Mamba fix...
+✅ Successfully imported Smart SOTA 2025 model
+Building Smart SOTA 2025 model...
+❌ Model building/testing failed: Exception encountered when calling layer "advanced_conv_block_1" (type AdvancedConvBlock).
+
+in user code:
+
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025.py", line 302, in call  *
+        x = self.sam2_attention(x, training=training)
+    File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler  **
+        raise e.with_traceback(filtered_tb) from None
+    File "/tmp/__autograph_generated_filekq1tybdg.py", line 21, in tf__call
+        attention_scores = ag__.ld(attention_scores) / ag__.converted_call(ag__.ld(tf).sqrt, (ag__.converted_call(ag__.ld(tf).cast, (ag__.ld(channels) // 8, ag__.ld(tf).float16), None, fscope),), None, fscope)
+
+    TypeError: Exception encountered when calling layer 'sam2_inspired_attention' (type SAM2InspiredAttention).
+    
+    in user code:
+    
+        File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025.py", line 227, in call  *
+            attention_scores = attention_scores / tf.sqrt(tf.cast(channels // 8, tf.float16))
+    
+        TypeError: `x` and `y` must have the same dtype, got tf.float32 != tf.float16.
+    
+    
+    Call arguments received by layer 'sam2_inspired_attention' (type SAM2InspiredAttention):
+      • x=tf.Tensor(shape=(None, 96, 112, 88, 44), dtype=float32)
+      • training=None
+
+
+Call arguments received by layer "advanced_conv_block_1" (type AdvancedConvBlock):
+  • x=tf.Tensor(shape=(None, 96, 112, 88, 22), dtype=float32)
+  • training=None
+
+Test completed with exit code: 1
+End time: Thu Jun 26 20:17:52 UTC 2025
+❌ MAMBA FIX STILL HAS ISSUES
+Check the error log for details

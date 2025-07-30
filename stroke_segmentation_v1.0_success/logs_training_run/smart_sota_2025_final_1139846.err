@@ -1,0 +1,158 @@
+2025-06-29 08:13:42.895316: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-29 08:13:42.896457: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-29 08:13:43.012865: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-29 08:13:43.259886: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-29 08:13:49.841459: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-29 08:14:05.139177: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-29 08:14:05.139966: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-29 08:14:05.141275: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-29 08:14:05.142520: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-29 08:14:05.142967: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-06-29 08:14:05.143598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-06-29 08:14:05.144232: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-29 08:14:05.144622: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-06-29 08:14:05.145211: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-06-29 08:14:05.146459: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-29 08:14:05.147000: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-06-29 08:14:05.148120: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+2025-06-29 08:14:12.205460: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-29 08:14:12.206383: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-29 08:14:12.321638: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-29 08:14:12.568119: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-29 08:14:19.293908: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-29 08:14:33,490 - INFO - 🎉 SMART SOTA 2025 PRODUCTION-READY - MIXED PRECISION COMPATIBLE
+2025-06-29 08:14:33,491 - INFO - ================================================================================
+2025-06-29 08:14:33,493 - INFO - ✅ Mixed precision compatibility for all Enhanced SAM2 components
+2025-06-29 08:14:33,494 - INFO - ✅ Hierarchical memory banks with proper dtype casting
+2025-06-29 08:14:33,495 - INFO - ✅ Multi-scale cross-attention with float16/float32 compatibility
+2025-06-29 08:14:33,496 - INFO - ✅ 3D positional encoding with mixed precision support
+2025-06-29 08:14:33,497 - INFO - ✅ Vision Mamba integration (working)
+2025-06-29 08:14:33,498 - INFO - ✅ Boundary-aware loss functions (working)
+2025-06-29 08:14:33,499 - INFO - ✅ Production-ready error handling and comprehensive logging
+2025-06-29 08:14:33,500 - INFO - ✅ Multi-GPU training with memory optimization
+2025-06-29 08:14:33,501 - INFO - 🎯 Target: 70-78% validation Dice breakthrough with stable training
+2025-06-29 08:14:33,503 - INFO - ================================================================================
+2025-06-29 08:14:33,504 - INFO - 🔧 Setting up training environment...
+INFO:tensorflow:Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-06-29 08:14:37,776 - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-06-29 08:14:37,778 - INFO - ✅ Mixed precision enabled (mixed_float16)
+2025-06-29 08:14:37,779 - INFO - 🔧 Configuring multi-GPU strategy...
+2025-06-29 08:14:37,781 - INFO - Detected GPUs: 4
+2025-06-29 08:14:38.024566: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-29 08:14:38.025519: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-29 08:14:38.026686: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-06-29 08:14:38.027413: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-06-29 08:14:38.028557: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-06-29 08:14:38.029658: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-06-29 08:14:38.030855: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-06-29 08:14:38.031682: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+INFO:tensorflow:Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-06-29 08:14:38,035 - INFO - Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-06-29 08:14:38,073 - INFO - 🚀 MirroredStrategy with 4 devices
+2025-06-29 08:14:38,074 - INFO - 📚 Loading dataset...
+2025-06-29 08:14:38,075 - INFO - Loading dataset from: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training
+2025-06-29 08:14:38,818 - INFO - Loaded 655 image/mask pairs from full dataset
+2025-06-29 08:14:38,821 - INFO - Dataset split: 556 train, 99 validation
+2025-06-29 08:14:38,823 - INFO - 🔄 Creating data generators...
+2025-06-29 08:14:38,824 - INFO - 🏗️ Building production-ready model...
+2025-06-29 08:14:38,826 - INFO - 🏗️ Building Smart SOTA 2025 Production-Ready Model...
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,239 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,245 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,288 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,294 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,372 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,378 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,470 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,476 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,517 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:39,523 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-29 08:14:46,463 - INFO - ✅ Model built successfully: 24,309,960 parameters
+2025-06-29 08:14:46,471 - INFO - 🔥 Model parameters: 24,309,960
+2025-06-29 08:14:46,472 - INFO - 📊 Parameter count: 24,309,960
+2025-06-29 08:14:46,508 - INFO - 🧪 Testing data generators and model...
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:46,645 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:47,764 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:49,188 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:50,306 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:52,275 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:53,387 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:54,503 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:55,600 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-29 08:14:56,571 - INFO - ✅ Train batch: X=(4, 192, 224, 176, 1), y=(4, 192, 224, 176, 1)
+2025-06-29 08:14:56,573 - INFO - ✅ Val batch: X=(4, 192, 224, 176, 1), y=(4, 192, 224, 176, 1)
+2025-06-29 08:14:56,575 - INFO - ✅ Data dtypes: X=float32, y=float32
+2025-06-29 08:14:56.709536: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8907
+2025-06-29 08:15:01,315 - ERROR - ❌ call failed: {{function_node __wrapped__Reshape_device_/job:localhost/replica:0/task:0/device:GPU:0}} Input to reshape is a tensor with 81312 values, but the requested shape has 73920 [Op:Reshape]
+2025-06-29 08:15:01,317 - ERROR - ❌ call failed: Exception encountered when calling layer 'stage2_enhanced_sam2_cross_attn' (type ProductionCrossScaleAttention).
+
+{{function_node __wrapped__Reshape_device_/job:localhost/replica:0/task:0/device:GPU:0}} Input to reshape is a tensor with 81312 values, but the requested shape has 73920 [Op:Reshape]
+
+Call arguments received by layer 'stage2_enhanced_sam2_cross_attn' (type ProductionCrossScaleAttention):
+  • args=('tf.Tensor(shape=(1, 1848, 44), dtype=float16)', 'tf.Tensor(shape=(1, 1858, 44), dtype=float16)')
+  • kwargs={'training': 'False'}
+2025-06-29 08:15:01,318 - ERROR - ❌ call failed: Exception encountered when calling layer 'stage2_enhanced_sam2_cross_attn' (type ProductionCrossScaleAttention).
+
+{{function_node __wrapped__Reshape_device_/job:localhost/replica:0/task:0/device:GPU:0}} Input to reshape is a tensor with 81312 values, but the requested shape has 73920 [Op:Reshape]
+
+Call arguments received by layer 'stage2_enhanced_sam2_cross_attn' (type ProductionCrossScaleAttention):
+  • args=('tf.Tensor(shape=(1, 1848, 44), dtype=float16)', 'tf.Tensor(shape=(1, 1858, 44), dtype=float16)')
+  • kwargs={'training': 'False'}
+2025-06-29 08:15:01,319 - ERROR - ❌ Data/model test failed: Exception encountered when calling layer 'stage2_enhanced_sam2_cross_attn' (type ProductionCrossScaleAttention).
+
+{{function_node __wrapped__Reshape_device_/job:localhost/replica:0/task:0/device:GPU:0}} Input to reshape is a tensor with 81312 values, but the requested shape has 73920 [Op:Reshape]
+
+Call arguments received by layer 'stage2_enhanced_sam2_cross_attn' (type ProductionCrossScaleAttention):
+  • args=('tf.Tensor(shape=(1, 1848, 44), dtype=float16)', 'tf.Tensor(shape=(1, 1858, 44), dtype=float16)')
+  • kwargs={'training': 'False'}
+2025-06-29 08:15:01,326 - ERROR - Full traceback: Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 1059, in train_smart_sota_2025_production_ready
+    test_output = model(X_train[:1], training=False)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 61, in wrapper
+    raise
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 570, in call
+    x = self.enhanced_sam2_attention(x, training=training)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 61, in wrapper
+    raise
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 366, in call
+    enhanced = self.cross_attention(features, combined_features, training=training)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 61, in wrapper
+    raise
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 222, in call
+    Q = tf.reshape(Q, [batch_size, seq_len_q, self.num_heads, self.head_dim])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Exception encountered when calling layer 'stage2_enhanced_sam2_cross_attn' (type ProductionCrossScaleAttention).
+
+{{function_node __wrapped__Reshape_device_/job:localhost/replica:0/task:0/device:GPU:0}} Input to reshape is a tensor with 81312 values, but the requested shape has 73920 [Op:Reshape]
+
+Call arguments received by layer 'stage2_enhanced_sam2_cross_attn' (type ProductionCrossScaleAttention):
+  • args=('tf.Tensor(shape=(1, 1848, 44), dtype=float16)', 'tf.Tensor(shape=(1, 1858, 44), dtype=float16)')
+  • kwargs={'training': 'False'}
+
+2025-06-29 08:15:01,327 - ERROR - ❌ Training failed despite production fixes

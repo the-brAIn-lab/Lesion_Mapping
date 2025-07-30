@@ -1,0 +1,41 @@
+🔍 DEBUGGING SAM2 ATTENTION ISSUE
+=================================
+Purpose: Find the exact issue in SAM2InspiredAttention
+Mamba fix worked, now debugging SAM2 component
+
+Job ID: 1128651
+Node: hggpu9-12
+Start: Thu Jun 26 20:20:55 UTC 2025
+
+Testing SAM2 attention component...
+Testing SAM2 Attention issue...
+Input shape: (2, 96, 112, 88, 44)
+
+--- TESTING SAM2 ATTENTION ---
+❌ SAM2 attention failed: Exception encountered when calling layer 'sam2_inspired_attention' (type SAM2InspiredAttention).
+
+{{function_node __wrapped__BatchMatMulV2_device_/job:localhost/replica:0/task:0/device:GPU:0}} OOM when allocating tensor with shape[2,946176,946176] and type float on /job:localhost/replica:0/task:0/device:GPU:0 by allocator GPU_0_bfc [Op:BatchMatMulV2] name: 
+
+Call arguments received by layer 'sam2_inspired_attention' (type SAM2InspiredAttention):
+  • x=tf.Tensor(shape=(2, 96, 112, 88, 44), dtype=float32)
+  • training=False
+
+--- DEBUGGING SAM2 STEP BY STEP ---
+Testing query conv...
+Queries shape: (2, 96, 112, 88, 5)
+Testing key conv...
+Keys shape: (2, 96, 112, 88, 5)
+Testing value conv...
+Values shape: (2, 96, 112, 88, 44)
+Testing flatten...
+Queries flat: (2, 946176, 5)
+Keys flat: (2, 946176, 5)
+Values flat: (2, 946176, 44)
+Testing attention scores...
+❌ SAM2 step-by-step failed at: {{function_node __wrapped__BatchMatMulV2_device_/job:localhost/replica:0/task:0/device:GPU:0}} OOM when allocating tensor with shape[2,946176,946176] and type float on /job:localhost/replica:0/task:0/device:GPU:0 by allocator GPU_0_bfc [Op:BatchMatMulV2] name: 
+
+🔧 SAM2 attention debugging completed!
+
+SAM2 debug completed with exit code: 0
+End time: Thu Jun 26 20:22:06 UTC 2025
+✅ SAM2 ISSUE IDENTIFIED

@@ -1,0 +1,87 @@
+=== SLURM RESOURCE CHECK ===
+Node: hggpu9-4
+Job ID: 1159592
+Allocated GPUs: 
+Allocated CPUs: 16
+Allocated memory: 307200 MB
+Available memory:               total        used        free      shared  buff/cache   available
+Mem:          503Gi       5.0Gi       480Gi       4.2Gi        17Gi       491Gi
+Swap:            0B          0B          0B
+GPU 0: NVIDIA RTX 4500 Ada Generation (UUID: GPU-dd7817bb-79b3-62f7-9c38-9b86485d5e99)
+GPU 1: NVIDIA RTX 4500 Ada Generation (UUID: GPU-82339fee-8caa-848e-d280-be95bbebecf7)
+GPU 2: NVIDIA RTX 4500 Ada Generation (UUID: GPU-3a5593a8-cdba-6706-b35e-ef0d5165c9ff)
+GPU 3: NVIDIA RTX 4500 Ada Generation (UUID: GPU-dc2667b5-78bc-efa9-cb8a-a994f66c42aa)
+memory.total [MiB], memory.used [MiB], memory.free [MiB]
+24570 MiB, 1 MiB, 24217 MiB
+24570 MiB, 1 MiB, 24217 MiB
+24570 MiB, 1 MiB, 24217 MiB
+24570 MiB, 1 MiB, 24217 MiB
+=== PYTHON ENVIRONMENT TEST ===
+Python: 3.11.13 | packaged by conda-forge | (main, Jun  4 2025, 14:48:23) [GCC 13.3.0]
+TensorFlow: 2.15.1
+Initial CPU Memory: 5.19GB
+Visible GPUs: 4
+GPU 0: PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+GPU 1: PhysicalDevice(name='/physical_device:GPU:1', device_type='GPU')
+GPU 2: PhysicalDevice(name='/physical_device:GPU:2', device_type='GPU')
+GPU 3: PhysicalDevice(name='/physical_device:GPU:3', device_type='GPU')
+✅ Environment check passed
+=== PRE-TRAINING MEMORY CHECK ===
+              total        used        free      shared  buff/cache   available
+Mem:          503Gi       5.0Gi       480Gi       4.2Gi        17Gi       491Gi
+Swap:            0B          0B          0B
+memory.used [MiB], memory.free [MiB]
+1 MiB, 24217 MiB
+1 MiB, 24217 MiB
+1 MiB, 24217 MiB
+1 MiB, 24217 MiB
+=== STARTING TRAINING ===
+2025-07-18 19:27:41.686347: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-07-18 19:27:41.686843: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-07-18 19:27:41.904564: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-07-18 19:27:42.331363: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-07-18 19:27:51.283520: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-07-18 19:28:13,207 - SmartSOTA - INFO - ✅ All imports successful
+2025-07-18 19:28:13,211 - SmartSOTA - INFO - TensorFlow eager execution: True
+2025-07-18 19:28:17,720 - SmartSOTA - INFO - Environment verified:
+- Python 3.11.13 | packaged by conda-forge | (main, Jun  4 2025, 14:48:23) [GCC 13.3.0]
+- TF 2.15.1
+- NumPy 1.26.4
+- GPU devices: 4
+2025-07-18 19:28:17,735 - SmartSOTA - INFO - 🔧 Using memory-optimized training configuration
+2025-07-18 19:28:17.991907: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-07-18 19:28:17.992169: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-07-18 19:28:17.992596: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-07-18 19:28:17.992872: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-07-18 19:28:17.993087: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-07-18 19:28:17.993336: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-07-18 19:28:17.993827: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-07-18 19:28:17.994081: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+2025-07-18 19:28:17,995 - SmartSOTA - INFO - Memory at initialization_start: CPU=0.60GB | GPU0: 0.00GB | GPU1: 0.00GB | GPU2: 0.00GB | GPU3: 0.00GB | Disk: 245.7GB free
+2025-07-18 19:28:17,997 - tensorflow - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-07-18 19:28:17,998 - OptimizedTraining - INFO - ✅ Mixed precision (float16) enabled
+2025-07-18 19:28:17,998 - OptimizedTraining - INFO - ✅ Mixed precision (float16) enabled
+2025-07-18 19:28:18,000 - OptimizedTraining - ERROR - ❌ Strategy setup failed: module 'tensorflow._api.v2.distribute.experimental' has no attribute 'ParameterServerOptions'
+2025-07-18 19:28:18,000 - OptimizedTraining - ERROR - ❌ Strategy setup failed: module 'tensorflow._api.v2.distribute.experimental' has no attribute 'ParameterServerOptions'
+=== POST-TRAINING ANALYSIS ===
+Python exit code: 0
+Final memory usage:
+              total        used        free      shared  buff/cache   available
+Mem:          503Gi       5.0Gi       480Gi       4.2Gi        17Gi       491Gi
+Swap:            0B          0B          0B
+memory.used [MiB]
+1 MiB
+1 MiB
+1 MiB
+1 MiB
+Checking for OOM events:
+SLURM memory accounting:
+1159592            300G              00:02:09    RUNNING 
+1159592.bat+                         00:02:09    RUNNING 
+1159592.ext+                         00:02:09    RUNNING 
+=== TRAINING SUMMARY ===
+✅ Training completed successfully
+Job completed at: Fri Jul 18 19:28:23 UTC 2025
+Cleaning up...

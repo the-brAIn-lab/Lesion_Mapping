@@ -1,0 +1,1002 @@
+2025-06-27 19:22:09.969567: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-27 19:22:09.970862: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-27 19:22:10.101083: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-27 19:22:10.372910: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-27 19:22:17.172565: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-27 19:22:33.280855: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-27 19:22:33.281732: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-27 19:22:33.283116: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-27 19:22:33.284147: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-27 19:22:33.284621: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-06-27 19:22:33.285363: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-06-27 19:22:33.286003: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-27 19:22:33.286413: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-06-27 19:22:33.287060: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-06-27 19:22:33.287920: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-27 19:22:33.288384: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-06-27 19:22:33.288997: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+2025-06-27 19:22:41.655686: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-27 19:22:41.656794: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-27 19:22:41.778571: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-27 19:22:42.031513: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-27 19:22:48.659596: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-27 19:23:03,146 - INFO - 🎉 SMART SOTA 2025 - OPTIMIZED REGULARIZATION & TRAINING
+2025-06-27 19:23:03,171 - INFO - ================================================================================
+2025-06-27 19:23:03,172 - INFO - ✅ OPTIMIZATIONS APPLIED:
+2025-06-27 19:23:03,174 - INFO -    - Reduced dropout from 0.3 to 0.15 (less aggressive regularization)
+2025-06-27 19:23:03,175 - INFO -    - Increased batch size from 4 to 8 (better gradient estimates)
+2025-06-27 19:23:03,176 - INFO -    - Extended early stopping patience from 20 to 30 epochs
+2025-06-27 19:23:03,177 - INFO -    - Less aggressive learning rate reduction (0.8 factor vs 0.7)
+2025-06-27 19:23:03,179 - INFO -    - Enhanced learning rate schedule to maintain higher rates longer
+2025-06-27 19:23:03,180 - INFO -    - Improved epoch shuffling with explicit verification
+2025-06-27 19:23:03,181 - INFO - ✅ All architectural components maintained exactly from working version
+2025-06-27 19:23:03,182 - INFO - 🎯 Target: Restore 70%+ training Dice and achieve 68-75% validation Dice
+2025-06-27 19:23:03,184 - INFO - ================================================================================
+2025-06-27 19:23:03,185 - INFO - 🔧 Setting up training environment...
+INFO:tensorflow:Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-06-27 19:23:07,528 - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-06-27 19:23:07,530 - INFO - 🔧 Configuring multi-GPU strategy...
+2025-06-27 19:23:07,531 - INFO - Detected GPUs: 4
+2025-06-27 19:23:07.774110: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-27 19:23:07.775174: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-27 19:23:07.776772: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-06-27 19:23:07.777578: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-06-27 19:23:07.778474: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-06-27 19:23:07.779130: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-06-27 19:23:07.779728: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-06-27 19:23:07.780381: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+INFO:tensorflow:Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-06-27 19:23:07,784 - INFO - Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-06-27 19:23:07,827 - INFO - 🚀 MirroredStrategy with 4 devices
+2025-06-27 19:23:07,829 - INFO - 📚 Loading dataset...
+2025-06-27 19:23:07,830 - INFO - Loading dataset from: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training
+2025-06-27 19:23:08,643 - INFO - Loaded 655 image/mask pairs from full dataset
+2025-06-27 19:23:08,647 - INFO - Dataset split: 556 train, 99 validation
+2025-06-27 19:23:08,648 - INFO - 🔄 Creating data generators...
+2025-06-27 19:23:08,649 - INFO - 🏗️ Building model with single dropout modification...
+2025-06-27 19:23:08,651 - INFO - 🏗️ Building Smart SOTA 2025 with Dropout Only Modification...
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,053 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,060 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,103 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,109 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,192 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,199 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,290 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,296 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,339 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:09,346 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-06-27 19:23:14,077 - INFO - ✅ Model built successfully: 11,475,388 parameters
+2025-06-27 19:23:14,082 - INFO - 🔥 Model parameters: 11,475,388
+2025-06-27 19:23:14,083 - INFO - ✅ Optimal parameter range (8-12M)
+2025-06-27 19:23:14,117 - INFO - 🧪 Testing data generators...
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:14,312 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:15,992 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:17,375 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:19,045 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:20,131 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:21,817 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:23,799 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:25,512 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:27,184 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:28,303 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:29,423 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:30,517 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:31,601 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:32,682 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:33,782 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:34,889 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:35,851 - INFO - ✅ Train batch: X=(8, 192, 224, 176, 1), y=(8, 192, 224, 176, 1)
+2025-06-27 19:23:35,853 - INFO - ✅ Val batch: X=(8, 192, 224, 176, 1), y=(8, 192, 224, 176, 1)
+2025-06-27 19:23:35,854 - INFO - 🧪 Testing model forward pass...
+2025-06-27 19:23:36.013127: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8907
+2025-06-27 19:23:41.196304: I external/local_xla/xla/service/service.cc:168] XLA service 0x56385cdcdb70 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2025-06-27 19:23:41.196953: I external/local_xla/xla/service/service.cc:176]   StreamExecutor device (0): NVIDIA RTX 4500 Ada Generation, Compute Capability 8.9
+2025-06-27 19:23:41.197540: I external/local_xla/xla/service/service.cc:176]   StreamExecutor device (1): NVIDIA RTX 4500 Ada Generation, Compute Capability 8.9
+2025-06-27 19:23:41.198106: I external/local_xla/xla/service/service.cc:176]   StreamExecutor device (2): NVIDIA RTX 4500 Ada Generation, Compute Capability 8.9
+2025-06-27 19:23:41.198570: I external/local_xla/xla/service/service.cc:176]   StreamExecutor device (3): NVIDIA RTX 4500 Ada Generation, Compute Capability 8.9
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1751052221.855436  127730 device_compiler.h:186] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2025-06-27 19:23:49,143 - INFO - ✅ Forward pass successful: (1, 192, 224, 176, 1)
+2025-06-27 19:23:49,145 - INFO - 🧪 Testing loss computation...
+2025-06-27 19:23:51,414 - INFO - ✅ Loss computation successful: 0.706810712814331
+2025-06-27 19:23:51,416 - INFO - 🚀 Starting Smart SOTA 2025 training with dropout regularization...
+2025-06-27 19:23:51,417 - INFO - Single modification applied - stable training expected!
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:51,603 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:52,667 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:54,015 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:55,937 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:57,272 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:58,926 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:23:59,967 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:24:01,062 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+INFO:tensorflow:Collective all_reduce tensors: 309 all_reduces, num_devices = 4, group_size = 4, implementation = CommunicationImplementation.NCCL, num_packs = 1
+2025-06-27 19:24:25,334 - INFO - Collective all_reduce tensors: 309 all_reduces, num_devices = 4, group_size = 4, implementation = CommunicationImplementation.NCCL, num_packs = 1
+INFO:tensorflow:Collective all_reduce tensors: 309 all_reduces, num_devices = 4, group_size = 4, implementation = CommunicationImplementation.NCCL, num_packs = 1
+2025-06-27 19:25:19,905 - INFO - Collective all_reduce tensors: 309 all_reduces, num_devices = 4, group_size = 4, implementation = CommunicationImplementation.NCCL, num_packs = 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:12,601 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:13,706 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:15,344 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:17,313 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:18,431 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:19,810 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:20,935 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:22,596 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:24.130233: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8907
+2025-06-27 19:26:24.134832: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8907
+2025-06-27 19:26:24.148391: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8907
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:24,320 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:26,056 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:27,387 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:28,590 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:29,995 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:31,081 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:32,616 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:34,584 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:36,360 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:37,454 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:39,577 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:41,414 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:42.103798: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:306] gpu_async_0 cuMemAllocAsync failed to allocate 876158976 bytes: CUDA error: out of memory (CUDA_ERROR_OUT_OF_MEMORY)
+ Reported by CUDA: Free memory/Total memory: 156893184/25393496064
+2025-06-27 19:26:42.104794: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:311] Stats: Limit:                     23575789568
+InUse:                     24626847320
+MaxInUse:                  24664990042
+NumAllocs:                        6270
+MaxAllocSize:               4982844336
+Reserved:                            0
+PeakReserved:                        0
+LargestFreeBlock:                    0
+
+2025-06-27 19:26:42.105511: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:63] Histogram of current allocation: (allocation_size_in_bytes, nb_allocation_of_that_sizes), ...;
+2025-06-27 19:26:42.105926: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1, 90
+2025-06-27 19:26:42.106459: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2, 33
+2025-06-27 19:26:42.106937: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 4, 179
+2025-06-27 19:26:42.107493: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 8, 24
+2025-06-27 19:26:42.108006: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 12, 2
+2025-06-27 19:26:42.108467: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 20, 33
+2025-06-27 19:26:42.108926: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 22, 3
+2025-06-27 19:26:42.109397: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 44, 59
+2025-06-27 19:26:42.109875: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 88, 153
+2025-06-27 19:26:42.110417: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 128, 7
+2025-06-27 19:26:42.110916: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 132, 16
+2025-06-27 19:26:42.111404: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 176, 138
+2025-06-27 19:26:42.111879: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 320, 2
+2025-06-27 19:26:42.112350: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 352, 137
+2025-06-27 19:26:42.112794: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 440, 8
+2025-06-27 19:26:42.113362: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 484, 2
+2025-06-27 19:26:42.113833: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 528, 2
+2025-06-27 19:26:42.114266: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 640, 8
+2025-06-27 19:26:42.114753: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 704, 125
+2025-06-27 19:26:42.115205: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 880, 24
+2025-06-27 19:26:42.115717: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 968, 6
+2025-06-27 19:26:42.116265: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1028, 1
+2025-06-27 19:26:42.116728: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1056, 54
+2025-06-27 19:26:42.117167: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1408, 24
+2025-06-27 19:26:42.117605: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1936, 11
+2025-06-27 19:26:42.118056: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2112, 7
+2025-06-27 19:26:42.118538: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2376, 3
+2025-06-27 19:26:42.119048: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2816, 16
+2025-06-27 19:26:42.119513: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 3872, 40
+2025-06-27 19:26:42.119977: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 4224, 5
+2025-06-27 19:26:42.120446: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 5632, 7
+2025-06-27 19:26:42.120939: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 6534, 1
+2025-06-27 19:26:42.121449: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 7744, 18
+2025-06-27 19:26:42.121964: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 8448, 3
+2025-06-27 19:26:42.122418: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 13068, 3
+2025-06-27 19:26:42.122863: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 14784, 3
+2025-06-27 19:26:42.123308: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 15488, 41
+2025-06-27 19:26:42.123814: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 17424, 4
+2025-06-27 19:26:42.124268: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 26136, 3
+2025-06-27 19:26:42.124701: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 29568, 1
+2025-06-27 19:26:42.125148: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 30976, 15
+2025-06-27 19:26:42.125625: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 34848, 12
+2025-06-27 19:26:42.126080: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 52272, 11
+2025-06-27 19:26:42.126557: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 59136, 1
+2025-06-27 19:26:42.127037: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 61952, 27
+2025-06-27 19:26:42.127507: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 67584, 2
+2025-06-27 19:26:42.127996: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 92928, 1
+2025-06-27 19:26:42.128450: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 104544, 9
+2025-06-27 19:26:42.128910: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 118272, 6
+2025-06-27 19:26:42.129388: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 123904, 24
+2025-06-27 19:26:42.129874: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 135168, 6
+2025-06-27 19:26:42.130346: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 139392, 1
+2025-06-27 19:26:42.130834: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 185856, 4
+2025-06-27 19:26:42.131322: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 209088, 11
+2025-06-27 19:26:42.131767: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 236544, 1
+2025-06-27 19:26:42.132273: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 243936, 1
+2025-06-27 19:26:42.132767: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 247808, 15
+2025-06-27 19:26:42.133210: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 248160, 1
+2025-06-27 19:26:42.133677: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 259072, 2
+2025-06-27 19:26:42.134136: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 278784, 4
+2025-06-27 19:26:42.134597: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 295680, 2
+2025-06-27 19:26:42.135039: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 296320, 2
+2025-06-27 19:26:42.135498: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 418176, 9
+2025-06-27 19:26:42.135954: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 473088, 1
+2025-06-27 19:26:42.136392: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 495616, 15
+2025-06-27 19:26:42.136842: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 518144, 6
+2025-06-27 19:26:42.137278: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 557568, 5
+2025-06-27 19:26:42.137785: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 574464, 1
+2025-06-27 19:26:42.138239: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 650496, 2
+2025-06-27 19:26:42.138670: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 651904, 2
+2025-06-27 19:26:42.139111: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 743424, 1
+2025-06-27 19:26:42.139576: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 836352, 11
+2025-06-27 19:26:42.140060: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 946176, 6
+2025-06-27 19:26:42.140548: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 975744, 1
+2025-06-27 19:26:42.141027: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1115136, 6
+2025-06-27 19:26:42.141593: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1148928, 3
+2025-06-27 19:26:42.142038: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1300992, 3
+2025-06-27 19:26:42.142456: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1303808, 2
+2025-06-27 19:26:42.142891: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1486848, 3
+2025-06-27 19:26:42.143371: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1672704, 8
+2025-06-27 19:26:42.143824: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1892352, 1
+2025-06-27 19:26:42.144261: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1951488, 17
+2025-06-27 19:26:42.144715: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1985280, 1
+2025-06-27 19:26:42.145157: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2509056, 1
+2025-06-27 19:26:42.145613: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2601984, 2
+2025-06-27 19:26:42.146074: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2607616, 1
+2025-06-27 19:26:42.146561: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 3345408, 7
+2025-06-27 19:26:42.147019: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 3763584, 1
+2025-06-27 19:26:42.147445: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 3784704, 1
+2025-06-27 19:26:42.147902: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 3902976, 13
+2025-06-27 19:26:42.148352: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 5018112, 3
+2025-06-27 19:26:42.148813: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 5203968, 9
+2025-06-27 19:26:42.149337: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 5215232, 2
+2025-06-27 19:26:42.149805: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 6690816, 3
+2025-06-27 19:26:42.150324: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 7527168, 3
+2025-06-27 19:26:42.150818: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 10407936, 35
+2025-06-27 19:26:42.151338: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 10430464, 2
+2025-06-27 19:26:42.151784: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 13896960, 1
+2025-06-27 19:26:42.152217: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 15138816, 2
+2025-06-27 19:26:42.152663: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 20815872, 36
+2025-06-27 19:26:42.153105: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 30277632, 3
+2025-06-27 19:26:42.153582: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 41631744, 35
+2025-06-27 19:26:42.154029: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 60555264, 6
+2025-06-27 19:26:42.154484: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 83263488, 36
+2025-06-27 19:26:42.154954: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 166526976, 29
+2025-06-27 19:26:42.155405: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 333053952, 3
+2025-06-27 19:26:42.155872: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 666107904, 12
+2025-06-27 19:26:42.156334: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 876158976, 5
+2025-06-27 19:26:42.156781: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:97] CU_MEMPOOL_ATTR_RESERVED_MEM_CURRENT: 24998051840
+2025-06-27 19:26:42.157172: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:99] CU_MEMPOOL_ATTR_USED_MEM_CURRENT: 24626847320
+2025-06-27 19:26:42.157604: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:100] CU_MEMPOOL_ATTR_RESERVED_MEM_HIGH: 25132269568
+2025-06-27 19:26:42.158005: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:101] CU_MEMPOOL_ATTR_USED_MEM_HIGH: 24664990042
+2025-06-27 19:26:42.158577: W tensorflow/core/framework/op_kernel.cc:1839] OP_REQUIRES failed at matmul_op_impl.h:921 : RESOURCE_EXHAUSTED: OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+2025-06-27 19:26:42.159083: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 179468297784057900
+2025-06-27 19:26:42.159503: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 7304104179103416336
+2025-06-27 19:26:42.159883: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 18191127131597129192
+2025-06-27 19:26:42.160303: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 5569060369115974027
+2025-06-27 19:26:42.160680: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4921481089026968207
+2025-06-27 19:26:42.161046: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 13942202690817478022
+2025-06-27 19:26:42.161462: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 16041985034809478727
+2025-06-27 19:26:42.161870: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4296340722265689492
+2025-06-27 19:26:42.162301: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 14505884283502252422
+2025-06-27 19:26:42.162735: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9618023138670499792
+2025-06-27 19:26:42.163157: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 5654427382157596607
+2025-06-27 19:26:42.163536: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 13893590460937263822
+2025-06-27 19:26:42.163933: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 7304459814149086657
+2025-06-27 19:26:42.164444: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9247241456493371317
+2025-06-27 19:26:42.164859: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 7529626337569751483
+2025-06-27 19:26:42.165279: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 10531422037128528563
+2025-06-27 19:26:42.165655: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 16143647103297979258
+2025-06-27 19:26:42.166076: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15914999179040473234
+2025-06-27 19:26:42.166506: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9927306690108768584
+2025-06-27 19:26:42.166912: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 17269147362477613539
+2025-06-27 19:26:42.167311: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 14717927019840463544
+2025-06-27 19:26:42.167726: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 3739693976225030724
+2025-06-27 19:26:42.168179: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4007189537632265814
+2025-06-27 19:26:42.168609: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 8668448602938066764
+2025-06-27 19:26:42.169055: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 1395001886234831849
+2025-06-27 19:26:42.169448: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 6506079614908100939
+2025-06-27 19:26:42.169882: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11050851409554879169
+2025-06-27 19:26:42.170297: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 6454869597864170804
+2025-06-27 19:26:42.170680: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 2257308275319928209
+2025-06-27 19:26:42.171118: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 12306656900714280689
+2025-06-27 19:26:42.171535: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 3883355657581893699
+2025-06-27 19:26:42.171924: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 12996298565783337139
+2025-06-27 19:26:42.172289: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 1312140973989206664
+2025-06-27 19:26:42.172698: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 7257819128517360099
+2025-06-27 19:26:42.173059: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4291201908854470479
+2025-06-27 19:26:42.173436: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 7711959854094229009
+2025-06-27 19:26:42.173939: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9371852377621578768
+2025-06-27 19:26:42.174341: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4368804470081373523
+2025-06-27 19:26:42.174759: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 194749643761289038
+2025-06-27 19:26:42.175147: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 8785894774995583558
+2025-06-27 19:26:42.175547: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 14404304205631826213
+2025-06-27 19:26:42.176064: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 5332971387475092728
+2025-06-27 19:26:42.176475: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 2501672624222789928
+2025-06-27 19:26:42.176906: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11189918424378991268
+2025-06-27 19:26:42.177319: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15909086861754330523
+2025-06-27 19:26:42.177728: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 2339960752038570973
+2025-06-27 19:26:42.178199: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11621530843853394058
+2025-06-27 19:26:42.178674: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11986281696457560543
+2025-06-27 19:26:42.179077: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 8256260190668427398
+2025-06-27 19:26:42.179515: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 208717497427030863
+2025-06-27 19:26:42.179911: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15410432863211001248
+2025-06-27 19:26:42.180322: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 17430362836755281088
+2025-06-27 19:26:42.180787: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 12718593572773697698
+2025-06-27 19:26:42.181220: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9954032054945569773
+2025-06-27 19:26:42.181646: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4407658268757261508
+2025-06-27 19:26:42.182253: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9427686441507185352
+2025-06-27 19:26:42.182703: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11276891928885994702
+2025-06-27 19:26:42.183155: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4509950755040617547
+2025-06-27 19:26:42.183602: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9349690085251671677
+2025-06-27 19:26:42.184061: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 10869290055879763617
+2025-06-27 19:26:42.184511: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4243919898611543167
+2025-06-27 19:26:42.185005: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11901902005542187167
+2025-06-27 19:26:42.185465: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 10580214735841030917
+2025-06-27 19:26:42.185926: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 12093813711316777007
+2025-06-27 19:26:42.186448: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 10323779137176780207
+2025-06-27 19:26:42.186961: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11820026823092682736
+2025-06-27 19:26:42.187453: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11368567927687686026
+2025-06-27 19:26:42.187840: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 1702730214267725881
+2025-06-27 19:26:42.188271: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 16023259974517778976
+2025-06-27 19:26:42.188645: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9310436811410090606
+2025-06-27 19:26:42.189062: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11812007585033882841
+2025-06-27 19:26:42.189466: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9507188623891361271
+2025-06-27 19:26:42.190090: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15692029596330667446
+2025-06-27 19:26:42.190507: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15386823448307027601
+2025-06-27 19:26:42.190933: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9378744817201745716
+2025-06-27 19:26:42.191285: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 8147915820888527231
+2025-06-27 19:26:42.191664: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9516174175356473636
+2025-06-27 19:26:42.192078: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 11196392999562374636
+2025-06-27 19:26:42.192465: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 17181200663265711816
+2025-06-27 19:26:42.192809: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9641585818609176031
+2025-06-27 19:26:42.193168: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15481039273578379406
+2025-06-27 19:26:42.193528: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15729724360242420191
+2025-06-27 19:26:42.193871: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 3310707823923747356
+2025-06-27 19:26:42.194239: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15985992465352052176
+2025-06-27 19:26:42.194660: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 6455086398806622016
+2025-06-27 19:26:42.195090: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 7917898257776368785
+2025-06-27 19:26:42.195471: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 4289825009597913490
+2025-06-27 19:26:42.195924: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 9981732182981052550
+2025-06-27 19:26:42.196306: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 13824433632989768400
+2025-06-27 19:26:42.196686: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 1716515980061739975
+2025-06-27 19:26:42.197054: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 13087932565346356770
+2025-06-27 19:26:42.197426: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 12382399671320178965
+2025-06-27 19:26:42.197783: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 7427266569401340605
+2025-06-27 19:26:42.198249: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 10778705435146671090
+2025-06-27 19:26:42.198628: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 3798421963006252230
+2025-06-27 19:26:42.199035: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 15558219569089230360
+2025-06-27 19:26:42.199411: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 7583550469053501815
+2025-06-27 19:26:42.199880: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 17070558250658388225
+2025-06-27 19:26:42.200286: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 10511428360857729385
+2025-06-27 19:26:42.200777: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 14760762810603732065
+2025-06-27 19:26:42.201193: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 13630657703196318750
+2025-06-27 19:26:42.201702: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 12088054549019033205
+2025-06-27 19:26:42.202088: I tensorflow/core/framework/local_rendezvous.cc:421] Local rendezvous recv item cancelled. Key hash: 17165382052383276870
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:42,549 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:44,586 - ERROR - ❌ Training failed: Graph execution error:
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+5 root error(s) found.
+  (0) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[div_no_nan_1/ReadVariableOp_6/_3108]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/then/_28940/cond_1/cond/IsFinite/_3412]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/pivot_f/_28943/_3367]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[group_deps/_3173]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+  (1) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[div_no_nan_1/ReadVariableOp_6/_3108]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/then/_28940/cond_1/cond/IsFinite/_3412]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/pivot_f/_28943/_3367]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+  (2) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[div_no_nan_1/ReadVariableOp_6/_3108]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/then/_28940/cond_1/cond/IsFinite/_3412]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+  (3) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[div_no_nan_1/ReadVariableOp_6/_3108]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+  (4) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+0 successful operations.
+0 derived errors ignored. [Op:__inference_train_function_266940]
+2025-06-27 19:26:44,618 - ERROR - Full traceback: Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 872, in train_smart_sota_2025_dropout_only
+    history = model.fit(
+              ^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/eager/execute.py", line 59, in quick_execute
+    except TypeError as e:
+tensorflow.python.framework.errors_impl.ResourceExhaustedError: Graph execution error:
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+Detected at node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1002, in _bootstrap
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1150, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 590, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 515, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/functional.py", line 672, in _run_internal_graph
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 392, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 394, in call
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/base_layer.py", line 1149, in __call__
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 96, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 43, in wrapper
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 280, in call
+
+5 root error(s) found.
+  (0) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[div_no_nan_1/ReadVariableOp_6/_3108]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/then/_28940/cond_1/cond/IsFinite/_3412]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/pivot_f/_28943/_3367]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[group_deps/_3173]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+  (1) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[div_no_nan_1/ReadVariableOp_6/_3108]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/then/_28940/cond_1/cond/IsFinite/_3412]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/pivot_f/_28943/_3367]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+  (2) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[div_no_nan_1/ReadVariableOp_6/_3108]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[cond_1/then/_5002/cond_1/cond/then/_28940/cond_1/cond/IsFinite/_3412]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+  (3) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+	 [[div_no_nan_1/ReadVariableOp_6/_3108]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+  (4) RESOURCE_EXHAUSTED:  OOM when allocating tensor with shape[2,14784,14816] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node SmartSOTA2025_DropoutOnly/decode7/decode7_sam2/MatMul}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+
+0 successful operations.
+0 derived errors ignored. [Op:__inference_train_function_266940]
+
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:44,816 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:45,946 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:47,334 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-27 19:26:48,836 - ERROR - ❌ Training failed despite minimal modification

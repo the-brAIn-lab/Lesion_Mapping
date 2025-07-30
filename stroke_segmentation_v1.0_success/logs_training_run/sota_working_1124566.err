@@ -1,0 +1,25 @@
+2025-06-16 05:45:51.273169: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-16 05:45:51.274208: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-16 05:45:51.402877: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-16 05:45:51.668170: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-16 05:45:58.436698: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-16 05:46:10,563 - INFO - Starting Stroke Lesion Segmentation Training
+2025-06-16 05:46:12,724 - INFO - Detected 1 GPU(s), using GPU:0
+2025-06-16 05:46:12,965 - INFO - Found 600 valid image/mask pairs
+2025-06-16 05:46:12,968 - INFO - Initialized generator with 480 samples
+2025-06-16 05:46:12,970 - INFO - Initialized generator with 120 samples
+2025-06-16 05:46:12,971 - INFO - Training samples: 480
+2025-06-16 05:46:12,972 - INFO - Validation samples: 120
+2025-06-16 05:46:13.052198: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-16 05:46:13.053175: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-16 05:46:13,560 - INFO - Model input shape: (None, 128, 128, 128, 1), output shape: (None, 128, 128, 128, 1)
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-16 05:46:13,733 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-16 05:46:13,828 - INFO - Loaded sub-r009s057_ses-1: img_shape=(197, 233, 189), mask_shape=(197, 233, 189)
+2025-06-16 05:46:13,830 - INFO - Resizing sub-r009s057_ses-1 from (197, 233, 189) to (128, 128, 128)
+2025-06-16 05:46:14,062 - INFO - Post-resize sub-r009s057_ses-1: img_shape=(128, 128, 128), mask_shape=(128, 128, 128)
+2025-06-16 05:46:14,101 - INFO - Batch shape: X=(1, 128, 128, 128, 1), y=(1, 128, 128, 128, 1)
+2025-06-16 05:46:14,103 - INFO - Validating model with batch: X=(1, 128, 128, 128, 1), y=(1, 128, 128, 128, 1)
+2025-06-16 05:46:14,104 - ERROR - Model validation failed: Model.predict() got an unexpected keyword argument 'training'
+2025-06-16 05:46:14,104 - ERROR - Training pipeline failed: Model.predict() got an unexpected keyword argument 'training'

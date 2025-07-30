@@ -1,0 +1,102 @@
+2025-06-27 04:59:59.392009: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-27 04:59:59.393061: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-27 04:59:59.596074: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-27 05:00:00.030064: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-27 05:00:08.822536: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-27 05:00:28.313726: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-27 05:00:28.314583: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-27 05:00:28.315978: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-27 05:00:28.317701: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-27 05:00:28.318279: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-06-27 05:00:28.319034: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-06-27 05:00:28.319772: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-27 05:00:28.320364: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-06-27 05:00:28.321195: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-06-27 05:00:28.322108: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-27 05:00:28.322718: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-06-27 05:00:28.323997: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+2025-06-27 05:00:37.510996: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-27 05:00:37.511861: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-27 05:00:37.716897: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-27 05:00:38.127168: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-27 05:00:46.830487: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-27 05:01:05,489 - INFO - 🚀 MEMORY-OPTIMIZED SMART SOTA 2025
+2025-06-27 05:01:05,491 - INFO - ================================================================================
+2025-06-27 05:01:05,492 - INFO - 🔧 AGGRESSIVE MEMORY OPTIMIZATIONS:
+2025-06-27 05:01:05,494 - INFO - ✅ Input size: 128×128×128 (71% memory reduction)
+2025-06-27 05:01:05,495 - INFO - ✅ Base filters: 8 (50% parameter reduction)
+2025-06-27 05:01:05,496 - INFO - ✅ Single GPU training (eliminates multi-GPU overhead)
+2025-06-27 05:01:05,497 - INFO - ✅ Batch size: 1 (maximum memory safety)
+2025-06-27 05:01:05,498 - INFO - ✅ Gradient checkpointing enabled
+2025-06-27 05:01:05,499 - INFO - ✅ Simplified SAM2 attention (minimal memory footprint)
+2025-06-27 05:01:05,500 - INFO - 🎯 Target: Stable training within 24GB GPU constraints
+2025-06-27 05:01:05,501 - INFO - ================================================================================
+2025-06-27 05:01:05,501 - INFO - 🔧 Setting up memory-optimized training environment...
+2025-06-27 05:01:05,502 - INFO - 🔧 Configuring memory-optimized mixed precision...
+INFO:tensorflow:Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-06-27 05:01:10,238 - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-06-27 05:01:10,240 - INFO - ✅ Mixed precision configured for memory optimization
+2025-06-27 05:01:10,241 - INFO - 🔧 Configuring single GPU strategy for memory optimization...
+2025-06-27 05:01:10,242 - INFO - Detected GPUs: 4
+2025-06-27 05:01:10,243 - INFO - ✅ Memory growth enabled for GPU 0
+2025-06-27 05:01:10,246 - INFO - 🚀 Using single GPU strategy for memory optimization
+2025-06-27 05:01:10,247 - INFO - 📚 Loading dataset...
+2025-06-27 05:01:10,248 - INFO - Loading dataset from: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training
+2025-06-27 05:01:11,198 - INFO - Loaded 655 image/mask pairs from full dataset
+2025-06-27 05:01:11,201 - INFO - Dataset split: 556 train, 99 validation
+2025-06-27 05:01:11,202 - INFO - 🔄 Creating memory-efficient data generators...
+2025-06-27 05:01:11,204 - INFO - 🔧 Ultra Memory-Efficient DataGenerator: 556 pairs
+2025-06-27 05:01:11,205 - INFO - 🔧 Ultra Memory-Efficient DataGenerator: 99 pairs
+2025-06-27 05:01:11,206 - INFO - 🏗️ Building memory-optimized model...
+2025-06-27 05:01:11,207 - INFO - 🏗️ Building Memory-Optimized SOTA Model...
+2025-06-27 05:01:11,208 - INFO - Input shape: (128, 128, 128, 1), Base filters: 8
+2025-06-27 05:01:11.484614: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-27 05:01:11.485641: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-27 05:01:11,750 - ERROR - ❌ Setup failed: Exception encountered when calling layer "stage2" (type MemoryOptimizedConvBlock).
+
+in user code:
+
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 272, in call  *
+        x = tf.recompute_grad(self.sam2_attention)(x, training=training)
+
+    ValueError: The custom_gradient decorator currently supports keywords arguments only when eager execution is enabled.
+
+
+Call arguments received by layer "stage2" (type MemoryOptimizedConvBlock):
+  • x=tf.Tensor(shape=(None, 64, 64, 64, 8), dtype=float16)
+  • training=None
+2025-06-27 05:01:11,756 - ERROR - Full traceback: Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 634, in train_memory_optimized_sota
+    model = build_memory_optimized_sota_model(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 331, in build_memory_optimized_sota_model
+    conv2 = MemoryOptimizedConvBlock(base_filters * 2, use_sam2_attention=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/tmp/__autograph_generated_file6kt618r5.py", line 72, in tf__call
+    ag__.if_stmt(ag__.ld(self).use_sam2_attention, if_body_2, else_body_2, get_state_2, set_state_2, ('x',), 1)
+  File "/tmp/__autograph_generated_file6kt618r5.py", line 67, in if_body_2
+    ag__.if_stmt(ag__.ld(MemoryOptimizedSOTAConfig).USE_GRADIENT_CHECKPOINTING, if_body_1, else_body_1, get_state_1, set_state_1, ('x',), 1)
+  File "/tmp/__autograph_generated_file6kt618r5.py", line 62, in if_body_1
+    x = ag__.converted_call(ag__.converted_call(ag__.ld(tf).recompute_grad, (ag__.ld(self).sam2_attention,), None, fscope), (ag__.ld(x),), dict(training=ag__.ld(training)), fscope)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Exception encountered when calling layer "stage2" (type MemoryOptimizedConvBlock).
+
+in user code:
+
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 272, in call  *
+        x = tf.recompute_grad(self.sam2_attention)(x, training=training)
+
+    ValueError: The custom_gradient decorator currently supports keywords arguments only when eager execution is enabled.
+
+
+Call arguments received by layer "stage2" (type MemoryOptimizedConvBlock):
+  • x=tf.Tensor(shape=(None, 64, 64, 64, 8), dtype=float16)
+  • training=None
+
+2025-06-27 05:01:11,758 - ERROR - ❌ Training failed

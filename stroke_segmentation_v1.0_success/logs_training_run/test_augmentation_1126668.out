@@ -1,0 +1,44 @@
+🔧 TRAINING AUGMENTATION FIX TEST
+=================================
+SMOKING GUN: Training used random horizontal flips
+Solution: Test both original and flipped orientations
+Expected: Flipped or ensemble should give Dice > 0.3
+🔧 TRAINING AUGMENTATION FIX TEST
+================================================================================
+Purpose: Test model with EXACT same augmentation as training
+Key insight: Training used random horizontal flips
+Expected: Flipped orientation should give much better Dice
+✅ TensorFlow configured
+✅ Model loaded: 5,695,045 parameters
+
+📂 Case: sub-r048s014_ses-1
+  True lesion voxels: 1,112
+  🔧 EXACT TRAINING PREPROCESSING:
+    Original shape: (197, 233, 189)
+    Resizing from (197, 233, 189) to (192, 224, 176)
+    Before normalization: [0.000000, 152.713562]
+    Percentiles: p1=1.177913, p99=78.017382
+    After clipping: [1.177913, 78.017380]
+    After normalization: [0.000000, 1.000000]
+    Final shape: (192, 224, 176, 1)
+
+🧪 TEST 1: Original Orientation
+----------------------------------------
+  Prediction max: 0.072087
+  Prediction mean: 0.00000023
+  Best Dice: 0.000000 at threshold 0.5
+
+🧪 TEST 2: Horizontally Flipped
+----------------------------------------
+  Prediction max: 0.292522
+  Prediction mean: 0.00000037
+  Best Dice: 0.000000 at threshold 0.5
+
+🏆 RESULTS COMPARISON:
+==================================================
+Original:  Dice = 0.000000
+Flipped:   Dice = 0.000000
+∞x
+
+❌ Limited improvement
+  → May need additional investigation

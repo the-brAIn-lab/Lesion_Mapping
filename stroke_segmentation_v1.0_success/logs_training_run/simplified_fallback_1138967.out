@@ -1,0 +1,50 @@
+🛠️ SIMPLIFIED SOTA FALLBACK TRAINING
+=====================================
+Strategy: Remove ALL potentially problematic components
+Goal: Achieve stable training and 65-70% validation Dice
+
+🔧 DISABLED COMPONENTS:
+  ❌ Mixed precision (using float32)
+  ❌ Vision Mamba blocks
+  ❌ SAM2 attention
+  ❌ Boundary-aware loss
+  ❌ Complex augmentation
+
+✅ STABLE COMPONENTS:
+  ✅ Standard U-Net architecture
+  ✅ SE attention blocks
+  ✅ Simple attention gates
+  ✅ Dice + Focal loss
+  ✅ Conservative batch size (2)
+
+Job ID: 1138967
+Node: hggpu9-3
+Start: Sat Jun 28 20:26:23 UTC 2025
+
+Environment configured:
+Python: Python 3.11.13
+TensorFlow: 2.15.1
+GPU: NVIDIA RTX 4500 Ada Generation
+
+🚀 Starting simplified SOTA fallback training...
+Expected: Stable training with good Dice scores
+Epoch 1/60
+
+=====================================
+SIMPLIFIED FALLBACK TRAINING COMPLETED
+=====================================
+Exit code: 1
+End time: Sat Jun 28 20:28:55 UTC 2025
+❌ SIMPLIFIED TRAINING FAILED
+
+🔧 If even simplified model fails:
+1. Check data loading issues
+2. Verify preprocessing pipeline
+3. Test with even smaller model
+4. Check CUDA/TensorFlow compatibility
+
+Final GPU state:
+memory.used [MiB], memory.total [MiB]
+1 MiB, 24570 MiB
+
+Training session completed: Sat Jun 28 20:28:57 UTC 2025

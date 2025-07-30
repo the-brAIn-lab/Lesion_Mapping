@@ -1,0 +1,179 @@
+2025-07-01 23:32:40.508018: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-07-01 23:32:40.509160: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-07-01 23:32:40.638927: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-07-01 23:32:40.913811: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-07-01 23:32:58.601015: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-07-01 23:33:34.725456: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-07-01 23:33:34.726112: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-07-01 23:33:34.726841: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-07-01 23:33:34.727529: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-07-01 23:33:34.727931: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-07-01 23:33:34.728571: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-07-01 23:33:34.729468: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-07-01 23:33:34.729889: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-07-01 23:33:34.730478: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-07-01 23:33:34.731362: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-07-01 23:33:34.731864: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-07-01 23:33:34.732511: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+2025-07-01 23:33:41.552091: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-07-01 23:33:41.552751: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-07-01 23:33:41.665336: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-07-01 23:33:41.907173: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-07-01 23:33:48.357768: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-07-01 23:34:09,397 - INFO - 🎉 SMART SOTA 2025 FINAL WORKING VERSION - Training Started
+INFO:tensorflow:Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-07-01 23:34:13,609 - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-07-01 23:34:13,610 - INFO - ✅ Mixed precision enabled (mixed_float16)
+2025-07-01 23:34:13,611 - INFO - 🔧 Configuring multi-GPU strategy...
+2025-07-01 23:34:13,612 - INFO - Detected GPUs: 4
+2025-07-01 23:34:13.855605: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-07-01 23:34:13.856457: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-07-01 23:34:13.857170: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-07-01 23:34:13.857879: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-07-01 23:34:13.858764: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-07-01 23:34:13.859380: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-07-01 23:34:13.860052: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-07-01 23:34:13.860630: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+INFO:tensorflow:Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-07-01 23:34:13,864 - INFO - Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-07-01 23:34:13,898 - INFO - 🚀 MirroredStrategy with 4 devices
+2025-07-01 23:34:13,899 - INFO - Loading dataset from: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training
+2025-07-01 23:34:14,656 - INFO - Loaded 655 image/mask pairs from full dataset
+2025-07-01 23:34:14,659 - INFO - Dataset split: 556 train, 99 validation
+2025-07-01 23:34:14,660 - INFO - 🏗️ Building Smart SOTA 2025 Working Final Model...
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:14,999 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,005 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,047 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,053 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,129 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,134 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,147 - INFO - 🔧 FinalWorkingEnhancedSAM2: 44 channels, 3 scales
+2025-07-01 23:34:15,268 - INFO - ✅ Channel compatibility: 44 channels = 4 heads × 11 head_dim
+2025-07-01 23:34:15,269 - INFO - 🔧 WorkingCrossScaleAttention: 44 channels, 4 heads, 11 head_dim
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,330 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,336 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,378 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+INFO:tensorflow:Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:15,383 - INFO - Reduce to /job:localhost/replica:0/task:0/device:CPU:0 then broadcast to ('/job:localhost/replica:0/task:0/device:CPU:0',).
+2025-07-01 23:34:16,749 - ERROR - ❌ call failed: 'images' must have either 3 or 4 dimensions.
+2025-07-01 23:34:17,353 - ERROR - ❌ call failed: Exception encountered when calling layer 'stage2_enhanced_sam2' (type FinalWorkingEnhancedSAM2Attention).
+
+in user code:
+
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 51, in wrapper  *
+        result = func(*args, **kwargs)
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 313, in call  *
+        output_upsampled = tf.image.resize(aggregated_spatial, [original_h, original_w, original_d], method='trilinear')
+
+    ValueError: 'images' must have either 3 or 4 dimensions.
+
+
+Call arguments received by layer 'stage2_enhanced_sam2' (type FinalWorkingEnhancedSAM2Attention):
+  • args=('tf.Tensor(shape=(None, 96, 112, 88, 44), dtype=float16)',)
+  • kwargs={'training': 'None'}
+2025-07-01 23:34:17,392 - ERROR - ❌ Training failed: Exception encountered when calling layer "stage2" (type FinalWorkingAdvancedConvBlock).
+
+in user code:
+
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 56, in wrapper  *
+        raise
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 379, in call  *
+        if self.use_enhanced_sam2_attention: x = self.enhanced_sam2_attention(x, training=training)
+    File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler  **
+        raise e.with_traceback(filtered_tb) from None
+    File "/tmp/__autograph_generated_filerlaeb4hv.py", line 22, in tf__wrapper
+        raise
+    File "/tmp/__autograph_generated_filesjo0n9lt.py", line 96, in tf__call
+        output_upsampled = ag__.converted_call(ag__.ld(tf).image.resize, (ag__.ld(aggregated_spatial), [ag__.ld(original_h), ag__.ld(original_w), ag__.ld(original_d)]), dict(method='trilinear'), fscope)
+
+    ValueError: Exception encountered when calling layer 'stage2_enhanced_sam2' (type FinalWorkingEnhancedSAM2Attention).
+    
+    in user code:
+    
+        File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 51, in wrapper  *
+            result = func(*args, **kwargs)
+        File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 313, in call  *
+            output_upsampled = tf.image.resize(aggregated_spatial, [original_h, original_w, original_d], method='trilinear')
+    
+        ValueError: 'images' must have either 3 or 4 dimensions.
+    
+    
+    Call arguments received by layer 'stage2_enhanced_sam2' (type FinalWorkingEnhancedSAM2Attention):
+      • args=('tf.Tensor(shape=(None, 96, 112, 88, 44), dtype=float16)',)
+      • kwargs={'training': 'None'}
+
+
+Call arguments received by layer "stage2" (type FinalWorkingAdvancedConvBlock):
+  • args=('tf.Tensor(shape=(None, 96, 112, 88, 22), dtype=float16)',)
+  • kwargs={'training': 'None'}
+Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 544, in train_smart_sota_2025_working_final
+    model = build_smart_sota_2025_working_final(input_shape=cfg.INPUT_SHAPE, base_filters=cfg.BASE_FILTERS)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 405, in build_smart_sota_2025_working_final
+    s2 = FinalWorkingAdvancedConvBlock(base_filters*2, use_enhanced_sam2_attention=True, name='stage2')(layers.MaxPooling3D(2)(s1))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/tmp/__autograph_generated_filerlaeb4hv.py", line 22, in tf__wrapper
+    raise
+  File "/tmp/__autograph_generated_filegrqwfh62.py", line 50, in tf__call
+    ag__.if_stmt(ag__.ld(self).use_enhanced_sam2_attention, if_body_1, else_body_1, get_state_1, set_state_1, ('x',), 1)
+  File "/tmp/__autograph_generated_filegrqwfh62.py", line 45, in if_body_1
+    x = ag__.converted_call(ag__.ld(self).enhanced_sam2_attention, (ag__.ld(x),), dict(training=ag__.ld(training)), fscope)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/__autograph_generated_filerlaeb4hv.py", line 22, in tf__wrapper
+    raise
+  File "/tmp/__autograph_generated_filesjo0n9lt.py", line 96, in tf__call
+    output_upsampled = ag__.converted_call(ag__.ld(tf).image.resize, (ag__.ld(aggregated_spatial), [ag__.ld(original_h), ag__.ld(original_w), ag__.ld(original_d)]), dict(method='trilinear'), fscope)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Exception encountered when calling layer "stage2" (type FinalWorkingAdvancedConvBlock).
+
+in user code:
+
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 56, in wrapper  *
+        raise
+    File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 379, in call  *
+        if self.use_enhanced_sam2_attention: x = self.enhanced_sam2_attention(x, training=training)
+    File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler  **
+        raise e.with_traceback(filtered_tb) from None
+    File "/tmp/__autograph_generated_filerlaeb4hv.py", line 22, in tf__wrapper
+        raise
+    File "/tmp/__autograph_generated_filesjo0n9lt.py", line 96, in tf__call
+        output_upsampled = ag__.converted_call(ag__.ld(tf).image.resize, (ag__.ld(aggregated_spatial), [ag__.ld(original_h), ag__.ld(original_w), ag__.ld(original_d)]), dict(method='trilinear'), fscope)
+
+    ValueError: Exception encountered when calling layer 'stage2_enhanced_sam2' (type FinalWorkingEnhancedSAM2Attention).
+    
+    in user code:
+    
+        File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 51, in wrapper  *
+            result = func(*args, **kwargs)
+        File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/smart_sota_2025_final.py", line 313, in call  *
+            output_upsampled = tf.image.resize(aggregated_spatial, [original_h, original_w, original_d], method='trilinear')
+    
+        ValueError: 'images' must have either 3 or 4 dimensions.
+    
+    
+    Call arguments received by layer 'stage2_enhanced_sam2' (type FinalWorkingEnhancedSAM2Attention):
+      • args=('tf.Tensor(shape=(None, 96, 112, 88, 44), dtype=float16)',)
+      • kwargs={'training': 'None'}
+
+
+Call arguments received by layer "stage2" (type FinalWorkingAdvancedConvBlock):
+  • args=('tf.Tensor(shape=(None, 96, 112, 88, 22), dtype=float16)',)
+  • kwargs={'training': 'None'}
+
+2025-07-01 23:34:17,393 - ERROR - ❌ Training failed.

@@ -1,0 +1,282 @@
+2025-06-22 22:21:57.182536: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-22 22:21:57.183769: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-22 22:21:57.296319: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-22 22:21:57.532854: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-22 22:22:03.848698: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-22 22:22:17,171 - INFO - CORRECT FULL DATASET TRAINING
+2025-06-22 22:22:17,172 - INFO - ======================================================================
+2025-06-22 22:22:17,173 - INFO - Dataset: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training
+2025-06-22 22:22:17,174 - INFO - Expected samples: 655
+2025-06-22 22:22:17,175 - INFO - Batch size: 5 (with epoch shuffling)
+2025-06-22 22:22:17,176 - INFO - Validation split: 0.1 (10%)
+2025-06-22 22:22:17,177 - INFO - Architecture: State-of-the-art with 16 base filters (~5.7M params)
+2025-06-22 22:22:17,178 - INFO - ======================================================================
+INFO:tensorflow:Mixed precision compatibility check (mixed_float16): OK
+Your GPU will likely run quickly with dtype policy mixed_float16 as it has compute capability of at least 7.0. Your GPU: NVIDIA RTX 4500 Ada Generation, compute capability 8.9
+2025-06-22 22:22:19,142 - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPU will likely run quickly with dtype policy mixed_float16 as it has compute capability of at least 7.0. Your GPU: NVIDIA RTX 4500 Ada Generation, compute capability 8.9
+2025-06-22 22:22:19,143 - INFO - Mixed precision enabled: mixed_float16
+2025-06-22 22:22:19,144 - INFO - Using GPU: PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+2025-06-22 22:22:19,147 - INFO - Loading dataset from: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training
+2025-06-22 22:22:19,883 - INFO - Loaded 655 image/mask pairs from full dataset
+2025-06-22 22:22:19,886 - INFO - ======================================================================
+2025-06-22 22:22:19,887 - INFO - 🔍 PRE-TRAINING VERIFICATION
+2025-06-22 22:22:19,887 - INFO - ======================================================================
+2025-06-22 22:22:19,888 - INFO - 1. DATASET VERIFICATION:
+2025-06-22 22:22:19,889 - INFO -    Total pairs found: 655
+2025-06-22 22:22:19,890 - INFO -    Training pairs: 589 (89.9%)
+2025-06-22 22:22:19,891 - INFO -    Validation pairs: 66 (10.1%)
+2025-06-22 22:22:19,892 - INFO -    ✅ Dataset size correct
+2025-06-22 22:22:19,893 - INFO -    ✅ No overlap between train/validation
+2025-06-22 22:22:19,894 - INFO - 
+2. MODEL ARCHITECTURE VERIFICATION:
+2025-06-22 22:22:19.968287: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-22 22:22:19.969262: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+2025-06-22 22:22:20,482 - INFO -    Model parameters: 5,695,045
+2025-06-22 22:22:20,484 - INFO -    ✅ Parameter count in expected range (5M-6M)
+2025-06-22 22:22:20.557825: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8907
+2025-06-22 22:22:27,582 - INFO -    ✅ Forward pass successful: (1, 192, 224, 176, 1) → (1, 192, 224, 176, 1)
+2025-06-22 22:22:27,591 - INFO - 
+3. SAMPLE DATA LOADING TEST:
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:27,765 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:27,858 - INFO -    Sample 1 (sub-r001s001_ses-1): (197, 233, 189), 112,451 lesion voxels
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:27,998 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,096 - INFO -    Sample 2 (sub-r023s007_ses-1): (197, 233, 189), 4,314 lesion voxels
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,248 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,345 - INFO -    Sample 3 (sub-r052s032_ses-1): (197, 233, 189), 18,825 lesion voxels
+2025-06-22 22:22:28,346 - INFO -    ✅ Good lesion size diversity: 4,314 to 112,451
+2025-06-22 22:22:28,347 - INFO - 
+4. MEMORY ESTIMATION:
+2025-06-22 22:22:28,348 - INFO -    Batch size: 5
+2025-06-22 22:22:28,349 - INFO -    Estimated GPU memory: 0.3 GB
+2025-06-22 22:22:28,350 - INFO -    ✅ Memory usage reasonable
+2025-06-22 22:22:28,351 - INFO - 
+5. TRAINING TIME ESTIMATION:
+2025-06-22 22:22:28,352 - INFO -    Train batches per epoch: 117
+2025-06-22 22:22:28,353 - INFO -    Val batches per epoch: 13
+2025-06-22 22:22:28,354 - INFO -    Estimated time per epoch: 6.5 minutes
+2025-06-22 22:22:28,355 - INFO -    Estimated total time: 5.4 hours
+2025-06-22 22:22:28,355 - INFO - 
+======================================================================
+2025-06-22 22:22:28,356 - INFO - 🎉 ALL VERIFICATIONS PASSED!
+2025-06-22 22:22:28,357 - INFO - ✅ Ready to start training
+2025-06-22 22:22:28,358 - INFO - ======================================================================
+2025-06-22 22:22:28,359 - INFO - FINAL TRAINING CONFIGURATION:
+2025-06-22 22:22:28,360 - INFO -   Dataset: 655 total cases
+2025-06-22 22:22:28,361 - INFO -   Training: 589 cases (89.9%)
+2025-06-22 22:22:28,362 - INFO -   Validation: 66 cases (10.1%)
+2025-06-22 22:22:28,363 - INFO -   Model: 5,695,045 parameters
+2025-06-22 22:22:28,364 - INFO -   Batch size: 5
+2025-06-22 22:22:28,365 - INFO -   Input shape: (192, 224, 176, 1)
+2025-06-22 22:22:28,366 - INFO -   Estimated time: 5.4 hours
+2025-06-22 22:22:28,367 - INFO - ======================================================================
+2025-06-22 22:22:28,368 - INFO - Dataset: 589 samples
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,373 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,489 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,604 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,720 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,841 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:28,957 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,074 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,189 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,305 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,422 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,531 - INFO - Sample lesion sizes - Min: 1,064, Max: 58,010, Mean: 15,804
+2025-06-22 22:22:29,533 - INFO - Dataset: 66 samples
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,538 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,653 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,769 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,886 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:29,999 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:30,113 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:30,228 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:30,344 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:30,457 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:30,573 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:30,685 - INFO - Sample lesion sizes - Min: 420, Max: 100,135, Mean: 26,162
+2025-06-22 22:22:31,230 - INFO - Model parameters: 5,695,045
+2025-06-22 22:22:31,242 - INFO - Testing data generators...
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:31,416 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:32,556 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:33,704 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:34,798 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:35,893 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:36,962 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:38,048 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:39,115 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:40,166 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:41,208 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:42,131 - INFO - Train batch: X=(5, 192, 224, 176, 1), y=(5, 192, 224, 176, 1)
+2025-06-22 22:22:42,133 - INFO - Val batch: X=(5, 192, 224, 176, 1), y=(5, 192, 224, 176, 1)
+2025-06-22 22:22:42,134 - INFO - ✅ Data generators working correctly
+2025-06-22 22:22:42,135 - INFO - Starting training on FULL 655-image dataset...
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:42,318 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:43,362 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:44,428 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:45,516 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:46,603 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:54,614 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:55,784 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:56,826 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:57,914 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:22:58,987 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:00,156 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:01,254 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:02,465 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:03,545 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:04,676 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:05,869 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:06,996 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:08,175 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:09,239 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:10,362 - INFO - pixdim[0] (qfac) should be 1 (default) or -1; setting qfac to 1
+2025-06-22 22:23:28.397125: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:306] gpu_async_0 cuMemAllocAsync failed to allocate 2422210560 bytes: CUDA error: out of memory (CUDA_ERROR_OUT_OF_MEMORY)
+ Reported by CUDA: Free memory/Total memory: 1096417280/25393496064
+2025-06-22 22:23:28.397748: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:311] Stats: Limit:                     23575789568
+InUse:                     22385033658
+MaxInUse:                  23709680102
+NumAllocs:                        2919
+MaxAllocSize:               4861494176
+Reserved:                            0
+PeakReserved:                        0
+LargestFreeBlock:                    0
+
+2025-06-22 22:23:28.398189: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:63] Histogram of current allocation: (allocation_size_in_bytes, nb_allocation_of_that_sizes), ...;
+2025-06-22 22:23:28.398596: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1, 6
+2025-06-22 22:23:28.399046: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 4, 94
+2025-06-22 22:23:28.399508: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 8, 11
+2025-06-22 22:23:28.399945: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 32, 1
+2025-06-22 22:23:28.400509: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 64, 68
+2025-06-22 22:23:28.400961: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 128, 65
+2025-06-22 22:23:28.401387: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 256, 65
+2025-06-22 22:23:28.401866: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 512, 66
+2025-06-22 22:23:28.402329: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1024, 32
+2025-06-22 22:23:28.402773: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1028, 1
+2025-06-22 22:23:28.403201: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1728, 3
+2025-06-22 22:23:28.403632: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2048, 2
+2025-06-22 22:23:28.404093: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 4096, 6
+2025-06-22 22:23:28.404535: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 8192, 3
+2025-06-22 22:23:28.404974: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 13824, 2
+2025-06-22 22:23:28.405431: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 16384, 9
+2025-06-22 22:23:28.405857: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 27648, 8
+2025-06-22 22:23:28.406305: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 29568, 1
+2025-06-22 22:23:28.406748: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 32768, 3
+2025-06-22 22:23:28.407191: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 55296, 8
+2025-06-22 22:23:28.407631: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 65536, 9
+2025-06-22 22:23:28.408081: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 110592, 8
+2025-06-22 22:23:28.408519: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 131072, 1
+2025-06-22 22:23:28.408984: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 147840, 1
+2025-06-22 22:23:28.409419: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 221184, 8
+2025-06-22 22:23:28.409848: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 236544, 1
+2025-06-22 22:23:28.410277: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 262144, 3
+2025-06-22 22:23:28.410705: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 442368, 8
+2025-06-22 22:23:28.411157: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 524288, 1
+2025-06-22 22:23:28.411583: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 884736, 8
+2025-06-22 22:23:28.412023: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1048576, 3
+2025-06-22 22:23:28.412448: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1182720, 1
+2025-06-22 22:23:28.412875: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1769472, 8
+2025-06-22 22:23:28.413308: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1892352, 1
+2025-06-22 22:23:28.413765: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2365440, 1
+2025-06-22 22:23:28.414205: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 3538944, 7
+2025-06-22 22:23:28.414611: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 4730880, 4
+2025-06-22 22:23:28.415047: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 7077888, 3
+2025-06-22 22:23:28.415463: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 9461760, 2
+2025-06-22 22:23:28.415927: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 15138816, 1
+2025-06-22 22:23:28.416337: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 18923520, 10
+2025-06-22 22:23:28.416768: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 30277632, 1
+2025-06-22 22:23:28.417172: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 37847040, 2
+2025-06-22 22:23:28.417586: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 75694080, 12
+2025-06-22 22:23:28.417983: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 151388160, 3
+2025-06-22 22:23:28.418383: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 302776320, 10
+2025-06-22 22:23:28.418777: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 605552640, 1
+2025-06-22 22:23:28.419199: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 1211105280, 10
+2025-06-22 22:23:28.419627: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:66] 2422210560, 2
+2025-06-22 22:23:28.420091: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:97] CU_MEMPOOL_ATTR_RESERVED_MEM_CURRENT: 24058527744
+2025-06-22 22:23:28.420453: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:99] CU_MEMPOOL_ATTR_USED_MEM_CURRENT: 22385033658
+2025-06-22 22:23:28.420803: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:100] CU_MEMPOOL_ATTR_RESERVED_MEM_HIGH: 25132269568
+2025-06-22 22:23:28.421137: E external/local_xla/xla/stream_executor/gpu/gpu_cudamallocasync_allocator.cc:101] CU_MEMPOOL_ATTR_USED_MEM_HIGH: 23709680102
+2025-06-22 22:23:28.421506: W tensorflow/core/framework/op_kernel.cc:1839] OP_REQUIRES failed at conv_grad_input_ops_3d.cc:1133 : RESOURCE_EXHAUSTED: OOM when allocating tensor with shape[5,192,224,176,16] and type float on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+2025-06-22 22:23:28,541 - ERROR - Training failed: Graph execution error:
+
+Detected at node gradient_tape/SOTA_Attention_UNet/conv3d_30/Conv3D/Conv3DBackpropInputV2 defined at (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/correct_full_training.py", line 552, in <module>
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/correct_full_training.py", line 509, in train_model
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 65, in error_handler
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1807, in fit
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1401, in train_function
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1384, in step_function
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1373, in run_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/engine/training.py", line 1154, in train_step
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 543, in minimize
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/mixed_precision/loss_scale_optimizer.py", line 1259, in compute_gradients
+
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/optimizers/optimizer.py", line 276, in compute_gradients
+
+OOM when allocating tensor with shape[5,192,224,176,16] and type float on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0
+	 [[{{node gradient_tape/SOTA_Attention_UNet/conv3d_30/Conv3D/Conv3DBackpropInputV2}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+ [Op:__inference_train_function_20378]
+2025-06-22 22:23:28,548 - ERROR - ❌ Training failed

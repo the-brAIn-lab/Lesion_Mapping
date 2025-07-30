@@ -1,0 +1,111 @@
+🔍 COMPREHENSIVE STROKE SEGMENTATION DEBUG
+==========================================
+Purpose: Identify core issue causing Dice ~0.0
+Strategy: Test both orientations systematically
+Expected outcomes:
+  A) Flip fixes issue → Dice jumps to 0.3-0.5
+  B) Model works → Dice 0.3+ in best orientation
+  C) Deeper issues → Both orientations poor
+
+Job ID: 1126648
+Node: hggpu9-2
+Start: Sun Jun 22 03:22:23 UTC 2025
+
+Environment configured
+GPU Status:
+NVIDIA RTX 4500 Ada Generation, 24570 MiB, 1 MiB
+
+🚀 Running comprehensive debug analysis...
+🔍 COMPREHENSIVE STROKE SEGMENTATION DEBUG
+======================================================================
+Purpose: Identify why model performance is poor (Dice ~0.0)
+Strategy: Test both orientations with exact training preprocessing
+Expected: One orientation should show much better performance
+Start time: 2025-06-22 03:23:14
+
+======================================================================
+COMPREHENSIVE DEBUG ANALYSIS: sub-r048s014_ses-1
+======================================================================
+📂 Loading data...
+  Image path: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Testing_Split/Images/sub-r048s014_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz
+  Mask path: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Testing_Split/Masks/sub-r048s014_ses-1_space-MNI152NLin2009aSym_label-L_desc-T1lesion_mask.nii.gz
+  Original shape: (197, 233, 189)
+  True lesion voxels: 1,112
+✅ GPU configured: PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+✅ Mixed precision enabled
+✅ Model loaded: 5,695,045 parameters
+
+🔄 TESTING BOTH ORIENTATIONS
+==================================================
+
+📍 Testing: Original Orientation
+------------------------------
+  Input shape: (197, 233, 189)
+  Input range: [0.000000, 167.835052]
+  Input mean: 14.263987
+  Non-zero voxels: 8,245,013
+  Resizing from (197, 233, 189) to (192, 224, 176)
+  After resize: (192, 224, 176)
+  Before normalization - range: [0.000000, 152.713562]
+  Percentiles: p1=1.177913, p99=78.017382
+  After clipping - range: [1.177913, 78.017380]
+  After normalization - range: [0.000000, 1.000000]
+  After normalization - mean: 0.168954
+  Final shape: (192, 224, 176, 1)
+  Batch shape: (1, 192, 224, 176, 1)
+  Running prediction...
+  ✅ Original: Dice=0.0000, Threshold=0.50, Time=8.4s
+
+📍 Testing: Flipped Orientation
+------------------------------
+  Input shape: (197, 233, 189)
+  Input range: [0.000000, 167.835052]
+  Input mean: 14.263973
+  Non-zero voxels: 8,245,013
+  Resizing from (197, 233, 189) to (192, 224, 176)
+  After resize: (192, 224, 176)
+  Before normalization - range: [0.000000, 152.713562]
+  Percentiles: p1=1.177913, p99=78.017382
+  After clipping - range: [1.177913, 78.017380]
+  After normalization - range: [0.000000, 1.000000]
+  After normalization - mean: 0.168954
+  Final shape: (192, 224, 176, 1)
+  Batch shape: (1, 192, 224, 176, 1)
+  Running prediction...
+  ✅ Flipped: Dice=0.0000, Threshold=0.50, Time=0.1s
+
+🎯 RESULTS ANALYSIS
+========================================
+Original orientation: Dice = 0.0000
+Flipped orientation:  Dice = 0.0000
+∞x
+
+❌ DEEPER ISSUES: Both orientations perform poorly
+  - May need to check preprocessing pipeline
+  - Or model architecture/training issues
+
+🏁 FINAL CONCLUSION
+==================================================
+Test case: sub-r048s014_ses-1
+Solution: deeper_investigation
+Best performance: 0.0000 Dice
+Best orientation: original
+
+🎯 NEXT STEPS:
+1. Investigate preprocessing pipeline differences
+2. Check training data orientation
+3. Verify model architecture
+
+End time: 2025-06-22 03:23:29
+
+= activate_stroke_env.sh alignment_fix_test.py analyze_prediction.py attention_unet.py batch_test_all_cases.py batch_test_corrected.py batch_test_fixed_model.py batch_wise_train.py callbacks checkpoints check_training_affines.py chunked_prediction_test.py comprehensive_debug_test.py config conservative_postprocess_test.py corrected_sota_training.py data debug_batch_test.py evaluate_model.py final_working_train.py fixed_sota_training.py gpu_compatible_test.py install_env_job.sh logs memory_optimized_test_output minimal_memory_test.py model_backups models modified_verbose_threshold_test.py nano optimized_hybrid_training_backup.py optimized_hybrid_training_fixed.py optimized_hybrid_training.py outputs predictions Predictions __pycache__ raw_probability_analysis raw_probability_test.py real_data_loader.py results run_test_sota.sh safe_model_manager.py scripts simple_orientation_test.py simple_test_tf215.py slurm-1125615.out sota_attention_model.py sota_full_training.py SOTA_Implementation_Guide.md sota_training_fixed.py sota_training_pipeline.py sub-r050s008_img.nii.gz sub-r050s008_pred.nii.gz test_alignment_fix.py test_alignment_fix_verbose.py test_env.py test_fixed_model.py test_gpu_1122837.log test_gpu.py test_gpu_tf215.py test_memory_optimized.py test_model_claude.py test_model.py test_results_20250617_043924 test_results_20250618_062153 test_results_20250618_063346 test_results_20250618_184522 test_single_case.py test_sota_model.py test_sota_setup.py test_training_vs_test_case.py training verbose_single_test.py verbose_test_output verify_installation.py working_sota_model_old.py working_sota_model.py working_sota_model.py.bak working_sota_model.py.bak2 working_sota_model.py.bak3 working_sota_training_backup.py working_sota_training.py working_sota_training.py.bak26 working_sota_training.py.bak27 working_sota_training.py.bak31 working_sota_training.py.bak32 working_sota_training.py.bak34 working_sota_training.py.bak35 working_sota_training.py.bak4 60
+DEBUG COMPLETED
+= activate_stroke_env.sh alignment_fix_test.py analyze_prediction.py attention_unet.py batch_test_all_cases.py batch_test_corrected.py batch_test_fixed_model.py batch_wise_train.py callbacks checkpoints check_training_affines.py chunked_prediction_test.py comprehensive_debug_test.py config conservative_postprocess_test.py corrected_sota_training.py data debug_batch_test.py evaluate_model.py final_working_train.py fixed_sota_training.py gpu_compatible_test.py install_env_job.sh logs memory_optimized_test_output minimal_memory_test.py model_backups models modified_verbose_threshold_test.py nano optimized_hybrid_training_backup.py optimized_hybrid_training_fixed.py optimized_hybrid_training.py outputs predictions Predictions __pycache__ raw_probability_analysis raw_probability_test.py real_data_loader.py results run_test_sota.sh safe_model_manager.py scripts simple_orientation_test.py simple_test_tf215.py slurm-1125615.out sota_attention_model.py sota_full_training.py SOTA_Implementation_Guide.md sota_training_fixed.py sota_training_pipeline.py sub-r050s008_img.nii.gz sub-r050s008_pred.nii.gz test_alignment_fix.py test_alignment_fix_verbose.py test_env.py test_fixed_model.py test_gpu_1122837.log test_gpu.py test_gpu_tf215.py test_memory_optimized.py test_model_claude.py test_model.py test_results_20250617_043924 test_results_20250618_062153 test_results_20250618_063346 test_results_20250618_184522 test_single_case.py test_sota_model.py test_sota_setup.py test_training_vs_test_case.py training verbose_single_test.py verbose_test_output verify_installation.py working_sota_model_old.py working_sota_model.py working_sota_model.py.bak working_sota_model.py.bak2 working_sota_model.py.bak3 working_sota_training_backup.py working_sota_training.py working_sota_training.py.bak26 working_sota_training.py.bak27 working_sota_training.py.bak31 working_sota_training.py.bak32 working_sota_training.py.bak34 working_sota_training.py.bak35 working_sota_training.py.bak4 60
+Exit code: 1
+End time: Sun Jun 22 03:23:31 UTC 2025
+❌ DEBUG FAILED
+Check error log for details
+
+Final GPU status:
+memory.used [MiB], memory.total [MiB]
+1 MiB, 24570 MiB

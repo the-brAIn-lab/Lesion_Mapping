@@ -1,0 +1,69 @@
+🔍 DEBUGGING MULTI-GPU SCRIPT IMPORT ISSUES
+============================================
+Job ID: 1127516
+Start: Tue Jun 24 02:25:29 UTC 2025
+
+✅ Environment activated
+
+🧪 TESTING BASIC IMPORTS:
+Python version: 3.11.13 | packaged by conda-forge | (main, Jun  4 2025, 14:48:23) [GCC 13.3.0]
+✅ TensorFlow: 2.15.1
+✅ Keras layers import OK
+✅ sklearn import OK
+✅ numpy import OK
+✅ baseline script import OK
+
+🔍 TESTING MULTI-GPU SCRIPT IMPORT:
+Attempting to import multi_gpu_advanced_sota...
+✅ Multi-GPU script imports successfully!
+Testing key functions...
+✅ configure_multi_gpu_strategy import OK
+✅ build_massive_sota_model import OK
+✅ ultimate_loss import OK
+
+🔧 CHECKING FOR SPECIFIC ERRORS:
+Checking if deep_supervision_loss is still being called...
+270:def deep_supervision_loss(y_true, y_pred_list, weights=None):
+511:                loss=lambda y_true, y_pred: deep_supervision_loss(y_true, y_pred),
+
+Checking USE_DEEP_SUPERVISION settings...
+44:    USE_DEEP_SUPERVISION = False
+198:    if MultiGPUAdvancedConfig.USE_DEEP_SUPERVISION:
+208:    if MultiGPUAdvancedConfig.USE_DEEP_SUPERVISION:
+218:    if MultiGPUAdvancedConfig.USE_DEEP_SUPERVISION:
+231:    if MultiGPUAdvancedConfig.USE_DEEP_SUPERVISION:
+508:        if MultiGPUAdvancedConfig.USE_DEEP_SUPERVISION:
+
+🧪 TESTING MODEL BUILDING:
+Testing model building with small size...
+❌ Model building error: Exception encountered when calling layer "multi_head_attention" (type MultiHeadAttention).
+
+Dimension value must be integer or None or have an __index__ method, got value '<KerasTensor: shape=() dtype=int32 inferred_value=[16] (created by layer 'tf.compat.v1.floor_div')>' with type '<class 'keras.src.engine.keras_tensor.KerasTensor'>'
+
+Call arguments received by layer "multi_head_attention" (type MultiHeadAttention):
+  • query=tf.Tensor(shape=(None, 2, 2, 2, 128), dtype=float32)
+  • value=tf.Tensor(shape=(None, 2, 2, 2, 128), dtype=float32)
+  • key=None
+  • attention_mask=None
+  • return_attention_scores=False
+  • training=None
+  • use_causal_mask=False
+
+🔍 TESTING TENSORFLOW DISTRIBUTION:
+Testing MirroredStrategy...
+✅ MirroredStrategy works: 1 devices
+
+📁 CHECKING FILE EXISTENCE:
+Checking if all required files exist...
+-rw-r--r-- 1 rb194958e GeneralUsers 21678 Jun 24 01:16 multi_gpu_advanced_sota.py
+-rw-r--r-- 1 rb194958e GeneralUsers 22615 Jun 22 22:22 correct_full_training.py
+-rwxr-xr-x 1 rb194958e GeneralUsers 4608 Jun 23 22:28 scripts/massive_multi_gpu_sota.sh
+
+🔍 FINAL DIAGNOSIS:
+If we got here without errors, the script should work.
+If there were errors above, those need to be fixed.
+
+============================================
+Debug completed: Tue Jun 24 02:27:48 UTC 2025
+Check the output above for specific errors.
+============================================

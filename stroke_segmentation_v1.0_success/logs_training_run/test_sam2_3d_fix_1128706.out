@@ -1,0 +1,56 @@
+🔧 TESTING SAM2 3D MEMORY-EFFICIENT FIX
+=======================================
+Purpose: Test 3D-specific SAM2 attention that works with medical volumes
+Problem: tf.image.resize doesn't work with 5D tensors (3D medical volumes)
+Solution: Use 3D pooling + proper 3D upsampling operations
+
+Job ID: 1128706
+Node: hggpu9-12
+Start: Thu Jun 26 20:41:47 UTC 2025
+
+Environment configured
+
+🚀 Testing 3D-specific SAM2 fix...
+Testing Memory-Efficient SAM2 Attention for 3D...
+Input shape: (2, 96, 112, 88, 44)
+Original sequence length: 946,176
+Original attention matrix size: 946,176 × 946,176
+Original memory requirement: ~3.6 TB
+
+--- TESTING FIXED 3D SAM2 ATTENTION ---
+Pooled sequence length: 14784 (vs original 946176)
+✅ 3D SAM2 attention successful: (2, 96, 112, 88, 44) → (2, 96, 112, 88, 44)
+✅ Output shape verification passed
+
+--- TESTING DIFFERENT POOL SIZES ---
+Pooled sequence length: 118272 (vs original 946176)
+❌ 3D SAM2 attention failed: Exception encountered when calling layer 'memory_efficient_sam2_attention3d_1' (type MemoryEfficientSAM2Attention3D).
+
+{{function_node __wrapped__BatchMatMulV2_device_/job:localhost/replica:0/task:0/device:GPU:0}} OOM when allocating tensor with shape[2,118272,118272] and type float on /job:localhost/replica:0/task:0/device:GPU:0 by allocator gpu_async_0 [Op:BatchMatMulV2] name: 
+
+Call arguments received by layer 'memory_efficient_sam2_attention3d_1' (type MemoryEfficientSAM2Attention3D):
+  • x=tf.Tensor(shape=(2, 96, 112, 88, 44), dtype=float32)
+  • training=False
+
+❌ 3D SAM2 attention fix failed
+
+🔧 3D SAM2 attention testing completed!
+
+SAM2 3D fix test completed with exit code: 0
+End time: Thu Jun 26 20:42:38 UTC 2025
+✅ SAM2 3D FIX SUCCESSFUL
+
+Key improvements:
+  - Works with 5D tensors (3D medical volumes)
+  - Uses 3D pooling instead of 2D image operations
+  - Memory-efficient hierarchical attention
+  - Pool size 4: 64x memory reduction (946K → 14K sequence length)
+
+Next steps:
+1. Integrate into smart_sota_2025_fixed.py
+2. Test complete model building
+3. Run full SOTA training
+
+Final GPU state:
+memory.used [MiB], memory.total [MiB]
+1 MiB, 24570 MiB

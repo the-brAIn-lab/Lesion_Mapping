@@ -1,0 +1,101 @@
+2025-06-24 00:51:20.160633: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-24 00:51:20.161858: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-24 00:51:20.289895: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-24 00:51:20.557367: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-24 00:51:27.285420: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-06-24 00:51:42.804695: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-24 00:51:42.805592: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-24 00:51:42.807021: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-24 00:51:42.807706: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-24 00:51:42.808161: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-06-24 00:51:42.808833: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-06-24 00:51:42.809676: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-24 00:51:42.810090: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-06-24 00:51:42.810700: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-06-24 00:51:42.811524: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.
+2025-06-24 00:51:42.811879: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-06-24 00:51:42.812553: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+2025-06-24 00:51:49.404934: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-06-24 00:51:49.405599: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-06-24 00:51:49.519374: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-06-24 00:51:49.764407: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-06-24 00:51:56.418544: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/multi_gpu_advanced_sota.py:18: DeprecationWarning: Please import `map_coordinates` from the `scipy.ndimage` namespace; the `scipy.ndimage.interpolation` namespace is deprecated and will be removed in SciPy 2.0.0.
+  from scipy.ndimage.interpolation import map_coordinates
+2025-06-24 00:52:10,476 - INFO - 🚀 MULTI-GPU MASSIVE SOTA TRAINING
+2025-06-24 00:52:10,480 - INFO - ================================================================================
+2025-06-24 00:52:10,481 - INFO - Target: 80%+ Dice coefficient with MASSIVE architecture
+2025-06-24 00:52:10,482 - INFO - Strategy: 4-GPU MirroredStrategy with 25M+ parameters
+2025-06-24 00:52:10,483 - INFO - ================================================================================
+INFO:tensorflow:Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-06-24 00:52:14,705 - INFO - Mixed precision compatibility check (mixed_float16): OK
+Your GPUs will likely run quickly with dtype policy mixed_float16 as they all have compute capability of at least 7.0
+2025-06-24 00:52:14,708 - INFO - Detected GPUs: 4
+2025-06-24 00:52:14,709 - INFO - GPU 0: PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+2025-06-24 00:52:14,710 - INFO - GPU 1: PhysicalDevice(name='/physical_device:GPU:1', device_type='GPU')
+2025-06-24 00:52:14,711 - INFO - GPU 2: PhysicalDevice(name='/physical_device:GPU:2', device_type='GPU')
+2025-06-24 00:52:14,712 - INFO - GPU 3: PhysicalDevice(name='/physical_device:GPU:3', device_type='GPU')
+2025-06-24 00:52:14.964740: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 0
+2025-06-24 00:52:14.965733: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 22483 MB memory:  -> device: 0, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:1c:00.0, compute capability: 8.9
+2025-06-24 00:52:14.966662: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 1
+2025-06-24 00:52:14.967354: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 22483 MB memory:  -> device: 1, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:4f:00.0, compute capability: 8.9
+2025-06-24 00:52:14.967973: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 2
+2025-06-24 00:52:14.968591: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 22483 MB memory:  -> device: 2, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:9d:00.0, compute capability: 8.9
+2025-06-24 00:52:14.969383: I tensorflow/core/common_runtime/gpu/gpu_process_state.cc:236] Using CUDA malloc Async allocator for GPU: 3
+2025-06-24 00:52:14.969976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 22483 MB memory:  -> device: 3, name: NVIDIA RTX 4500 Ada Generation, pci bus id: 0000:ce:00.0, compute capability: 8.9
+INFO:tensorflow:Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-06-24 00:52:14,973 - INFO - Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1', '/job:localhost/replica:0/task:0/device:GPU:2', '/job:localhost/replica:0/task:0/device:GPU:3')
+2025-06-24 00:52:15,012 - INFO - 🚀 MirroredStrategy initialized with 4 devices
+2025-06-24 00:52:15,013 - INFO - 💪 Effective batch size: 4 (global)
+2025-06-24 00:52:15,014 - INFO - 📊 Per-GPU batch size: 1
+2025-06-24 00:52:15,017 - INFO - Loading dataset from: /mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training
+2025-06-24 00:52:15,745 - INFO - Loaded 655 image/mask pairs from full dataset
+2025-06-24 00:52:15,749 - INFO - Multi-GPU split: 556 train, 99 validation
+2025-06-24 00:52:15,750 - INFO - Building MASSIVE SOTA model within MirroredStrategy scope...
+2025-06-24 00:52:16,364 - ERROR - Training failed: Exception encountered when calling layer "multi_head_attention" (type MultiHeadAttention).
+
+Dimension value must be integer or None or have an __index__ method, got value '<KerasTensor: shape=() dtype=int32 inferred_value=[16] (created by layer 'tf.compat.v1.floor_div')>' with type '<class 'keras.src.engine.keras_tensor.KerasTensor'>'
+
+Call arguments received by layer "multi_head_attention" (type MultiHeadAttention):
+  • query=tf.Tensor(shape=(None, 48, 56, 44, 192), dtype=float16)
+  • value=tf.Tensor(shape=(None, 48, 56, 44, 192), dtype=float16)
+  • key=None
+  • attention_mask=None
+  • return_attention_scores=False
+  • training=None
+  • use_causal_mask=False
+Traceback (most recent call last):
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/multi_gpu_advanced_sota.py", line 567, in <module>
+    history, model = train_multi_gpu_advanced_model()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/multi_gpu_advanced_sota.py", line 493, in train_multi_gpu_advanced_model
+    model = build_massive_sota_model(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/multi_gpu_advanced_sota.py", line 179, in build_massive_sota_model
+    conv3 = massive_conv_block(pool2, base_filters * 4, use_swin=True)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/multi_gpu_advanced_sota.py", line 143, in massive_conv_block
+    x = swin_transformer_block(x, num_heads=min(16, num_filters//16))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/stroke_segmentation_sota/multi_gpu_advanced_sota.py", line 87, in swin_transformer_block
+    attention_output = layers.MultiHeadAttention(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 70, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/mnt/beegfs/hellgate/home/rb194958e/.conda/envs/tf215_env/lib/python3.11/site-packages/tensorflow/python/framework/tensor_shape.py", line 220, in __init__
+    raise TypeError(
+TypeError: Exception encountered when calling layer "multi_head_attention" (type MultiHeadAttention).
+
+Dimension value must be integer or None or have an __index__ method, got value '<KerasTensor: shape=() dtype=int32 inferred_value=[16] (created by layer 'tf.compat.v1.floor_div')>' with type '<class 'keras.src.engine.keras_tensor.KerasTensor'>'
+
+Call arguments received by layer "multi_head_attention" (type MultiHeadAttention):
+  • query=tf.Tensor(shape=(None, 48, 56, 44, 192), dtype=float16)
+  • value=tf.Tensor(shape=(None, 48, 56, 44, 192), dtype=float16)
+  • key=None
+  • attention_mask=None
+  • return_attention_scores=False
+  • training=None
+  • use_causal_mask=False

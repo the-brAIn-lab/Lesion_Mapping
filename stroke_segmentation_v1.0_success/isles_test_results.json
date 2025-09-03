@@ -1,0 +1,339 @@
+{
+  "summary": {
+    "num_samples": 5,
+    "mean_dice": 0.011698386142467156,
+    "std_dice": 0.018369180645653585,
+    "median_dice": 0.0007733765135219863,
+    "min_dice": 0.0,
+    "max_dice": 0.04763534323454605,
+    "mean_lesion_size": 1167.0,
+    "mean_prediction_confidence": 0.0026943998062051834,
+    "domain_adaptation_ratio": 0.26590360403060914,
+    "mean_intensity_shift": -0.05519356578588486,
+    "output_directory": "/home/rbielski/stroke_cleaned/stroke_segmentation_v1.0_success/test_results_isles",
+    "files_saved": 10
+  },
+  "sample_info": [
+    {
+      "subject_id": "sub-strokecase0001",
+      "image_path": "/home/rbielski/ISLES-2022/sub-strokecase0001/ses-0001/anat/sub-strokecase0001_ses-0001_FLAIR.nii.gz",
+      "mask_path": "/home/rbielski/ISLES-2022/derivatives/sub-strokecase0001/ses-0001/sub-strokecase0001_ses-0001_msk.nii.gz",
+      "prediction_path": "/home/rbielski/stroke_cleaned/stroke_segmentation_v1.0_success/test_results_isles/pred_0001_sub-strokecase0001_FLAIR_pred.nii.gz",
+      "original_shape": [
+        281,
+        352,
+        352
+      ],
+      "processed_shape": [
+        1,
+        192,
+        224,
+        176,
+        1
+      ],
+      "dice_score": 0.04763534323454605,
+      "lesion_volume_voxels": 835,
+      "prediction_confidence": 0.000962336256634444,
+      "intensity_stats": {
+        "mean": 84.97149903873604,
+        "std": 292.73248025896436,
+        "min": 0.0,
+        "max": 2207.997802734375,
+        "percentile_95": 1022.5333862304688,
+        "percentile_5": 0.0
+      },
+      "domain_adaptation": {
+        "original_mean": 0.06844843178987503,
+        "adapted_mean": 0.019207650795578957,
+        "adaptation_ratio": 0.2806149125099182,
+        "intensity_shift": -0.04924078285694122
+      },
+      "modality": "FLAIR",
+      "target_modality": "T1w",
+      "upsampling_applied": true,
+      "zoom_factors": {
+        "image": [
+          0.6832740213523132,
+          0.6363636363636364,
+          0.5
+        ],
+        "mask": [
+          1.7142857142857142,
+          2.0,
+          2.410958904109589
+        ]
+      }
+    },
+    {
+      "subject_id": "sub-strokecase0002",
+      "image_path": "/home/rbielski/ISLES-2022/sub-strokecase0002/ses-0001/anat/sub-strokecase0002_ses-0001_FLAIR.nii.gz",
+      "mask_path": "/home/rbielski/ISLES-2022/derivatives/sub-strokecase0002/ses-0001/sub-strokecase0002_ses-0001_msk.nii.gz",
+      "prediction_path": "/home/rbielski/stroke_cleaned/stroke_segmentation_v1.0_success/test_results_isles/pred_0002_sub-strokecase0002_FLAIR_pred.nii.gz",
+      "original_shape": [
+        281,
+        352,
+        352
+      ],
+      "processed_shape": [
+        1,
+        192,
+        224,
+        176,
+        1
+      ],
+      "dice_score": 0.0,
+      "lesion_volume_voxels": 118,
+      "prediction_confidence": 0.006632436998188496,
+      "intensity_stats": {
+        "mean": 103.30633561066156,
+        "std": 346.61310263924275,
+        "min": 0.0,
+        "max": 2795.480224609375,
+        "percentile_95": 1185.7435302734375,
+        "percentile_5": 0.0
+      },
+      "domain_adaptation": {
+        "original_mean": 0.07095737010240555,
+        "adapted_mean": 0.016960807144641876,
+        "adaptation_ratio": 0.23902812600135803,
+        "intensity_shift": -0.05399656295776367
+      },
+      "modality": "FLAIR",
+      "target_modality": "T1w",
+      "upsampling_applied": true,
+      "zoom_factors": {
+        "image": [
+          0.6832740213523132,
+          0.6363636363636364,
+          0.5
+        ],
+        "mask": [
+          1.7142857142857142,
+          2.0,
+          2.4444444444444446
+        ]
+      }
+    },
+    {
+      "subject_id": "sub-strokecase0003",
+      "image_path": "/home/rbielski/ISLES-2022/sub-strokecase0003/ses-0001/anat/sub-strokecase0003_ses-0001_FLAIR.nii.gz",
+      "mask_path": "/home/rbielski/ISLES-2022/derivatives/sub-strokecase0003/ses-0001/sub-strokecase0003_ses-0001_msk.nii.gz",
+      "prediction_path": "/home/rbielski/stroke_cleaned/stroke_segmentation_v1.0_success/test_results_isles/pred_0003_sub-strokecase0003_FLAIR_pred.nii.gz",
+      "original_shape": [
+        281,
+        352,
+        352
+      ],
+      "processed_shape": [
+        1,
+        192,
+        224,
+        176,
+        1
+      ],
+      "dice_score": 0.0007733765135219863,
+      "lesion_volume_voxels": 3873,
+      "prediction_confidence": 0.0011089142644777894,
+      "intensity_stats": {
+        "mean": 111.7128253774933,
+        "std": 350.38880857843,
+        "min": 0.0,
+        "max": 2761.142822265625,
+        "percentile_95": 1188.087890625,
+        "percentile_5": 0.0
+      },
+      "domain_adaptation": {
+        "original_mean": 0.07921960949897766,
+        "adapted_mean": 0.02763042412698269,
+        "adaptation_ratio": 0.34878262877464294,
+        "intensity_shift": -0.05158918350934982
+      },
+      "modality": "FLAIR",
+      "target_modality": "T1w",
+      "upsampling_applied": true,
+      "zoom_factors": {
+        "image": [
+          0.6832740213523132,
+          0.6363636363636364,
+          0.5
+        ],
+        "mask": [
+          1.7142857142857142,
+          2.0,
+          2.4444444444444446
+        ]
+      }
+    },
+    {
+      "subject_id": "sub-strokecase0004",
+      "image_path": "/home/rbielski/ISLES-2022/sub-strokecase0004/ses-0001/anat/sub-strokecase0004_ses-0001_FLAIR.nii.gz",
+      "mask_path": "/home/rbielski/ISLES-2022/derivatives/sub-strokecase0004/ses-0001/sub-strokecase0004_ses-0001_msk.nii.gz",
+      "prediction_path": "/home/rbielski/stroke_cleaned/stroke_segmentation_v1.0_success/test_results_isles/pred_0004_sub-strokecase0004_FLAIR_pred.nii.gz",
+      "original_shape": [
+        281,
+        352,
+        352
+      ],
+      "processed_shape": [
+        1,
+        192,
+        224,
+        176,
+        1
+      ],
+      "dice_score": 0.010083210964267739,
+      "lesion_volume_voxels": 281,
+      "prediction_confidence": 0.00235213921405375,
+      "intensity_stats": {
+        "mean": 116.37487697031344,
+        "std": 358.59286317580995,
+        "min": 0.0,
+        "max": 3134.1572265625,
+        "percentile_95": 1160.4605712890625,
+        "percentile_5": 0.0
+      },
+      "domain_adaptation": {
+        "original_mean": 0.08183594793081284,
+        "adapted_mean": 0.018273495137691498,
+        "adaptation_ratio": 0.2232942283153534,
+        "intensity_shift": -0.06356245279312134
+      },
+      "modality": "FLAIR",
+      "target_modality": "T1w",
+      "upsampling_applied": true,
+      "zoom_factors": {
+        "image": [
+          0.6832740213523132,
+          0.6363636363636364,
+          0.5
+        ],
+        "mask": [
+          1.7142857142857142,
+          2.0,
+          2.4444444444444446
+        ]
+      }
+    },
+    {
+      "subject_id": "sub-strokecase0005",
+      "image_path": "/home/rbielski/ISLES-2022/sub-strokecase0005/ses-0001/anat/sub-strokecase0005_ses-0001_FLAIR.nii.gz",
+      "mask_path": "/home/rbielski/ISLES-2022/derivatives/sub-strokecase0005/ses-0001/sub-strokecase0005_ses-0001_msk.nii.gz",
+      "prediction_path": "/home/rbielski/stroke_cleaned/stroke_segmentation_v1.0_success/test_results_isles/pred_0005_sub-strokecase0005_FLAIR_pred.nii.gz",
+      "original_shape": [
+        352,
+        352,
+        230
+      ],
+      "processed_shape": [
+        1,
+        192,
+        224,
+        176,
+        1
+      ],
+      "dice_score": 0.0,
+      "lesion_volume_voxels": 728,
+      "prediction_confidence": 0.0024161722976714373,
+      "intensity_stats": {
+        "mean": 98.21044414017588,
+        "std": 318.20432279708444,
+        "min": 0.0,
+        "max": 2404.17431640625,
+        "percentile_95": 1059.4666748046875,
+        "percentile_5": 0.0
+      },
+      "domain_adaptation": {
+        "original_mean": 0.07554277777671814,
+        "adapted_mean": 0.01796393096446991,
+        "adaptation_ratio": 0.23779812455177307,
+        "intensity_shift": -0.05757884681224823
+      },
+      "modality": "FLAIR",
+      "target_modality": "T1w",
+      "upsampling_applied": true,
+      "zoom_factors": {
+        "image": [
+          0.5454545454545454,
+          0.6363636363636364,
+          0.7652173913043478
+        ],
+        "mask": [
+          1.7142857142857142,
+          2.0,
+          2.4444444444444446
+        ]
+      }
+    }
+  ],
+  "dice_scores": [
+    0.04763534323454605,
+    0.0,
+    0.0007733765135219863,
+    0.010083210964267739,
+    0.0
+  ],
+  "domain_analysis": {
+    "intensity_stats": [
+      {
+        "mean": 84.97149903873604,
+        "std": 292.73248025896436,
+        "min": 0.0,
+        "max": 2207.997802734375,
+        "percentile_95": 1022.5333862304688,
+        "percentile_5": 0.0
+      },
+      {
+        "mean": 103.30633561066156,
+        "std": 346.61310263924275,
+        "min": 0.0,
+        "max": 2795.480224609375,
+        "percentile_95": 1185.7435302734375,
+        "percentile_5": 0.0
+      },
+      {
+        "mean": 111.7128253774933,
+        "std": 350.38880857843,
+        "min": 0.0,
+        "max": 2761.142822265625,
+        "percentile_95": 1188.087890625,
+        "percentile_5": 0.0
+      },
+      {
+        "mean": 116.37487697031344,
+        "std": 358.59286317580995,
+        "min": 0.0,
+        "max": 3134.1572265625,
+        "percentile_95": 1160.4605712890625,
+        "percentile_5": 0.0
+      },
+      {
+        "mean": 98.21044414017588,
+        "std": 318.20432279708444,
+        "min": 0.0,
+        "max": 2404.17431640625,
+        "percentile_95": 1059.4666748046875,
+        "percentile_5": 0.0
+      }
+    ],
+    "lesion_sizes": [
+      835,
+      118,
+      3873,
+      281,
+      728
+    ],
+    "prediction_confidence": [
+      0.000962336256634444,
+      0.006632436998188496,
+      0.0011089142644777894,
+      0.00235213921405375,
+      0.0024161722976714373
+    ]
+  },
+  "metadata": {
+    "dataset": "ISLES-2022",
+    "model": "Vision Mamba + SAM2 U-Net",
+    "preprocessing": "upsampling + normalization",
+    "test_date": "unknown"
+  }
+}

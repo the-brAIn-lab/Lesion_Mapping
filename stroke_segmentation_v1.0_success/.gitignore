@@ -1,0 +1,36 @@
+# Large test result files
+test_results/*.npy
+test_results/*.png
+test_results/*.nii.gz
+test_results/prediction_sample_*.npy
+test_results/visualization_sample_*.png
+
+# Keep summary JSON files but exclude large individual results
+test_results/pred_*_pred.nii.gz
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Large model files
+models/*.keras
+models/*.h5
+*.keras
+*.h5
+
+# Log directories
+logs/
+logs_training_run/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Keep these important files:
+# test_results/test_results_*.json (summary files)
+# test_results/predictions.jsonl (predictions log)
+# test_results/predictions_log.txt (log file)

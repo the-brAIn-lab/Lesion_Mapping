@@ -1,0 +1,81 @@
+{
+  "timestamp": "20250902_134233",
+  "total_samples": 5,
+  "model_info": {
+    "input_shape": "(None, 192, 224, 176, 1)",
+    "output_shape": "(None, 192, 224, 176, 1)",
+    "parameters": 1459585
+  },
+  "sample_results": [
+    {
+      "sample_id": 0,
+      "image_file": "sub-r040s032_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz",
+      "mask_file": "sub-r040s032_ses-1_space-MNI152NLin2009aSym_label-L_desc-T1lesion_mask.nii.gz",
+      "dice_score": 0.030602114789805512,
+      "iou_score": 0.015538817737011776,
+      "gt_volume": 113993.0,
+      "pred_volume": 7336015.0,
+      "volume_error": 63.35496039174902,
+      "prediction_shape": "(1, 192, 224, 176, 1)",
+      "input_shape": "(1, 192, 224, 176, 1)"
+    },
+    {
+      "sample_id": 1,
+      "image_file": "sub-r004s037_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz",
+      "mask_file": "sub-r004s037_ses-1_space-MNI152NLin2009aSym_label-L_desc-T1lesion_mask.nii.gz",
+      "dice_score": 0.004997328373575093,
+      "iou_score": 0.002504923148617792,
+      "gt_volume": 18289.0,
+      "pred_volume": 7301222.0,
+      "volume_error": 398.21384436556326,
+      "prediction_shape": "(1, 192, 224, 176, 1)",
+      "input_shape": "(1, 192, 224, 176, 1)"
+    },
+    {
+      "sample_id": 2,
+      "image_file": "sub-r004s001_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz",
+      "mask_file": "sub-r004s001_ses-1_space-MNI152NLin2009aSym_label-L_desc-T1lesion_mask.nii.gz",
+      "dice_score": 0.01130795950809122,
+      "iou_score": 0.005686129012428313,
+      "gt_volume": 41617.0,
+      "pred_volume": 7319039.0,
+      "volume_error": 174.8665689459868,
+      "prediction_shape": "(1, 192, 224, 176, 1)",
+      "input_shape": "(1, 192, 224, 176, 1)"
+    },
+    {
+      "sample_id": 3,
+      "image_file": "sub-r005s075_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz",
+      "mask_file": "sub-r005s075_ses-1_space-MNI152NLin2009aSym_label-L_desc-T1lesion_mask.nii.gz",
+      "dice_score": 0.005862025432122726,
+      "iou_score": 0.0029396288055390132,
+      "gt_volume": 21452.0,
+      "pred_volume": 7297520.0,
+      "volume_error": 339.17900427283337,
+      "prediction_shape": "(1, 192, 224, 176, 1)",
+      "input_shape": "(1, 192, 224, 176, 1)"
+    },
+    {
+      "sample_id": 4,
+      "image_file": "sub-r019s004_ses-1_space-MNI152NLin2009aSym_T1w.nii.gz",
+      "mask_file": "sub-r019s004_ses-1_space-MNI152NLin2009aSym_label-L_desc-T1lesion_mask.nii.gz",
+      "dice_score": 0.023515179870193848,
+      "iou_score": 0.011897475574228414,
+      "gt_volume": 86852.0,
+      "pred_volume": 7300036.0,
+      "volume_error": 83.05144383453403,
+      "prediction_shape": "(1, 192, 224, 176, 1)",
+      "input_shape": "(1, 192, 224, 176, 1)"
+    }
+  ],
+  "summary": {
+    "valid_samples": 5,
+    "failed_samples": 0,
+    "mean_dice": 0.01525692159475768,
+    "std_dice": 0.010127106323821331,
+    "mean_iou": 0.007713394855565062,
+    "std_iou": 0.0051530690147709194,
+    "min_dice": 0.004997328373575093,
+    "max_dice": 0.030602114789805512
+  }
+}

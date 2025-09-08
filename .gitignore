@@ -1,4 +1,21 @@
-.venv/
-*.keras
-*.pack
-.venv/
+# RESTRICTIVE GITIGNORE - Only allow specific small file types
+# Allow: .ipynb .py .txt .sh .json .csv .md .gitignore .gitattributes
+
+# Block everything by default
+*
+
+# Allow specific file extensions
+!*.ipynb
+!*.py
+!*.txt
+!*.sh
+!*.json
+!*.csv
+!*.md
+
+# Always allow git files
+!.gitignore
+!.gitattributes
+
+# Allow directories (so we can traverse them)
+!*/

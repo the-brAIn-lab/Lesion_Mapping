@@ -79,7 +79,7 @@ logger.info(f"Environment verified:\n"
 class CroppedTrainingConfig:
     # ======================= DATA CONFIG =======================
     # UPDATED for the new cropped combined dataset
-    DATA_DIR = Path("/home/rbielski/Atlas_2/Training/Cropped_128_Combined")
+    DATA_DIR = Path("/mnt/beegfs/hellgate/home/rb194958e/Atlas_2/Training/Cropped_128_Combined")
     
     # Fixed input shape since we're cropping to exactly 128x128x128
     INPUT_SHAPE = (128, 128, 128, 1)

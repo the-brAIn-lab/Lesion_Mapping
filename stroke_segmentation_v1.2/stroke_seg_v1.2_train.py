@@ -23,6 +23,9 @@ import os
 import sys
 import logging
 from pathlib import Path
+import tensorflow as tf
+from tensorflow.keras import mixed_precision
+mixed_precision.set_global_policy("mixed_float16")
 
 # ---- Environment (set BEFORE importing TensorFlow) ----
 import os
@@ -40,28 +43,20 @@ os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
 # - TF_ENABLE_ONEDNN_OPTS=0  # controls CPU-only kernels; leave default unless you need bit-for-bit CPU numerics
 
 
-import tensorflow as tf
-
-# See GPUs and enable memory growth (good practice)
 gpus = tf.config.list_physical_devices("GPU")
 print("Visible GPUs:", gpus)
 for gpu in gpus:
-    try:
-        tf.config.experimental.set_memory_growth(gpu, True)
-    except Exception as e:
-        print(f"Could not set memory growth on {gpu}: {e}")
+    try: tf.config.experimental.set_memory_growth(gpu, True)
+    except Exception as e: print(f"Could not set memory growth on {gpu}: {e}")
 
-# Optional: use all visible GPUs
-strategy = tf.distribute.MirroredStrategy() if gpus else tf.distribute.get_strategy()
+# ✅ Only mirror if multi-GPU
+strategy = tf.distribute.MirroredStrategy() if len(gpus) > 1 else tf.distribute.get_strategy()
 print("Strategy:", type(strategy).__name__)
 
-# Build/compile inside the scope if you use strategy
-# with strategy.scope():
-#     model = ...
-#     model.compile(...)
 
-from tensorflow.keras import mixed_precision
-mixed_precision.set_global_policy("mixed_float16")
+
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -222,8 +217,10 @@ class DynamicTrainingConfig:
     @property
     def checkpoint_path(self) -> Path:
         return self.CALLBACKS_DIR / "best_model_dynamic.weights.h5"
+    
+    
 
-
+    
 
 # ---------------------------------------------------------------------------
 # Custom layers (identical to previous implementations)
@@ -235,9 +232,9 @@ except Exception:
     from tensorflow.keras.utils import register_keras_serializable  # fallback
 
 
+# --- ResidualConvBlock: force LN in float32 ---
 @register_keras_serializable(package="custom")
 class ResidualConvBlock(layers.Layer):
-    """Residual block using LayerNorm (more stable than BN for very small batches)."""
     def __init__(self, filters, kernel_reg=None, **kwargs):
         super().__init__(**kwargs)
         self.filters = filters
@@ -246,25 +243,34 @@ class ResidualConvBlock(layers.Layer):
     def build(self, input_shape):
         self.conv1 = layers.Conv3D(self.filters, 3, padding='same',
                                    kernel_regularizer=self.kernel_reg)
-        self.ln1 = layers.LayerNormalization(epsilon=1e-5)
+        # LN in float32 for stability under mixed precision
+        self.ln1 = layers.LayerNormalization(epsilon=1e-5, dtype="float32")
+
         self.conv2 = layers.Conv3D(self.filters, 3, padding='same',
                                    kernel_regularizer=self.kernel_reg)
-        self.ln2 = layers.LayerNormalization(epsilon=1e-5)
+        self.ln2 = layers.LayerNormalization(epsilon=1e-5, dtype="float32")
+
         self.dropout = layers.SpatialDropout3D(0.1)
+
         self.residual_conv = layers.Conv3D(self.filters, 1, padding='same')
-        self.residual_ln = layers.LayerNormalization(epsilon=1e-5)
+        self.residual_ln = layers.LayerNormalization(epsilon=1e-5, dtype="float32")
         super().build(input_shape)
 
     def call(self, inputs, training=None):
         x = self.conv1(inputs)
-        x = self.ln1(x)
+        x = self.ln1(x)                         # fp32 here
         x = tf.nn.relu(x)
         x = self.dropout(x, training=training)
         x = self.conv2(x)
-        x = self.ln2(x)
+        x = self.ln2(x)                         # fp32 here
+        x = tf.cast(x, inputs.dtype)            # cast back to match inputs (fp16)
+
         residual = self.residual_conv(inputs)
-        residual = self.residual_ln(residual)
+        residual = self.residual_ln(residual)   # fp32 here
+        residual = tf.cast(residual, inputs.dtype)
+
         return tf.nn.relu(x + residual)
+
 
     def get_config(self):
         config = super().get_config()
@@ -276,9 +282,9 @@ class ResidualConvBlock(layers.Layer):
         return config
 
 
+
 @register_keras_serializable(package="custom")
 class VisionMambaBlock(layers.Layer):
-    """Efficient vision Mamba block with dynamic input support"""
     def __init__(self, filters, kernel_size=3, expansion=2, **kwargs):
         super().__init__(**kwargs)
         self.filters = filters
@@ -286,23 +292,11 @@ class VisionMambaBlock(layers.Layer):
         self.expansion = expansion
 
     def build(self, input_shape):
-        self.in_conv = layers.Conv3D(
-            self.filters * self.expansion,
-            1,
-            use_bias=False,
-            padding='same',
-            data_format='channels_last')
-        self.spatial_conv = layers.Conv3D(
-            self.filters * self.expansion,
-            self.kernel_size,
-            padding='same',
-            use_bias=False,
-            data_format='channels_last')
-        self.out_conv = layers.Conv3D(
-            self.filters, 1,
-            padding='same',
-            data_format='channels_last')
-        self.norm = layers.LayerNormalization()
+        self.in_conv = layers.Conv3D(self.filters * self.expansion, 1, use_bias=False, padding='same')
+        self.spatial_conv = layers.Conv3D(self.filters * self.expansion, self.kernel_size, padding='same', use_bias=False)
+        self.out_conv = layers.Conv3D(self.filters, 1, padding='same')
+        # LN in fp32, then cast back
+        self.norm = layers.LayerNormalization(epsilon=1e-5, dtype="float32")
         self.dropout = layers.SpatialDropout3D(0.1)
         super().build(input_shape)
 
@@ -310,11 +304,13 @@ class VisionMambaBlock(layers.Layer):
         x = self.in_conv(inputs)
         x = tf.nn.relu(x)
         x = self.spatial_conv(x)
-        x = tf.cast(tf.nn.relu(x), inputs.dtype)
+        x = tf.nn.relu(x)
         x = self.dropout(x, training=training)
         x = self.out_conv(x)
-        x = self.norm(x)
+        x = self.norm(x)                 # fp32
+        x = tf.cast(x, inputs.dtype)     # back to fp16
         return x + inputs
+
 
     def get_config(self):
         config = super().get_config()
@@ -327,7 +323,6 @@ class VisionMambaBlock(layers.Layer):
 
 @register_keras_serializable(package="custom")
 class SAM2Attention(layers.Layer):
-    """Enhanced SAM2 attention with hierarchical memory banks"""
     def __init__(self, filters, heads, **kwargs):
         super().__init__(**kwargs)
         self.filters = filters
@@ -338,7 +333,7 @@ class SAM2Attention(layers.Layer):
 
     def build(self, input_shape):
         self.query = layers.Conv3D(self.filters, 1, data_format='channels_last')
-        self.key = layers.Conv3D(self.filters, 1, data_format='channels_last')
+        self.key   = layers.Conv3D(self.filters, 1, data_format='channels_last')
         self.value = layers.Conv3D(self.filters, 1, data_format='channels_last')
         self.out_conv = layers.Conv3D(input_shape[-1], 1, data_format='channels_last')
         self.memory_bank = self.add_weight(
@@ -351,35 +346,45 @@ class SAM2Attention(layers.Layer):
         super().build(input_shape)
 
     def call(self, inputs, training=None):
-        batch_size = tf.shape(inputs)[0]
-        height = tf.shape(inputs)[1]
-        width = tf.shape(inputs)[2]
-        depth_dim = tf.shape(inputs)[3]
+        b = tf.shape(inputs)[0]
+        h = tf.shape(inputs)[1]
+        w = tf.shape(inputs)[2]
+        d = tf.shape(inputs)[3]
+
         q = self.query(inputs)
         k = self.key(inputs)
         v = self.value(inputs)
-        k = k + self.memory_bank
-        v = v + self.memory_bank
-        q = self._split_heads_safe(q, batch_size, height, width, depth_dim)
-        k = self._split_heads_safe(k, batch_size, height, width, depth_dim)
-        v = self._split_heads_safe(v, batch_size, height, width, depth_dim)
+
+        # ensure memory_bank matches compute dtype (fp16 under mixed precision)
+        mb = tf.cast(self.memory_bank, k.dtype)
+        k = k + mb
+        v = v + mb
+
+        q = self._split_heads_safe(q, b, h, w, d)
+        k = self._split_heads_safe(k, b, h, w, d)
+        v = self._split_heads_safe(v, b, h, w, d)
+
         dk = tf.cast(self.depth, q.dtype)
-        attn_logits = tf.matmul(q, k, transpose_b=True)
-        attn_logits = attn_logits / tf.math.sqrt(dk)
+        attn_logits = tf.matmul(q, k, transpose_b=True) / tf.math.sqrt(dk)
         attn_weights = tf.nn.softmax(attn_logits, axis=-1)
         attn_output = tf.matmul(attn_weights, v)
-        attn_output = self._combine_heads_safe(attn_output, batch_size, height, width, depth_dim)
+        attn_output = self._combine_heads_safe(attn_output, b, h, w, d)
+
         output = self.out_conv(attn_output)
         output = self.dropout(output, training=training)
+
+        # cast back so residual add matches inputs dtype (fp16)
+        output = tf.cast(output, inputs.dtype)
         return output + inputs
 
-    def _split_heads_safe(self, x, batch_size, height, width, depth_dim):
-        x = tf.reshape(x, [batch_size, height, width, depth_dim, self.heads, self.depth])
+    def _split_heads_safe(self, x, b, h, w, d):
+        x = tf.reshape(x, [b, h, w, d, self.heads, self.depth])
         return tf.transpose(x, perm=[0, 4, 1, 2, 3, 5])
 
-    def _combine_heads_safe(self, x, batch_size, height, width, depth_dim):
+    def _combine_heads_safe(self, x, b, h, w, d):
         x = tf.transpose(x, perm=[0, 2, 3, 4, 1, 5])
-        return tf.reshape(x, [batch_size, height, width, depth_dim, self.filters])
+        return tf.reshape(x, [b, h, w, d, self.filters])
+
 
     def get_config(self):
         config = super().get_config()
@@ -710,7 +715,12 @@ def load_generic_dataset(config: DynamicTrainingConfig):
     cleanup_suffixes = ("_img_prepped", "_mask_prepped", "_image", "_img")
 
     def strip_ext(name: str) -> str:
-        return os.name[:-7] if name.endswith(".nii.gz") else name
+        if name.endswith(".nii.gz"):
+            return name[:-7]
+        if name.endswith(".nii"):
+            return name[:-4]
+        return name
+
 
     def strip_any_suffix(stem: str, suffixes: tuple[str, ...]) -> str:
         s = stem
@@ -752,15 +762,30 @@ def load_generic_dataset(config: DynamicTrainingConfig):
                 or "mask" in stem or "lesion" in stem)
 
 
+    # Replace these two blocks:
+
     if single_folder_mode:
-        all_niis = sorted(images_dir.glob("*.nii.gz"))
+        # OLD:
+        # all_niis = sorted(images_dir.glob("*.nii.gz"))
+        # images = [p for p in all_niis if is_image(p.name)]
+        # masks  = [p for p in all_niis if is_mask(p.name)]
+
+        # NEW (recursive + both .nii.gz and .nii):
+        all_niis = sorted(list(images_dir.rglob("*.nii.gz")) + list(images_dir.rglob("*.nii")))
         images = [p for p in all_niis if is_image(p.name)]
         masks  = [p for p in all_niis if is_mask(p.name)]
         logger.info(f"📁 Single-folder mode: {len(images)} images, {len(masks)} masks in {images_dir}")
+
     else:
-        images = sorted([p for p in images_dir.glob("*.nii.gz") if is_image(p.name)])
-        masks  = sorted([p for p in masks_dir.glob("*.nii.gz")  if is_mask(p.name)])
+        # OLD:
+        # images = sorted([p for p in images_dir.glob("*.nii.gz") if is_image(p.name)])
+        # masks  = sorted([p for p in masks_dir.glob("*.nii.gz")  if is_mask(p.name)])
+
+        # NEW (recursive + both .nii.gz and .nii):
+        images = sorted([p for p in list(images_dir.rglob("*.nii.gz")) + list(images_dir.rglob("*.nii")) if is_image(p.name)])
+        masks  = sorted([p for p in list(masks_dir.rglob("*.nii.gz")) + list(masks_dir.rglob("*.nii"))  if is_mask(p.name)])
         logger.info(f"📂 Two-folder mode: images={len(images)} ({images_dir}), masks={len(masks)} ({masks_dir})")
+
 
     logger.info(f"Found {len(images)} image files and {len(masks)} mask files")
 
@@ -983,200 +1008,59 @@ def _generate_batch(pairs, target_shape):
         msk = _load_and_preprocess_mask(msk_path, target_shape)
         yield img, msk
 
-# ---------------------------------------------------------------------------
-# Data generator with optional augmentations for training
-# ---------------------------------------------------------------------------
-class DynamicDataGenerator(tf.keras.utils.Sequence):
-    """Dynamic data generator for 3D medical volumes with optional augmentation.
-    
-    Implements the Keras Sequence interface for memory-efficient loading
-    and preprocessing of 3D medical image volumes and their corresponding masks.
-    """
-    
-    def __init__(self, pairs, config, is_training=False):
-        """Initialize the generator with pairs of image/mask paths and config.
-        
-        Args:
-            pairs: List of (image_path, mask_path) tuples.
-            config: DynamicTrainingConfig object with parameters.
-            is_training: If True, apply augmentation.
-        """
-        self.pairs = pairs
-        self.config = config
-        self.batch_size = config.BATCH_SIZE
-        self.target_shape = tuple(config.INPUT_SHAPE[:-1])
-        self.config = config
-        self.is_training = is_training
-        self.indexes = np.arange(len(self.pairs))
-        self.resample_to_target = bool(config.RESAMPLE_TO_TARGET)
-        
-        # Shuffle at initialization
-        if self.is_training:
-            random.shuffle(self.pairs)
-    
-    def __len__(self):
-        """Return the number of batches per epoch."""
-        return math.ceil(len(self.pairs) / self.batch_size)
-    
-    def __getitem__(self, idx):
-        """Get a batch of data."""
-        batch_pairs = self.pairs[idx * self.batch_size:(idx + 1) * self.batch_size]
-        batch_x = np.zeros((len(batch_pairs), *self.config.INPUT_SHAPE), dtype=np.float32)
-        batch_y = np.zeros((len(batch_pairs), *self.config.INPUT_SHAPE), dtype=np.float32)
-        
-        for i, (img_path, msk_path) in enumerate(batch_pairs):
-            # Load and preprocess image and mask
-            img = _load_and_preprocess_image(str(img_path), self.target_shape)
-            msk = _load_and_preprocess_mask(str(msk_path), self.target_shape)
-            
-            # Apply augmentations if in training mode
-            if self.is_training and self.config.AUGMENTATION_INTENSITY > 0:
-                img, msk = self._augment(img, msk)
-            
-            # Add channel dimension
-            batch_x[i, ..., 0] = img
-            batch_y[i, ..., 0] = msk
-            
-        return batch_x, batch_y
-    
-    def on_epoch_end(self):
-        """Called at the end of each epoch."""
-        if self.is_training:
-            random.shuffle(self.pairs)
-    
-    def _augment(self, image, mask):
-        """Apply augmentations to image and mask."""
-        # Skip augmentation based on probability
-        if random.random() > self.config.AUGMENTATION_INTENSITY:
-            return image, mask
-        
-        # Random flips
-        if random.random() > 0.5:
-            image = np.flip(image, axis=0)
-            mask = np.flip(mask, axis=0)
-        if random.random() > 0.5:
-            image = np.flip(image, axis=1)
-            mask = np.flip(mask, axis=1)
-            
-        # Random rotation (limited to rotation_range degrees)
-        if random.random() > 0.7:
-            angle = random.uniform(-self.config.ROTATION_RANGE, self.config.ROTATION_RANGE)
-            # Random rotation axis (0, 1, or 2)
-            axis = random.randint(0, 2)
-            axes = [(0, 1), (0, 2), (1, 2)][axis]
-            image = rotate(image, angle, axes=axes, reshape=False, order=1, mode='constant')
-            mask = rotate(mask, angle, axes=axes, reshape=False, order=0, mode='constant')
-            # Ensure mask remains binary
-            mask = (mask > 0.5).astype(np.float32)
-        
-        # Random gamma correction (image only)
-        if random.random() > 0.8:
-            gamma = random.uniform(0.7, 1.3)
-            image_max = image.max()
-            if image_max > 0:
-                image = np.power(image / image_max, gamma) * image_max
-        
-        return image, mask
 
-def load_generic_dataset(config: DynamicTrainingConfig):
-    logger.info("📚 Loading dataset (flex loader for T1w volumes)…")
-    log_memory_usage("dataset_load_start")
-
-    images_dir = config.IMAGES_DIR
-    masks_dir = config.MASKS_DIR
-    single_folder_mode = images_dir == masks_dir
-
-    image_suffixes = config.IMAGE_SUFFIXES
-    mask_suffixes = config.MASK_SUFFIXES
-    cleanup_suffixes = ("_img_prepped", "_mask_prepped", "_image", "_img")
-
-    def strip_ext(name: str) -> str:
-        return name[:-7] if name.endswith(".nii.gz") else name
-
-    def strip_suffixes(stem: str, suffixes: tuple[str, ...]) -> str:
-        for suffix in sorted(suffixes, key=len, reverse=True):
-            if stem.endswith(suffix):
-                return stem[:-len(suffix)]
-        return stem
-
-    def normalise_key(name: str, suffixes: tuple[str, ...]) -> str:
-        stem = strip_ext(name)
-        for cleanup in cleanup_suffixes:
-            if stem.endswith(cleanup):
-                stem = stem[:-len(cleanup)]
-        stem = strip_suffixes(stem, suffixes)
-        return stem.rstrip("_")
-
-    def is_image(name: str) -> bool:
-        stem = strip_ext(name)
-        lower = stem.lower()
-        return any(stem.endswith(sfx) for sfx in image_suffixes) or (
-            "mask" not in lower and "lesion" not in lower and ("t1w" in lower or lower.endswith("t1"))
+class ProgressPrinter(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        import tensorflow as tf, numpy as np
+        logs = logs or {}
+        # get current LR robustly
+        lr = self.model.optimizer.learning_rate
+        try:
+            lr = tf.keras.backend.get_value(lr)
+        except Exception:
+            try: lr = float(lr)
+            except Exception: lr = np.nan
+        print(
+            f"Epoch {epoch+1}: "
+            f"dice={logs.get('dice_coefficient', float('nan')):.4f} "
+            f"val_dice={logs.get('val_dice_coefficient', float('nan')):.4f} "
+            f"loss={logs.get('loss', float('nan')):.4f} "
+            f"val_loss={logs.get('val_loss', float('nan')):.4f} "
+            f"lr={lr:.2e}",
+            flush=True
         )
 
-    def is_mask(name: str) -> bool:
-        stem = strip_ext(name)
-        lower = stem.lower()
-        return any(stem.endswith(sfx) for sfx in mask_suffixes) or "mask" in lower or "lesion" in lower
 
-    if single_folder_mode:
-        all_niis = sorted(images_dir.glob("*.nii.gz"))
-        images = [p for p in all_niis if is_image(p.name)]
-        masks  = [p for p in all_niis if is_mask(p.name)]
-        logger.info(f"📁 Single-folder mode: {len(images)} images, {len(masks)} masks in {images_dir}")
-    else:
-        images = sorted([p for p in images_dir.glob("*.nii.gz") if is_image(p.name)])
-        masks  = sorted([p for p in masks_dir.glob("*.nii.gz")  if is_mask(p.name)])
-        logger.info(f"📂 Two-folder mode: images={len(images)} ({images_dir}), masks={len(masks)} ({masks_dir})")
-
-    logger.info(f"Found {len(images)} image files and {len(masks)} mask files")
-
-    img_map = {normalise_key(p.name, image_suffixes): p for p in images}
-    msk_map = {normalise_key(p.name, mask_suffixes): p for p in masks}
-    keys = sorted(set(k for k in img_map.keys() if k) & set(k for k in msk_map.keys() if k))
-
-    if not keys:
-        logger.error("No image–mask pairs matched. Examples:")
-        for k, v in list(img_map.items())[:5]:
-            logger.error(f"  IMG key {k or '<empty>'} -> {v.name}")
-        for k, v in list(msk_map.items())[:5]:
-            logger.error(f"  MSK key {k or '<empty>'} -> {v.name}")
-        raise RuntimeError("No pairs matched. Check filename patterns / suffix lists in DynamicTrainingConfig.")
-
-    pairs, lesion_counts = [], []
-    for k in keys:
-        img_p = img_map[k]
-        msk_p = msk_map[k]
-        try:
-            mask_obj = nib.load(str(msk_p))
-            has_lesion = bool(np.any(mask_obj.get_fdata() > 0))
-            lesion_counts.append(1 if has_lesion else 0)
-            pairs.append((img_p, msk_p))
-        except Exception as e:
-            logger.warning(f"Skipping pair for {k}: {e}")
-        finally:
-            try:
-                del mask_obj
-            except Exception:
-                pass
-            gc.collect()
-
-    logger.info(f"📊 Created {len(pairs)} image–mask pairs")
-    if lesion_counts:
-        logger.info(f"🧠 Lesion presence: {np.mean(lesion_counts)*100:.2f}%")
-    log_memory_usage("dataset_load_end")
-    return pairs, np.array(lesion_counts, dtype=np.int32)
-
+# ---------------------------------------------------------------------------
+# Unified, refactored training entrypoint
+# ---------------------------------------------------------------------------
 def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overrides):
+    """
+    Train SmartSOTA Dynamic UNet.
+    - Supports overrides via kwargs (or pass a prebuilt `config`)
+    - Resumes from best or latest weights
+    - Uses ReduceLROnPlateau (mode='max' on val_dice_coefficient)
+    - Writes history CSV and JSON, plus latest/best checkpoints
+    """
+    # --- peel off fit() kwargs so they don't end up in the dataclass
+    fit_keys = ("steps_per_epoch", "validation_steps", "shuffle", "class_weight")
+    fit_kwargs = {k: overrides.pop(k) for k in list(overrides.keys()) if k in fit_keys}
+
+    # resume-only kwargs (not part of the dataclass)
+    load_weights_from   = overrides.pop("LOAD_WEIGHTS_FROM", None)   # str | None
+    resume_from_latest  = overrides.pop("RESUME_FROM_LATEST", False) # bool
+
     if config is not None and overrides:
         raise ValueError("Provide either an existing config or keyword overrides, not both.")
     if config is None:
         config = DynamicTrainingConfig(**overrides)
 
+    # ---- basic env checks ----
     if not tf.config.list_physical_devices("GPU"):
         logger.critical("🚫 No GPUs visible. Fix NVIDIA driver/CUDA before training.")
         raise SystemExit(1)
 
+    # ensure global batch divisibility across replicas
     try:
         replicas = strategy.num_replicas_in_sync
     except Exception:
@@ -1184,19 +1068,22 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     if config.BATCH_SIZE % replicas != 0:
         raise ValueError(f"Global batch ({config.BATCH_SIZE}) must be divisible by replicas ({replicas}).")
 
-    max_dims = detect_input_shape(config.DATA_DIR)
-    config.INPUT_SHAPE = max_dims + (1,)
+    # ---- input shape: use override if provided; else detect from data ----
+    if getattr(config, "INPUT_SHAPE", None) in (None, (), []):
+        max_dims = detect_input_shape(config.DATA_DIR)
+        config.INPUT_SHAPE = tuple(max_dims) + (1,)
     config._write_config()
     logger.info(f"🧭 INPUT_SHAPE set to: {config.INPUT_SHAPE}")
 
+    # ---- dataset & splits ----
     pairs, lesion_presence = load_generic_dataset(config)
     train_pairs, val_pairs = create_stratified_splits(
         pairs, lesion_presence, batch_size=config.BATCH_SIZE, test_size=config.VALIDATION_SPLIT
     )
-
     train_gen = DynamicDataGenerator(train_pairs, config, is_training=True)
-    val_gen = DynamicDataGenerator(val_pairs, config, is_training=False)
+    val_gen   = DynamicDataGenerator(val_pairs,   config, is_training=False)
 
+    # ---- build/compile under current strategy ----
     with strategy.scope():
         model = build_dynamic_model(config)
         model.summary(print_fn=logger.info)
@@ -1205,28 +1092,60 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             learning_rate=config.INITIAL_LR,
             global_clipnorm=config.MAX_GRAD_NORM
         )
-
-        def lr_schedule(epoch):
-            if epoch < config.WARMUP_EPOCHS:
-                return config.INITIAL_LR * (epoch + 1) / max(1, config.WARMUP_EPOCHS)
-            progress = (epoch - config.WARMUP_EPOCHS) / max(1, config.TOTAL_EPOCHS - config.WARMUP_EPOCHS)
-            cosine_decay = 0.5 * (1.0 + math.cos(math.pi * progress))
-            return max(config.MIN_LR, config.INITIAL_LR * cosine_decay)
-
-        lr_callback = tf.keras.callbacks.LearningRateScheduler(lr_schedule, verbose=0)
-        memory_callback = MemoryMonitoringCallback(log_frequency=10)
         loss_obj = CombinedLoss(alpha=config.DICE_WEIGHT, beta=config.BOUNDARY_WEIGHT)
-        checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
-            filepath=str(config.checkpoint_path),
-            monitor="val_dice_coefficient",
-            mode="max",
-            save_best_only=True,
-            save_weights_only=True,
-            verbose=1,
-        )
 
+        # You can set steps_per_execution here if desired to reduce overhead:
+        # model.compile(optimizer=optimizer, loss=loss_obj, metrics=[dice_coefficient], steps_per_execution=4)
         model.compile(optimizer=optimizer, loss=loss_obj, metrics=[dice_coefficient])
 
+        # ---- optional resume BEFORE training ----
+        if load_weights_from:
+            model.load_weights(str(load_weights_from))
+            logger.info(f"✅ Loaded weights from {load_weights_from}")
+        elif resume_from_latest:
+            latest = config.CALLBACKS_DIR / "latest.weights.h5"
+            if latest.exists():
+                model.load_weights(str(latest))
+                logger.info(f"✅ Loaded latest weights from {latest}")
+            else:
+                logger.info("ℹ️ RESUME_FROM_LATEST requested but no latest.weights.h5 found.")
+
+    # ---- callbacks ----
+    # Reduce LR when val Dice plateaus (instead of a fixed cosine schedule)
+    rlrop = tf.keras.callbacks.ReduceLROnPlateau(
+        monitor="val_dice_coefficient", mode="max",
+        factor=0.5, patience=4, min_lr=config.MIN_LR, verbose=1
+    )
+
+    checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
+        filepath=str(config.checkpoint_path),
+        monitor="val_dice_coefficient",
+        mode="max",
+        save_best_only=True,
+        save_weights_only=True,
+        verbose=1,
+    )
+    latest_cb = tf.keras.callbacks.ModelCheckpoint(
+        filepath=str(config.CALLBACKS_DIR / "latest.weights.h5"),
+        save_weights_only=True,
+        save_freq="epoch",
+        verbose=0,
+    )
+    csv_cb     = tf.keras.callbacks.CSVLogger(str(config.CALLBACKS_DIR / "history.csv"), append=True)
+    memory_cb  = MemoryMonitoringCallback(log_frequency=10)
+    progress_cb= ProgressPrinter()
+
+    # Optional NVML GPU mem logger if you defined NvmlGpuMemLogger earlier
+    try:
+        nvml_cb = NvmlGpuMemLogger() if 'NvmlGpuMemLogger' in globals() and NvmlGpuMemLogger else None
+    except Exception:
+        nvml_cb = None
+
+    callbacks = [checkpoint_cb, latest_cb, rlrop, csv_cb, memory_cb, progress_cb]
+    if nvml_cb is not None:
+        callbacks.append(nvml_cb)
+
+    # ---- preflight save check ----
     status = preflight_model_saving(model, config, logger)
     if status is True:
         logger.info("🟢 Preflight: full-model saving is guaranteed to work.")
@@ -1236,26 +1155,61 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         logger.critical("🔴 Preflight FAILED: saving will error at end; fix before training.")
         raise RuntimeError("Preflight model saving failed")
 
+    # ---- train ----
     logger.info("🚀 Starting training...")
     history = model.fit(
         train_gen,
         epochs=config.TOTAL_EPOCHS,
         validation_data=val_gen,
-        callbacks=[lr_callback, memory_callback, checkpoint_cb],
+        callbacks=callbacks,
         initial_epoch=config.INITIAL_EPOCH,
+        verbose=1,
+        steps_per_epoch=len(train_gen),
+        validation_steps=len(val_gen),
+        **{k: v for k, v in fit_kwargs.items() if v is not None}
     )
+
+    # ---- persist history JSON (optional) ----
+    try:
+        (config.CALLBACKS_DIR / "artifacts").mkdir(parents=True, exist_ok=True)
+        with open(config.CALLBACKS_DIR / "artifacts" / "history_epoch.json", "w") as f:
+            json.dump(getattr(history, "history", {}), f)
+    except Exception as e:
+        logger.warning(f"Could not save history JSON: {e}")
+
+    # ---- save final weights and full model ----
+    final_weights = config.model_path.with_suffix(".final.weights.h5")
+    try:
+        model.save_weights(str(final_weights))
+        logger.info(f"💾 Saved final weights to {final_weights}")
+    except Exception:
+        logger.exception("Saving final weights failed")
 
     try:
         model.save(str(config.model_path), include_optimizer=False)
-        logger.info(f"Saved full model to {config.model_path}")
+        logger.info(f"💾 Saved full model to {config.model_path}")
     except Exception:
-        logger.exception("Full-model save failed; falling back to weights-only")
+        logger.exception("Full-model save failed; falling back to weights-only duplicate")
         weights_only = config.model_path.with_suffix(".weights.h5")
-        model.save_weights(str(weights_only))
-        logger.info(f"Saved weights only to {weights_only}")
+        try:
+            model.save_weights(str(weights_only))
+            logger.info(f"💾 Saved weights only to {weights_only}")
+        except Exception:
+            logger.exception("Weights-only fallback also failed")
 
     logger.info("🏁 Training complete.")
+
+    # free graph state in long sessions (best-effort)
+    try:
+        tf.keras.backend.clear_session()
+        gc.collect()
+    except Exception:
+        pass
+
     return history
+
+
+
 
 def preflight_model_saving(model, config, logger):
     config.MODEL_DIR.mkdir(parents=True, exist_ok=True)

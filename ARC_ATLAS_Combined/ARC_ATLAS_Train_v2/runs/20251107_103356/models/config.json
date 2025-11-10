@@ -1,0 +1,57 @@
+{
+  "DATA_DIR": "/home/rbielski/ARC/ds004884/derivatives/aggregates/t1w_with_masks/mni_1mm_ants_fixed/_standardized/_combined_manifests_2bins_normal/_combined_splits_70_30_global/train_hires",
+  "IMAGES_DIR": "/home/rbielski/ARC/ds004884/derivatives/aggregates/t1w_with_masks/mni_1mm_ants_fixed/_standardized/_combined_manifests_2bins_normal/_combined_splits_70_30_global/train_hires/t1",
+  "MASKS_DIR": "/home/rbielski/ARC/ds004884/derivatives/aggregates/t1w_with_masks/mni_1mm_ants_fixed/_standardized/_combined_manifests_2bins_normal/_combined_splits_70_30_global/train_hires/masks",
+  "IMAGE_SUFFIXES": [
+    "_T1w_MNI_norm",
+    "_T1w_MNI",
+    "_T1w_brain",
+    "_T1w",
+    "_T1"
+  ],
+  "MASK_SUFFIXES": [
+    "_lesion_mask_MNI_clean",
+    "_lesion_mask_MNI",
+    "_lesion_mask",
+    "_desc-lesion_mask",
+    "_mask"
+  ],
+  "INPUT_SHAPE": [
+    192,
+    224,
+    192,
+    1
+  ],
+  "VALIDATION_SPLIT": 0.15,
+  "SMALL_LESION_THRESHOLD": 25000,
+  "BATCH_SIZE": 1,
+  "INITIAL_EPOCH": 0,
+  "TOTAL_EPOCHS": 120,
+  "INITIAL_LR": 0.0001,
+  "MIN_LR": 3e-06,
+  "WARMUP_EPOCHS": 10,
+  "MAX_GRAD_NORM": 1.0,
+  "BASE_FILTERS": 8,
+  "DROPOUT_RATE": 0.55,
+  "L2_REG": 0.0015,
+  "MAMBA_DEPTH": 2,
+  "SAM_HEADS": 2,
+  "AUGMENTATION_INTENSITY": 0.15,
+  "SYNTHETIC_LESION_PROB": 0.3,
+  "ROTATION_RANGE": 15,
+  "USE_BOUNDARY_LOSS": true,
+  "DICE_LOSS_WEIGHT": 0.4,
+  "BOUNDARY_LOSS_WEIGHT": 0.6,
+  "DEEP_SUPERVISION_WEIGHTS": [
+    0.1,
+    0.2,
+    0.3
+  ],
+  "DICE_WEIGHT": 0.3,
+  "BOUNDARY_WEIGHT": 0.7,
+  "RESAMPLE_TO_TARGET": true,
+  "DECISION_THRESHOLD": 0.5,
+  "MODEL_DIR": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v2/runs/20251107_103356/models",
+  "CALLBACKS_DIR": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v2/runs/20251107_103356/callbacks",
+  "timestamp": "20251107_103356"
+}

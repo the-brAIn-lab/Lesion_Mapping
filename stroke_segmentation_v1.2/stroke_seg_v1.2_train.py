@@ -162,25 +162,25 @@ class DynamicTrainingConfig:
     SMALL_LESION_THRESHOLD: int = 100
     BATCH_SIZE: int = 2
     INITIAL_EPOCH: int = 0
-    TOTAL_EPOCHS: int = 200
-    INITIAL_LR: float = 1e-4
-    MIN_LR: float = 5e-7
-    WARMUP_EPOCHS: int = 15
+    TOTAL_EPOCHS: int = 250
+    INITIAL_LR: float = 3e-5
+    MIN_LR: float = 1e-6
+    WARMUP_EPOCHS: int = 10
     MAX_GRAD_NORM: float = 1.0
     BASE_FILTERS: int = 8
-    DROPOUT_RATE: float = 0.55
-    L2_REG: float = 1.5e-3
+    DROPOUT_RATE: float = 0.35
+    L2_REG: float = 3.0e-4
     MAMBA_DEPTH: int = 2
-    SAM_HEADS: int = 4
-    AUGMENTATION_INTENSITY: float = 0.5
+    SAM_HEADS: int = 2
+    AUGMENTATION_INTENSITY: float = 0.4
     SYNTHETIC_LESION_PROB: float = 0.3
     ROTATION_RANGE: int = 20
     USE_BOUNDARY_LOSS: bool = True
-    DICE_LOSS_WEIGHT: float = 0.4
-    BOUNDARY_LOSS_WEIGHT: float = 0.6
+    DICE_LOSS_WEIGHT: float = 0.6
+    BOUNDARY_LOSS_WEIGHT: float = 0.4
     DEEP_SUPERVISION_WEIGHTS: tuple[float, ...] = (0.1, 0.2, 0.3)
-    DICE_WEIGHT: float = 0.4
-    BOUNDARY_WEIGHT: float = 0.6
+    DICE_WEIGHT: float = 0.6
+    BOUNDARY_WEIGHT: float = 0.4
     RESAMPLE_TO_TARGET: bool = True
     DECISION_THRESHOLD: float = 0.5
     MODEL_DIR: Path = field(default_factory=lambda: _default_dir("SMARTSOTA_MODEL_DIR", Path.cwd() / "models"))
@@ -524,7 +524,7 @@ def boundary_loss(y_true, y_pred):
 
 @register_keras_serializable(package="custom")
 class CombinedLoss(tf.keras.losses.Loss):
-    def __init__(self, alpha=0.4, beta=0.6, name="combined_loss"):
+    def __init__(self, alpha=0.6, beta=0.4, name="combined_loss"):
         super().__init__(name=name)
         self.alpha = float(alpha)
         self.beta = float(beta)

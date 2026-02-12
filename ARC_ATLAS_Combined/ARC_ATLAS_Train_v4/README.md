@@ -10,21 +10,37 @@ Everything needed to prep + train the ARC/ATLAS v4 experiment lives here. Only t
   - `downsampling/*.py`: degradation recipes using local data.
 - `data/`
   - `prep_outputs/`: per-dataset standardized outputs (cached, slugged by source path).
-  - `processed/train_combined/`: merged ARC+ATLAS set for training.
+  - `templateflow/`: local TemplateFlow cache (default `TEMPLATEFLOW_HOME`).
+  - `processed/train_atlas_only/`: default training set.
+  - `processed/train_combined/`: optional merged ARC+ATLAS set for training.
   - `processed/test_input/`: merged external test set after test prep.
   - `downsampled/`: targets for generated degraded sets.
+- `tools/`
+  - `ants/bin/`: local ANTs runtime binaries (`antsRegistration`, `antsApplyTransforms`).
 - `notebooks/`
   - `ARC_ATLAS_TrainPrep_v4.ipynb`: fresh prep of ARC+ATLAS raw data into local standardized + combined train set.
   - `ARC_ATLAS_TestPrep_v4.ipynb`: prep any external dataset for testing.
-  - `ARC_ATLAS_Train_v4.ipynb`: training (expects `data/processed/train_combined`).
+  - `ARC_ATLAS_Train_v4.ipynb`: training (default `data/processed/train_atlas_only`).
   - `ARC_ATLAS_Test_v4.ipynb`: evaluate latest run; uses `data/processed/test_input` by default.
   - `prep/`: legacy prep notebooks (kept for reference).
 - `requirements.txt`: runtime deps.
 
+## Self-contained Runtime Dependencies
+- `prep_utils.py` now defaults to local runtime paths inside this project:
+  - ANTs binaries: `tools/ants/bin/antsRegistration` and `tools/ants/bin/antsApplyTransforms`
+  - TemplateFlow cache: `data/templateflow` (via `TEMPLATEFLOW_HOME`)
+- You can still override paths with environment variables:
+  - `ANTS_REG`, `ANTS_APPLY`, `TEMPLATEFLOW_HOME`
+- If local ANTs binaries are missing, prep will fail with an explicit error showing the expected local path.
+
 ## Quick start
-1. Run `ARC_ATLAS_TrainPrep_v4.ipynb` (defaults: ARC raw at `../ARC/ds004884/derivatives/aggregates/t1w_with_masks`; ATLAS raw at `../Atlas_2`, edit as needed). Outputs go to `data/prep_outputs/*` and are combined into `data/processed/train_combined`.
-2. Run `ARC_ATLAS_Train_v4.ipynb` to train; it creates `runs/latest` and `runs/latest_best.weights.h5`.
-3. For external data, run `ARC_ATLAS_TestPrep_v4.ipynb` to standardize into `data/processed/test_input`, then use `ARC_ATLAS_Test_v4.ipynb` to evaluate. Downsampling recipes live in `src/downsampling/`.
+1. Run `ARC_ATLAS_TrainPrep_v4.ipynb` (current default is ATLAS-only). Outputs go to `data/prep_outputs/*` and are combined into `data/processed/train_atlas_only`.
+2. Run `ARC_ATLAS_Train_v4.ipynb` to train from `data/processed/train_atlas_only`; it creates `runs/latest` and `runs/latest_best.weights.h5`.
+3. For external data, run `ARC_ATLAS_TestPrep_v4.ipynb` to standardize into `data/processed/test_input`.
+   Set `HAS_MASKS=True` for metric evaluation, or `HAS_MASKS=False` for image-only prediction prep.
+4. Run `ARC_ATLAS_Test_v4.ipynb` to generate predicted masks for all test images.
+   If masks are present, it also reports Dice and writes a per-case CSV in `runs/<run>/test_predictions/<timestamp>/`.
+5. Downsampling recipes live in `src/downsampling/`.
 
 ## Notes
 - All logs, callbacks, and configs stay under `runs/`; `runs/latest` points to the most recent training run and `runs/latest_best.weights.h5` mirrors its best checkpoint.

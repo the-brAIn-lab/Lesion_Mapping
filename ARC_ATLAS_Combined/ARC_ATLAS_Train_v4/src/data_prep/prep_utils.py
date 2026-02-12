@@ -1,7 +1,12 @@
 """Prep utilities to standardize T1 + lesion masks into MNI and normalized form.
 
-All paths are project-relative. External dependency: ANTs binaries (`antsRegistration`,
-`antsApplyTransforms`) must be on PATH or provided via env vars ANTS_REG / ANTS_APPLY.
+Defaults are self-contained under the project root:
+- ANTs binaries are resolved from `<project>/tools/ants/(bin)/` first.
+- TemplateFlow cache defaults to `<project>/data/templateflow`.
+
+Environment overrides still work:
+- `ANTS_REG` / `ANTS_APPLY`
+- `TEMPLATEFLOW_HOME`
 """
 from __future__ import annotations
 from dataclasses import dataclass
@@ -15,16 +20,53 @@ from typing import Iterable
 from collections import defaultdict
 
 
+def _project_root() -> Path:
+    # .../ARC_ATLAS_Train_v4/src/data_prep/prep_utils.py -> .../ARC_ATLAS_Train_v4
+    return Path(__file__).resolve().parents[2]
+
+
+def _first_existing(paths: list[Path]) -> Path | None:
+    for p in paths:
+        if p and p.exists():
+            return p
+    return None
+
+
+def _ensure_templateflow_home() -> Path:
+    tf_home = os.environ.get("TEMPLATEFLOW_HOME")
+    if tf_home:
+        return Path(tf_home).expanduser()
+    local_tf_home = _project_root() / "data" / "templateflow"
+    local_tf_home.mkdir(parents=True, exist_ok=True)
+    os.environ["TEMPLATEFLOW_HOME"] = str(local_tf_home)
+    return local_tf_home
+
+
+def _ants_candidates(binary_name: str) -> list[Path]:
+    root = _project_root()
+    return [
+        root / "tools" / "ants" / "bin" / binary_name,
+        root / "tools" / "ants" / binary_name,
+        root / "tools" / binary_name,
+    ]
+
+
 def _ants_bins():
-    reg = Path(shutil.which("antsRegistration") or "")
-    apply = Path(shutil.which("antsApplyTransforms") or "")
-    reg_env = Path(os.environ.get("ANTS_REG", reg)) if os.environ.get("ANTS_REG") else reg
-    app_env = Path(os.environ.get("ANTS_APPLY", apply)) if os.environ.get("ANTS_APPLY") else apply
-    if not reg_env.exists() or not app_env.exists():
+    reg_env = Path(os.environ["ANTS_REG"]).expanduser() if os.environ.get("ANTS_REG") else None
+    app_env = Path(os.environ["ANTS_APPLY"]).expanduser() if os.environ.get("ANTS_APPLY") else None
+
+    reg = reg_env or _first_existing(_ants_candidates("antsRegistration"))
+    app = app_env or _first_existing(_ants_candidates("antsApplyTransforms"))
+
+    if reg is None or app is None or not reg.exists() or not app.exists():
+        exp_reg = _ants_candidates("antsRegistration")[0]
+        exp_app = _ants_candidates("antsApplyTransforms")[0]
         raise FileNotFoundError(
-            "ANTs binaries not found. Set ANTS_REG / ANTS_APPLY env vars or add to PATH."
+            "ANTs binaries not found. Expected local binaries under "
+            f"'{exp_reg.parent}' (e.g. {exp_reg.name}, {exp_app.name}), "
+            "or set ANTS_REG / ANTS_APPLY."
         )
-    return reg_env, app_env
+    return reg, app
 
 
 def _run(cmd: list[str]):
@@ -52,6 +94,7 @@ def _slug_from_raw(raw_root: Path, name: str) -> str:
 
 def _tpl_path(resolution: int = 1) -> Path:
     """Return TemplateFlow MNI T1 path for given resolution, robust to return type."""
+    _ensure_templateflow_home()
     from templateflow.api import get as tf_get
     tpl = tf_get("MNI152NLin2009cAsym", resolution=resolution, suffix="T1w", desc="brain", extension="nii.gz")
     if isinstance(tpl, (list, tuple)):
@@ -380,7 +423,7 @@ def combine_standardized(dataset_roots: Iterable[Path], dest: Path):
             out_mk = dest_mk / f"{slug}__{mask.name}"
             shutil.copy2(t1, out_t1)
             shutil.copy2(mask, out_mk)
-            manifest.append({"slug": slug, "key": base, "t1": str(out_t1), "mask": str(out_mk)})
+            manifest.append({"slug": slug, "key": base, "t1": str(out_t1.resolve()), "mask": str(out_mk.resolve())})
     if manifest:
         mf = dest / "manifest.csv"
         with open(mf, "w", newline="") as f:
@@ -391,8 +434,136 @@ def combine_standardized(dataset_roots: Iterable[Path], dest: Path):
         print("No combined manifest written (no pairs).")
 
 
+def run_prep_images_only(
+    images_dir: Path,
+    out_root: Path,
+    name: str = "TEST",
+    t1_glob: str = "**/*.nii.gz",
+    already_mni: bool = False,
+    overwrite: bool = False,
+) -> Path:
+    """Prep images to MNI/normalized space without requiring lesion masks."""
+    images_dir = Path(images_dir).expanduser()
+    out_root = Path(out_root).expanduser()
+    if not images_dir.exists():
+        raise FileNotFoundError(f"Images root missing: {images_dir}")
+    out_root.mkdir(parents=True, exist_ok=True)
+
+    t1s = sorted(images_dir.glob(t1_glob))
+    if not t1s:
+        raise RuntimeError(f"No T1 images found in {images_dir} using glob {t1_glob}")
+
+    slug = _slug_from_raw(images_dir, name)
+    out_ds = out_root / slug
+    marker = out_ds / "source.json"
+    if overwrite and out_ds.exists():
+        shutil.rmtree(out_ds, ignore_errors=True)
+    elif marker.exists() and not overwrite:
+        print(f"[{name}] already processed -> {out_ds}, skipping (overwrite=True to redo).")
+        return out_ds
+
+    out_mni = out_ds / "mni_1mm_ants_fixed"
+    out_norm = out_mni / "t1_norm"
+    out_xfm = out_ds / "xfm"
+    for d in (out_mni, out_norm, out_xfm):
+        d.mkdir(parents=True, exist_ok=True)
+
+    tpl = None
+    reg_bin = apply_bin = None
+    seen_keys = set()
+    qc_rows = []
+
+    def _unique_key(base: str) -> str:
+        key = base or "case"
+        if key not in seen_keys:
+            seen_keys.add(key)
+            return key
+        i = 2
+        while f"{key}_{i}" in seen_keys:
+            i += 1
+        new_key = f"{key}_{i}"
+        seen_keys.add(new_key)
+        return new_key
+
+    for t1 in t1s:
+        key = _unique_key(_norm_key_from_name(t1.name))
+        prefix = out_xfm / f"{key}_t1_to_mni_"
+        t1_mni = out_mni / f"{key}_T1w_MNI.nii.gz"
+        t1_norm = out_norm / f"{key}_T1w_MNI_norm.nii.gz"
+
+        if already_mni:
+            if not t1_mni.exists():
+                shutil.copy2(t1, t1_mni)
+        else:
+            if tpl is None:
+                tpl = _tpl_path(resolution=1)
+            if reg_bin is None or apply_bin is None:
+                reg_bin, apply_bin = _ants_bins()
+            if not (prefix.with_name(prefix.name + "0GenericAffine.mat")).exists():
+                ants_register(t1, prefix, tpl, reg_bin, use_2mm=True)
+            if not t1_mni.exists():
+                ants_apply(t1, tpl, prefix, t1_mni, apply_bin, nn=False)
+
+        if not t1_norm.exists():
+            img_mni = nib.load(str(t1_mni))
+            norm = normalize_t1(img_mni.get_fdata().astype(np.float32))
+            nib.save(nib.Nifti1Image(norm, img_mni.affine, img_mni.header), str(t1_norm))
+
+        ti = nib.load(str(t1_mni))
+        qc_rows.append(
+            dict(
+                dataset=name,
+                slug=slug,
+                key=key,
+                t1_mni=str(t1_mni),
+                t1_shape=str(ti.shape[:3]),
+                t1_zooms=str(tuple(round(z, 3) for z in ti.header.get_zooms()[:3])),
+            )
+        )
+
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_text(json.dumps({"raw_root": str(images_dir), "slug": slug}, indent=2))
+
+    if qc_rows:
+        qc_csv = out_root / "prep_qc_images_only.csv"
+        with open(qc_csv, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=qc_rows[0].keys())
+            writer.writeheader()
+            writer.writerows(qc_rows)
+        print("QC written", qc_csv)
+    return out_ds
+
+
+def combine_standardized_images_only(dataset_roots: Iterable[Path], dest: Path):
+    """Combine standardized image-only outputs into a single test_input root."""
+    dest_t1 = dest / "t1"
+    dest_t1.mkdir(parents=True, exist_ok=True)
+    manifest = []
+    for ds_root in dataset_roots:
+        slug = ds_root.name
+        t1_dir = ds_root / "mni_1mm_ants_fixed" / "t1_norm"
+        if not t1_dir.exists():
+            print(f"[combine] missing t1_norm in {ds_root}, skipping")
+            continue
+        for t1 in sorted(t1_dir.glob("*.nii.gz")):
+            out_t1 = dest_t1 / f"{slug}__{t1.name}"
+            shutil.copy2(t1, out_t1)
+            manifest.append({"slug": slug, "key": t1.name, "t1": str(out_t1.resolve())})
+    if manifest:
+        mf = dest / "manifest.csv"
+        with open(mf, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=manifest[0].keys())
+            writer.writeheader()
+            writer.writerows(manifest)
+        print("Combined image-only manifest ->", mf)
+    else:
+        print("No image-only manifest written (no images).")
+
+
 __all__ = [
     'DatasetConfig',
     'run_prep',
     'combine_standardized',
+    'run_prep_images_only',
+    'combine_standardized_images_only',
 ]

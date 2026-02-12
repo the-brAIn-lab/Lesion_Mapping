@@ -14,12 +14,12 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 import re
+import csv
 import numpy as np
 import nibabel as nib
 import ipywidgets as W
 import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
-from scipy.ndimage import binary_dilation
 
 
 def _pairs(root: Path):
@@ -27,6 +27,29 @@ def _pairs(root: Path):
     if not t1_dir.exists() or not mk_dir.exists():
         raise FileNotFoundError(f"Expected t1/ and masks/ under {root}")
     pairs = {}
+    manifest = root / "manifest.csv"
+
+    if manifest.exists():
+        with manifest.open(newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                t1 = Path(row.get("t1", ""))
+                mk = Path(row.get("mask", ""))
+                if not t1.is_absolute():
+                    t1 = root / t1
+                if not mk.is_absolute():
+                    mk = root / mk
+                if not (t1.exists() and mk.exists()):
+                    continue
+                label = t1.name.replace("_T1w_MNI_norm", "")
+                idx = 2
+                lbl = label
+                while lbl in pairs:
+                    lbl = f"{label} ({idx})"; idx += 1
+                pairs[lbl] = {"t1": t1, "mask": mk}
+        if pairs:
+            return pairs
+
     for t1 in sorted(t1_dir.glob("*.nii.gz")):
         base = t1.name.replace("_T1w_MNI_norm", "")
         mask = mk_dir / t1.name.replace("_T1w_MNI_norm", "_lesion_mask_MNI_clean")
@@ -70,8 +93,8 @@ def _normalize(img: np.ndarray) -> np.ndarray:
 
 
 def _edges2d(mask2d):
-    m = mask2d.astype(bool)
-    return binary_dilation(m) & (~m)
+    # Contouring the binary mask at 0.5 traces the true voxel boundary.
+    return mask2d.astype(np.float32, copy=False)
 
 
 def _zooms3(img: nib.Nifti1Image):
@@ -139,7 +162,13 @@ def show_viewer(root: Path):
                 if cb_edges.value:
                     plt.contour(_edges2d(mask2d).T, levels=[0.5], linewidths=0.8, colors="r")
                 else:
-                    plt.imshow(np.ma.masked_where(~mask2d.T, mask2d.T), cmap="jet", alpha=float(sl_alpha.value), origin="lower")
+                    plt.imshow(
+                        np.ma.masked_where(~mask2d.T, mask2d.T),
+                        cmap="jet",
+                        alpha=float(sl_alpha.value),
+                        origin="lower",
+                        interpolation="nearest",
+                    )
                 plt.axis("off"); plt.tight_layout(); plt.show(); plt.close()
             else:
                 axes[0].imshow(img2d.T, cmap="gray", origin="lower")

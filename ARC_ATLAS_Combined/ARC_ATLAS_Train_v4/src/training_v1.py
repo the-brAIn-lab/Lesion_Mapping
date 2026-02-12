@@ -25,7 +25,6 @@ import logging
 from pathlib import Path
 import tensorflow as tf
 from tensorflow.keras import mixed_precision
-mixed_precision.set_global_policy("mixed_float16")
 
 # ---- Environment (set BEFORE importing TensorFlow) ----
 import os
@@ -48,6 +47,27 @@ print("Visible GPUs:", gpus)
 for gpu in gpus:
     try: tf.config.experimental.set_memory_growth(gpu, True)
     except Exception as e: print(f"Could not set memory growth on {gpu}: {e}")
+
+# Precision policy:
+# - Default ("auto"): mixed_float16 on GPU, float32 on CPU.
+# - Override with SMARTSOTA_MIXED_PRECISION in {"auto","float32","mixed_float16","mixed_bfloat16"}.
+_req_policy = os.environ.get("SMARTSOTA_MIXED_PRECISION", "auto").strip().lower()
+if _req_policy in {"float32", "fp32", "off", "false", "0"}:
+    _policy = "float32"
+elif _req_policy in {"mixed_bfloat16", "bfloat16", "bf16"}:
+    _policy = "mixed_bfloat16"
+elif _req_policy in {"mixed_float16", "float16", "fp16"}:
+    _policy = "mixed_float16" if gpus else "float32"
+    if not gpus:
+        print("No GPU detected; overriding float16 policy to float32.")
+else:
+    _policy = "mixed_float16" if gpus else "float32"
+try:
+    mixed_precision.set_global_policy(_policy)
+except Exception as e:
+    print(f"Could not set precision policy '{_policy}': {e}; falling back to float32.")
+    mixed_precision.set_global_policy("float32")
+print("Mixed precision policy:", mixed_precision.global_policy())
 
 # ✅ Only mirror if multi-GPU
 strategy = tf.distribute.MirroredStrategy() if len(gpus) > 1 else tf.distribute.get_strategy()

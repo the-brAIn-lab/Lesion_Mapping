@@ -78,6 +78,37 @@ def _run(cmd: list[str]):
     return res.stdout
 
 
+def _env_flag(name: str, default: bool = True) -> bool:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    raw = str(raw).strip().lower()
+    return raw in {"1", "true", "yes", "y", "on"}
+
+
+def _name_suggests_mni(path: Path) -> bool:
+    n = path.name.lower()
+    return ("space-mni" in n) or ("mni152" in n) or ("_mni" in n)
+
+
+def _looks_like_prealigned_mni(t1_path: Path, tpl_path: Path) -> bool:
+    """Heuristic: if file name indicates MNI and geometry roughly matches template, skip ANTs."""
+    if not _name_suggests_mni(t1_path):
+        return False
+    try:
+        ti = nib.load(str(t1_path))
+        tp = nib.load(str(tpl_path))
+        t_shape = tuple(int(v) for v in ti.shape[:3])
+        p_shape = tuple(int(v) for v in tp.shape[:3])
+        t_zoom = np.asarray(ti.header.get_zooms()[:3], dtype=np.float32)
+        p_zoom = np.asarray(tp.header.get_zooms()[:3], dtype=np.float32)
+        affine_close = bool(np.allclose(ti.affine, tp.affine, atol=5e-2))
+        shape_zoom_close = (t_shape == p_shape) and bool(np.allclose(t_zoom, p_zoom, atol=0.05))
+        return affine_close or shape_zoom_close
+    except Exception:
+        return False
+
+
 def _key_from_name(name: str) -> str | None:
     sub = re.search(r"(sub-[^_]+)", name)
     ses = re.search(r"(ses-[^_]+)", name)
@@ -336,7 +367,20 @@ def run_prep(datasets: Iterable[DatasetConfig], out_root: Path, force_overwrite:
             t1_norm = out_norm / f"{key}_T1w_MNI_norm.nii.gz"
             mask_clean = out_clean / f"{key}_lesion_mask_MNI_clean.nii.gz"
 
-            if ds.already_mni:
+            auto_mni = False
+            if not ds.already_mni and _env_flag("PREP_AUTO_MNI_DETECT", True) and _name_suggests_mni(t1):
+                auto_mni = True  # name-only fallback
+                if tpl is None:
+                    try:
+                        tpl = _tpl_path(resolution=1)
+                    except Exception as e:
+                        print(f"[{ds.name}] template unavailable ({e}); using name-only MNI detection for {t1.name}.")
+                if tpl is not None:
+                    auto_mni = _looks_like_prealigned_mni(t1, tpl)
+                if auto_mni:
+                    print(f"[{ds.name}] auto-detected prealigned MNI input for {t1.name}; skipping ANTs registration.")
+
+            if ds.already_mni or auto_mni:
                 if not mask_t1.exists():
                     resample_mask_to_t1(mask, t1, mask_t1)
                 if not t1_mni.exists():
@@ -491,7 +535,20 @@ def run_prep_images_only(
         t1_mni = out_mni / f"{key}_T1w_MNI.nii.gz"
         t1_norm = out_norm / f"{key}_T1w_MNI_norm.nii.gz"
 
-        if already_mni:
+        auto_mni = False
+        if not already_mni and _env_flag("PREP_AUTO_MNI_DETECT", True) and _name_suggests_mni(t1):
+            auto_mni = True  # name-only fallback
+            if tpl is None:
+                try:
+                    tpl = _tpl_path(resolution=1)
+                except Exception as e:
+                    print(f"[{name}] template unavailable ({e}); using name-only MNI detection for {t1.name}.")
+            if tpl is not None:
+                auto_mni = _looks_like_prealigned_mni(t1, tpl)
+            if auto_mni:
+                print(f"[{name}] auto-detected prealigned MNI input for {t1.name}; skipping ANTs registration.")
+
+        if already_mni or auto_mni:
             if not t1_mni.exists():
                 shutil.copy2(t1, t1_mni)
         else:

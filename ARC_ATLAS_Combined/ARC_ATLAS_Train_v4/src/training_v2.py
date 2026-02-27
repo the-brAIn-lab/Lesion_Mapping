@@ -49,9 +49,9 @@ for gpu in gpus:
     except Exception as e: print(f"Could not set memory growth on {gpu}: {e}")
 
 # Precision policy:
-# - Default ("auto"): mixed_float16 on GPU, float32 on CPU.
+# - Default is float32 for stability on custom 3D attention/loss stacks.
 # - Override with SMARTSOTA_MIXED_PRECISION in {"auto","float32","mixed_float16","mixed_bfloat16"}.
-_req_policy = os.environ.get("SMARTSOTA_MIXED_PRECISION", "auto").strip().lower()
+_req_policy = os.environ.get("SMARTSOTA_MIXED_PRECISION", "float32").strip().lower()
 if _req_policy in {"float32", "fp32", "off", "false", "0"}:
     _policy = "float32"
 elif _req_policy in {"mixed_bfloat16", "bfloat16", "bf16"}:
@@ -231,6 +231,11 @@ class DynamicTrainingConfig:
     PATCH_FG_PROB_BY_BIN: tuple[float, ...] = (0.95, 0.90, 0.80, 0.65, 0.55)
     PATCH_SIZE: tuple[int, int, int] | None = (112, 112, 112)
     PATCHES_PER_CASE: int = 1
+    LOAD_FULL_IMAGE_FOR_PATCHING: bool = True
+    FULL_RES_TARGET_SHAPE: tuple[int, int, int] | None = None
+    PATCH_SAMPLING_STRATEGY: str = "random"            # "random" | "hemisphere"
+    HEMISPHERE_AXIS: int = 2                           # RAS x-axis after canonicalization
+    HEMISPHERE_BALANCED: bool = True
     MAX_PATCHES_PER_CASE_PER_EPOCH: int = 64
     DIFF_AWARE_ENABLED: bool = True
     DIFF_EMA_LAMBDA: float = 0.8
@@ -252,6 +257,12 @@ class DynamicTrainingConfig:
         self.MASKS_DIR = Path(self.MASKS_DIR) if self.MASKS_DIR else self.DATA_DIR
         self.MODEL_DIR = Path(self.MODEL_DIR)
         self.CALLBACKS_DIR = Path(self.CALLBACKS_DIR)
+        self.PATCH_SAMPLING_STRATEGY = str(self.PATCH_SAMPLING_STRATEGY).strip().lower()
+        if self.PATCH_SAMPLING_STRATEGY not in {"random", "hemisphere"}:
+            raise ValueError("PATCH_SAMPLING_STRATEGY must be 'random' or 'hemisphere'.")
+        if int(self.HEMISPHERE_AXIS) not in (0, 1, 2):
+            raise ValueError("HEMISPHERE_AXIS must be 0, 1, or 2.")
+        self.HEMISPHERE_AXIS = int(self.HEMISPHERE_AXIS)
         self.MODEL_DIR.mkdir(parents=True, exist_ok=True)
         self.CALLBACKS_DIR.mkdir(parents=True, exist_ok=True)
         self._write_config()
@@ -269,6 +280,7 @@ class DynamicTrainingConfig:
             "SIZE_BUCKET_PROBS",
             "PATCH_FG_PROB_BY_BIN",
             "PATCH_SIZE",
+            "FULL_RES_TARGET_SHAPE",
             "OTSU_CLAMP",
         )
         for key in tuple_fields:
@@ -554,7 +566,9 @@ class MemoryMonitoringCallback(tf.keras.callbacks.Callback):
 # ---------------------------------------------------------------------------
 @register_keras_serializable(package="custom")
 def dice_coefficient(y_true, y_pred, smooth=1e-6):
-    y_true = tf.cast(y_true, tf.float32)
+    y_true = tf.where(tf.math.is_finite(y_true), y_true, tf.zeros_like(y_true))
+    y_pred = tf.where(tf.math.is_finite(y_pred), y_pred, tf.zeros_like(y_pred))
+    y_true = tf.cast(tf.clip_by_value(y_true, 0.0, 1.0), tf.float32)
     y_pred = tf.cast(tf.clip_by_value(y_pred, 1e-7, 1.0 - 1e-7), tf.float32)
     intersection = tf.reduce_sum(y_true * y_pred)
     denom = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred)
@@ -563,6 +577,19 @@ def dice_coefficient(y_true, y_pred, smooth=1e-6):
 @register_keras_serializable(package="custom")
 def dice_loss(y_true, y_pred):
     return 1.0 - dice_coefficient(y_true, y_pred)
+
+@register_keras_serializable(package="custom")
+def safe_binary_iou(y_true, y_pred, threshold=0.5, smooth=1e-6):
+    """
+    IoU metric that avoids confusion-matrix scatter indexing issues by
+    thresholding tensors directly and masking non-finite predictions.
+    """
+    y_true = tf.cast(y_true > 0.5, tf.float32)
+    y_pred = tf.where(tf.math.is_finite(y_pred), y_pred, tf.zeros_like(y_pred))
+    y_pred = tf.cast(y_pred > threshold, tf.float32)
+    intersection = tf.reduce_sum(y_true * y_pred)
+    union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) - intersection
+    return (intersection + smooth) / (union + smooth)
 
 def _sobel_3d(t):
     t = tf.cast(t, tf.float32)
@@ -587,7 +614,9 @@ def _sobel_3d(t):
 
 @register_keras_serializable(package="custom")
 def boundary_loss(y_true, y_pred):
-    y_true = tf.cast(y_true, tf.float32)
+    y_true = tf.where(tf.math.is_finite(y_true), y_true, tf.zeros_like(y_true))
+    y_pred = tf.where(tf.math.is_finite(y_pred), y_pred, tf.zeros_like(y_pred))
+    y_true = tf.cast(tf.clip_by_value(y_true, 0.0, 1.0), tf.float32)
     y_pred = tf.cast(tf.clip_by_value(y_pred, 1e-7, 1.0 - 1e-7), tf.float32)
     gxt, gyt, gzt = _sobel_3d(y_true)
     gxp, gyp, gzp = _sobel_3d(y_pred)
@@ -610,8 +639,10 @@ class CombinedLoss(tf.keras.losses.Loss):
 
 @register_keras_serializable(package="custom")
 def tversky_loss(y_true, y_pred, alpha=0.7, beta=0.3, eps=1e-6):
-    y_true = tf.cast(y_true, tf.float32)
-    y_pred = tf.cast(y_pred, tf.float32)
+    y_true = tf.where(tf.math.is_finite(y_true), y_true, tf.zeros_like(y_true))
+    y_pred = tf.where(tf.math.is_finite(y_pred), y_pred, tf.zeros_like(y_pred))
+    y_true = tf.cast(tf.clip_by_value(y_true, 0.0, 1.0), tf.float32)
+    y_pred = tf.cast(tf.clip_by_value(y_pred, eps, 1.0 - eps), tf.float32)
     tp = tf.reduce_sum(y_true * y_pred)
     fp = tf.reduce_sum((1.0 - y_true) * y_pred)
     fn = tf.reduce_sum(y_true * (1.0 - y_pred))
@@ -620,8 +651,9 @@ def tversky_loss(y_true, y_pred, alpha=0.7, beta=0.3, eps=1e-6):
 
 @register_keras_serializable(package="custom")
 def focal_tversky_loss(y_true, y_pred, alpha=0.7, beta=0.3, gamma=1.5, eps=1e-6):
-    t = 1.0 - tversky_loss(y_true, y_pred, alpha=alpha, beta=beta, eps=eps)
-    return tf.pow(1.0 - t, gamma)
+    tv = tversky_loss(y_true, y_pred, alpha=alpha, beta=beta, eps=eps)
+    tv = tf.clip_by_value(tv, 0.0, 1.0)
+    return tf.pow(tv, gamma)
 
 def make_tversky_loss(alpha, beta):
     @tf.function
@@ -717,6 +749,24 @@ class LossRampScheduler(tf.keras.callbacks.Callback):
         logger.info(f"📉 Loss mix @epoch {epoch}: dice={dice_w:.3f}, boundary={boundary_w:.3f}, focal={self.loss_obj.focal_weight:.3f}")
 
 
+class NonFiniteLossGuard(tf.keras.callbacks.Callback):
+    """Stop as soon as loss becomes non-finite and emit a clear diagnostic line."""
+    def _check(self, stage: str, batch: int, logs):
+        logs = logs or {}
+        loss = logs.get("loss")
+        if loss is None:
+            return
+        if not np.isfinite(loss):
+            logger.error(f"Non-finite loss detected at {stage} batch={batch}: {loss}. Stopping training.")
+            self.model.stop_training = True
+
+    def on_train_batch_end(self, batch, logs=None):
+        self._check("train", int(batch), logs)
+
+    def on_test_batch_end(self, batch, logs=None):
+        self._check("val", int(batch), logs)
+
+
 # ---------------------------------------------------------------------------
 # Volume loading and preprocessing
 # ---------------------------------------------------------------------------
@@ -780,6 +830,7 @@ def _load_and_preprocess_image(path: str, target_shape: tuple[int, int, int] | N
     vol = _maybe_resample(vol, target_shape if _should_resample() else None, order=1)
     if target_shape is not None and vol.shape != target_shape:
         vol = _center_crop_or_pad_volume(vol, target_shape)
+    vol = np.nan_to_num(vol, nan=0.0, posinf=0.0, neginf=0.0)
     return vol.astype(np.float32, copy=True)
 
 def _load_and_preprocess_mask(path: str, target_shape: tuple[int, int, int] | None) -> np.ndarray:
@@ -788,6 +839,7 @@ def _load_and_preprocess_mask(path: str, target_shape: tuple[int, int, int] | No
     vol = _maybe_resample(vol, target_shape if _should_resample() else None, order=0)
     if target_shape is not None and vol.shape != target_shape:
         vol = _center_crop_or_pad_volume(vol, target_shape)
+    vol = np.nan_to_num(vol, nan=0.0, posinf=0.0, neginf=0.0)
     return (vol > 0.5).astype(np.float32, copy=False)
 
 def compute_lesion_sizes(pairs, load_mask_fn, target_shape=None):
@@ -855,8 +907,10 @@ def apply_augmentations(image: np.ndarray, mask: np.ndarray, cfg, rng) -> tuple[
         if maxv > 0:
             image = np.power(np.clip(image / maxv, 0, 1), gamma) * maxv
 
+    image = np.nan_to_num(image, nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32, copy=False)
+    mask = np.nan_to_num(mask, nan=0.0, posinf=0.0, neginf=0.0)
     mask = (mask > 0.5).astype(np.float32, copy=False)
-    return image.astype(np.float32, copy=False), mask
+    return image, mask
 
 class SizeAwareCaseSampler:
     def __init__(self, lesion_sizes: np.ndarray, cfg: DynamicTrainingConfig):
@@ -926,23 +980,73 @@ def bin_index(v, edges):
     import numpy as _np
     return int(_np.digitize([v], _np.asarray(edges, dtype=_np.int64), right=False)[0])
 
-def sample_patch_center(mask, patch_size, p_fg, rng):
+def sample_patch_center(
+    mask,
+    patch_size,
+    p_fg,
+    rng,
+    hemisphere_axis: int | None = None,
+    hemisphere_side: int | None = None,
+):
     import numpy as _np
+
     Z, Y, X = mask.shape
     dz, dy, dx = patch_size
+    dims = [Z, Y, X]
+    patch_dims = [dz, dy, dx]
+
     fg = _np.argwhere(mask > 0)
     bg = _np.argwhere(mask == 0)
+
+    use_hemi = hemisphere_axis is not None and hemisphere_side in (0, 1)
+    if use_hemi:
+        axis = int(hemisphere_axis)
+        mid = dims[axis] // 2
+        if hemisphere_side == 0:
+            fg_side = fg[fg[:, axis] < mid] if fg.size > 0 else fg
+            bg_side = bg[bg[:, axis] < mid] if bg.size > 0 else bg
+            hemi_center = [Z // 2, Y // 2, X // 2]
+            hemi_center[axis] = max(0, mid // 2)
+        else:
+            fg_side = fg[fg[:, axis] >= mid] if fg.size > 0 else fg
+            bg_side = bg[bg[:, axis] >= mid] if bg.size > 0 else bg
+            hemi_center = [Z // 2, Y // 2, X // 2]
+            hemi_center[axis] = mid + max(0, (dims[axis] - mid) // 2)
+        if fg_side.size > 0:
+            fg = fg_side
+        if bg_side.size > 0:
+            bg = bg_side
+    else:
+        hemi_center = [Z // 2, Y // 2, X // 2]
+
     if rng.random() < p_fg and fg.size > 0:
         cz, cy, cx = fg[rng.integers(len(fg))]
     elif bg.size > 0:
         cz, cy, cx = bg[rng.integers(len(bg))]
     else:
-        cz, cy, cx = Z // 2, Y // 2, X // 2
+        cz, cy, cx = hemi_center
+
     jitter = rng.integers(low=-4, high=5, size=3)
-    cz, cy, cx = cz + jitter[0], cy + jitter[1], cx + jitter[2]
-    z0 = max(0, min(cz - dz // 2, Z - dz))
-    y0 = max(0, min(cy - dy // 2, Y - dy))
-    x0 = max(0, min(cx - dx // 2, X - dx))
+    centers = [int(cz + jitter[0]), int(cy + jitter[1]), int(cx + jitter[2])]
+    starts = []
+    for center, dim, p in zip(centers, dims, patch_dims):
+        starts.append(max(0, min(center - p // 2, dim - p)))
+
+    if use_hemi:
+        axis = int(hemisphere_axis)
+        dim = dims[axis]
+        p = patch_dims[axis]
+        mid = dim // 2
+        if hemisphere_side == 0:
+            hemi_lo, hemi_hi = 0, mid
+        else:
+            hemi_lo, hemi_hi = mid, dim
+
+        # If patch fits in one hemisphere, clamp to that hemisphere.
+        if p <= max(1, hemi_hi - hemi_lo):
+            starts[axis] = int(_np.clip(starts[axis], hemi_lo, max(hemi_lo, hemi_hi - p)))
+
+    z0, y0, x0 = starts
     z1, y1, x1 = z0 + dz, y0 + dy, x0 + dx
     return z0, z1, y0, y1, x0, x1
 
@@ -1327,6 +1431,14 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
 
     logger.info(f"🔧 Config: {config.model_path.name}")
     log_memory_usage("start")
+    if (
+        int(getattr(config, "SMALL_LESION_THRESHOLD", 100)) != 100
+        or float(getattr(config, "SYNTHETIC_LESION_PROB", 0.3)) != 0.3
+    ):
+        logger.warning(
+            "SMALL_LESION_THRESHOLD and SYNTHETIC_LESION_PROB are currently metadata-only in training_v2 "
+            "(no synthetic-lesion augmentation is applied)."
+        )
 
     if getattr(config, "INPUT_SHAPE", None) in (None, (), []):
         max_dims = detect_input_shape(config.DATA_DIR)
@@ -1335,6 +1447,23 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     if tuple(config.INPUT_SHAPE[:-1]) != patch_shape:
         config.INPUT_SHAPE = patch_shape + (1,)
     config._write_config()
+
+    # Case-loading shape (separate from model patch shape).
+    # - LOAD_FULL_IMAGE_FOR_PATCHING=True + FULL_RES_TARGET_SHAPE=None: keep native full volume.
+    # - LOAD_FULL_IMAGE_FOR_PATCHING=True + FULL_RES_TARGET_SHAPE=(...): resample/crop full volume to that shape.
+    # - LOAD_FULL_IMAGE_FOR_PATCHING=False: legacy behavior (load directly to patch/model shape).
+    case_target_shape = None
+    if bool(getattr(config, "LOAD_FULL_IMAGE_FOR_PATCHING", True)):
+        raw_full_shape = getattr(config, "FULL_RES_TARGET_SHAPE", None)
+        if raw_full_shape is not None:
+            case_target_shape = tuple(int(v) for v in raw_full_shape)
+        logger.info(
+            "Patch extraction source: full-volume mode "
+            f"(target_shape={case_target_shape if case_target_shape is not None else 'native'})"
+        )
+    else:
+        case_target_shape = tuple(config.INPUT_SHAPE[:-1])
+        logger.info(f"Patch extraction source: legacy patch-shaped loading {case_target_shape}")
 
     # --- Detect and log available GPUs ---
     gpus = tf.config.list_physical_devices("GPU")
@@ -1368,10 +1497,13 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                 tversky_beta=config.TVERSKY_BETA,
                 focal_gamma=config.FOCAL_TVERSKY_GAMMA,
             )
+        adam_kwargs = {"learning_rate": lr_schedule, "epsilon": 1e-8}
+        if float(getattr(config, "MAX_GRAD_NORM", 0.0) or 0.0) > 0.0:
+            adam_kwargs["clipnorm"] = float(config.MAX_GRAD_NORM)
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule, epsilon=1e-8),
+            optimizer=tf.keras.optimizers.Adam(**adam_kwargs),
             loss=loss_obj,
-            metrics=[dice_coefficient, tf.keras.metrics.MeanIoU(num_classes=2, name="mean_iou")],
+            metrics=[dice_coefficient, safe_binary_iou],
         )
     logger.info(f"Model built: {model.count_params():,} parameters")
 
@@ -1391,8 +1523,10 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     mask_preprocess_fn = globals().get("_load_and_preprocess_mask")
     if mask_preprocess_fn is None:
         logger.warning("Mask preprocessor not found; rebuilding inline fallback for lesion sizing.")
-        def mask_preprocess_fn(path: str, target_shape: tuple[int, int, int]):
+        def mask_preprocess_fn(path: str, target_shape: tuple[int, int, int] | None):
             mask_data = (nib.load(path).get_fdata() > 0.5).astype(np.float32)
+            if target_shape is None:
+                return mask_data
             slices = []
             for cur, tgt in zip(mask_data.shape, target_shape):
                 if cur >= tgt:
@@ -1406,7 +1540,7 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             z0, y0, x0 = offsets
             output[z0:z0+cropped.shape[0], y0:y0+cropped.shape[1], x0:x0+cropped.shape[2]] = cropped
             return output
-    lesion_sizes_all = compute_lesion_sizes(pairs, mask_preprocess_fn, config.INPUT_SHAPE[:-1])
+    lesion_sizes_all = compute_lesion_sizes(pairs, mask_preprocess_fn, case_target_shape)
     pair_lookup = {(str(img_p), str(msk_p)): idx for idx, (img_p, msk_p) in enumerate(pairs)}
     split_fn = globals().get("create_stratified_splits")
     if split_fn is None:
@@ -1431,9 +1565,15 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     train_indices = np.asarray([pair_lookup[(str(img), str(msk))] for img, msk in train_pairs], dtype=np.int64)
     train_lesion_sizes = lesion_sizes_all[train_indices]
     case_sampler = SizeAwareCaseSampler(train_lesion_sizes, config) if len(train_pairs) else None
-    patch_size = config.INPUT_SHAPE[:-1]
+    patch_size = tuple(config.INPUT_SHAPE[:-1])
     batch_cases = max(config.BATCH_SIZE, 1)
-    batch_patches = batch_cases * max(config.PATCHES_PER_CASE, 1)
+    patch_sampling = str(getattr(config, "PATCH_SAMPLING_STRATEGY", "random")).strip().lower()
+    hemisphere_mode = patch_sampling == "hemisphere"
+    hemisphere_axis = int(getattr(config, "HEMISPHERE_AXIS", 2))
+    patches_per_case = max(int(config.PATCHES_PER_CASE), 1)
+    if hemisphere_mode and bool(getattr(config, "HEMISPHERE_BALANCED", True)):
+        patches_per_case = max(patches_per_case, 2)
+    batch_patches = batch_cases * patches_per_case
     rng = np.random.default_rng(config.RNG_SEED)
 
     def training_batch_generator():
@@ -1444,8 +1584,8 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             xs, ys = [], []
             for idx in idxs:
                 img_p, msk_p = train_pairs[idx]
-                x = _load_and_preprocess_image(str(img_p), patch_size)
-                y = _load_and_preprocess_mask(str(msk_p), patch_size)
+                x = _load_and_preprocess_image(str(img_p), case_target_shape)
+                y = _load_and_preprocess_mask(str(msk_p), case_target_shape)
                 lesion_size = train_lesion_sizes[idx] if len(train_lesion_sizes) > idx else int((y > 0).sum())
                 if config.SIZE_AWARE_ENABLED and config.SIZE_AWARE_MODE == "bucket":
                     bin_id = bin_index(lesion_size, config.SIZE_BUCKET_EDGES)
@@ -1454,15 +1594,40 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                 else:
                     p_fg = float(config.PATCH_FG_PROB_BY_BIN[0])
                 mask_bin = (y > 0).astype(np.uint8)
-                for _ in range(config.PATCHES_PER_CASE):
-                    z0, z1, y0, y1, x0, x1 = sample_patch_center(mask_bin, patch_size, p_fg, rng)
+                for patch_iter in range(patches_per_case):
+                    hemisphere_side = None
+                    if hemisphere_mode:
+                        hemisphere_side = patch_iter % 2 if bool(getattr(config, "HEMISPHERE_BALANCED", True)) else int(rng.integers(0, 2))
+                    z0, z1, y0, y1, x0, x1 = sample_patch_center(
+                        mask_bin,
+                        patch_size,
+                        p_fg,
+                        rng,
+                        hemisphere_axis=hemisphere_axis if hemisphere_mode else None,
+                        hemisphere_side=hemisphere_side,
+                    )
                     patch_x = x[z0:z1, y0:y1, x0:x1]
                     patch_y = y[z0:z1, y0:y1, x0:x1]
+                    if patch_x.shape != patch_size:
+                        patch_x = _center_crop_or_pad_volume(patch_x, patch_size)
+                    if patch_y.shape != patch_size:
+                        patch_y = _center_crop_or_pad_volume(patch_y, patch_size)
                     if config.AUGMENTATION_INTENSITY > 0:
                         patch_x, patch_y = apply_augmentations(patch_x, patch_y, config, rng)
                     xs.append(patch_x[..., np.newaxis])
                     ys.append(patch_y[..., np.newaxis])
-            yield np.stack(xs, axis=0), np.stack(ys, axis=0)
+            xb = np.stack(xs, axis=0).astype(np.float32, copy=False)
+            yb = np.stack(ys, axis=0).astype(np.float32, copy=False)
+            if (not np.isfinite(xb).all()) or (not np.isfinite(yb).all()):
+                bad_x = int(np.size(xb) - np.isfinite(xb).sum())
+                bad_y = int(np.size(yb) - np.isfinite(yb).sum())
+                logger.warning(
+                    f"Non-finite batch values detected (x={bad_x}, y={bad_y}); replacing with zeros."
+                )
+                xb = np.nan_to_num(xb, nan=0.0, posinf=0.0, neginf=0.0)
+                yb = np.nan_to_num(yb, nan=0.0, posinf=0.0, neginf=0.0)
+            yb = (yb > 0.5).astype(np.float32, copy=False)
+            yield xb, yb
 
     train_ds = tf.data.Dataset.from_generator(
         training_batch_generator,
@@ -1532,6 +1697,8 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
 
     callbacks = [cb for cb in (sampler_cb, diff_cb, loss_ramp_cb) if cb is not None]
     callbacks.extend([checkpoint_cb, latest_cb, csv_cb, memory_cb, progress_cb])
+    callbacks.append(NonFiniteLossGuard())
+    callbacks.append(tf.keras.callbacks.TerminateOnNaN())
     if nvml_cb is not None:
         callbacks.append(nvml_cb)
     if swa_cb is not None:
@@ -1550,6 +1717,7 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         **{k: v for k, v in fit_kwargs.items() if v is not None}
     )
     logger.info(f"Training complete: {history.history.keys()}")
+    return history
 
 
 # ---------------------------------------------------------------------------

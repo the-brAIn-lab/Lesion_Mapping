@@ -368,17 +368,16 @@ def run_prep(datasets: Iterable[DatasetConfig], out_root: Path, force_overwrite:
             mask_clean = out_clean / f"{key}_lesion_mask_MNI_clean.nii.gz"
 
             auto_mni = False
-            if not ds.already_mni and _env_flag("PREP_AUTO_MNI_DETECT", True) and _name_suggests_mni(t1):
-                auto_mni = True  # name-only fallback
+            if not ds.already_mni and _env_flag("PREP_AUTO_MNI_DETECT", True):
                 if tpl is None:
                     try:
                         tpl = _tpl_path(resolution=1)
                     except Exception as e:
-                        print(f"[{ds.name}] template unavailable ({e}); using name-only MNI detection for {t1.name}.")
+                        print(f"[{ds.name}] template unavailable ({e}); cannot auto-detect MNI for {t1.name}; running ANTs.")
                 if tpl is not None:
                     auto_mni = _looks_like_prealigned_mni(t1, tpl)
-                if auto_mni:
-                    print(f"[{ds.name}] auto-detected prealigned MNI input for {t1.name}; skipping ANTs registration.")
+                    if auto_mni:
+                        print(f"[{ds.name}] auto-detected prealigned MNI input for {t1.name}; skipping ANTs registration.")
 
             if ds.already_mni or auto_mni:
                 if not mask_t1.exists():
@@ -536,17 +535,16 @@ def run_prep_images_only(
         t1_norm = out_norm / f"{key}_T1w_MNI_norm.nii.gz"
 
         auto_mni = False
-        if not already_mni and _env_flag("PREP_AUTO_MNI_DETECT", True) and _name_suggests_mni(t1):
-            auto_mni = True  # name-only fallback
+        if not already_mni and _env_flag("PREP_AUTO_MNI_DETECT", True):
             if tpl is None:
                 try:
                     tpl = _tpl_path(resolution=1)
                 except Exception as e:
-                    print(f"[{name}] template unavailable ({e}); using name-only MNI detection for {t1.name}.")
+                    print(f"[{name}] template unavailable ({e}); cannot auto-detect MNI for {t1.name}; running ANTs.")
             if tpl is not None:
                 auto_mni = _looks_like_prealigned_mni(t1, tpl)
-            if auto_mni:
-                print(f"[{name}] auto-detected prealigned MNI input for {t1.name}; skipping ANTs registration.")
+                if auto_mni:
+                    print(f"[{name}] auto-detected prealigned MNI input for {t1.name}; skipping ANTs registration.")
 
         if already_mni or auto_mni:
             if not t1_mni.exists():

@@ -248,6 +248,10 @@ class DynamicTrainingConfig:
     FOCAL_TVERSKY_GAMMA: float = 1.5
     FOCAL_TVERSKY_WEIGHT: float = 0.2
     RNG_SEED: int = 1234
+    WHOLE_BRAIN_VAL_ENABLED: bool = True
+    WHOLE_BRAIN_VAL_EVERY_N_EPOCHS: int = 1
+    WHOLE_BRAIN_VAL_MAX_CASES: Optional[int] = None
+    WHOLE_BRAIN_VAL_TTA: bool = False
 
     def __post_init__(self):
         if self.DATA_DIR is None:
@@ -263,6 +267,7 @@ class DynamicTrainingConfig:
         if int(self.HEMISPHERE_AXIS) not in (0, 1, 2):
             raise ValueError("HEMISPHERE_AXIS must be 0, 1, or 2.")
         self.HEMISPHERE_AXIS = int(self.HEMISPHERE_AXIS)
+        self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS = max(1, int(self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS))
         self.MODEL_DIR.mkdir(parents=True, exist_ok=True)
         self.CALLBACKS_DIR.mkdir(parents=True, exist_ok=True)
         self._write_config()
@@ -1087,6 +1092,111 @@ class DifficultyAwareCallback(tf.keras.callbacks.Callback):
         self.sampler.diff_aware_update(dice)
 
 
+def _full_volume_target_shape(cfg: DynamicTrainingConfig) -> tuple[int, int, int] | None:
+    """Return case-loading shape used for whole-volume inference/validation."""
+    if bool(getattr(cfg, "LOAD_FULL_IMAGE_FOR_PATCHING", True)):
+        raw_full_shape = getattr(cfg, "FULL_RES_TARGET_SHAPE", None)
+        if raw_full_shape is None:
+            return None
+        return tuple(int(v) for v in raw_full_shape)
+    return tuple(int(v) for v in cfg.INPUT_SHAPE[:-1])
+
+
+class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
+    """
+    Compute validation Dice on full brain volumes by stitching patch predictions.
+
+    This avoids center-crop validation bias and reports whole-volume metrics.
+    """
+
+    def __init__(self, val_pairs, cfg: DynamicTrainingConfig):
+        super().__init__()
+        self.val_pairs = list(val_pairs)
+        self.cfg = cfg
+        self.volume_target_shape = _full_volume_target_shape(cfg)
+        self.patch_size = tuple(cfg.PATCH_SIZE or cfg.INPUT_SHAPE[:-1])
+        self.overlap = float(cfg.GAUSSIAN_TILE_OVERLAP)
+        self.sigma = float(cfg.GAUSSIAN_TILE_SIGMA)
+        self.tta = bool(cfg.WHOLE_BRAIN_VAL_TTA)
+        self.every_n = max(1, int(cfg.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS))
+        self.threshold = float(cfg.DECISION_THRESHOLD)
+        self.max_cases = None if cfg.WHOLE_BRAIN_VAL_MAX_CASES in (None, 0) else int(cfg.WHOLE_BRAIN_VAL_MAX_CASES)
+        self._eps = 1e-6
+
+    def _iter_pairs(self):
+        if self.max_cases is None:
+            return self.val_pairs
+        return self.val_pairs[: max(1, self.max_cases)]
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs if logs is not None else {}
+        if (epoch + 1) % self.every_n != 0:
+            return
+
+        eval_pairs = self._iter_pairs()
+        if not eval_pairs:
+            logger.warning("Whole-brain validation skipped: no validation pairs available.")
+            return
+
+        case_soft = []
+        case_hard = []
+        inter_soft = pred_soft = true_sum = 0.0
+        t0 = time.time()
+
+        for i, (img_p, msk_p) in enumerate(eval_pairs, start=1):
+            x = _load_and_preprocess_image(str(img_p), self.volume_target_shape)
+            y = _load_and_preprocess_mask(str(msk_p), self.volume_target_shape).astype(np.float32)
+            probs = gaussian_tta_predict(
+                self.model,
+                x,
+                patch_size=self.patch_size,
+                overlap=self.overlap,
+                sigma=self.sigma,
+                tta=self.tta,
+            )
+            probs = np.nan_to_num(probs, nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32, copy=False)
+            probs = np.clip(probs, 0.0, 1.0)
+            pred_hard = (probs >= self.threshold).astype(np.float32, copy=False)
+
+            inter = float(np.sum(y * probs))
+            pred = float(np.sum(probs))
+            true = float(np.sum(y))
+            inter_soft += inter
+            pred_soft += pred
+            true_sum += true
+
+            case_soft.append(float((2.0 * inter + self._eps) / (pred + true + self._eps)))
+            inter_hard = float(np.sum(y * pred_hard))
+            pred_hard_sum = float(np.sum(pred_hard))
+            case_hard.append(float((2.0 * inter_hard + self._eps) / (pred_hard_sum + true + self._eps)))
+
+            if i % 8 == 0 or i == len(eval_pairs):
+                logger.info(f"Whole-brain val progress: {i}/{len(eval_pairs)} cases")
+
+        val_soft_macro = float(np.mean(case_soft)) if case_soft else 0.0
+        val_soft_micro = float((2.0 * inter_soft + self._eps) / (pred_soft + true_sum + self._eps))
+        val_hard_macro = float(np.mean(case_hard)) if case_hard else 0.0
+
+        logs["val_dice_coefficient"] = val_soft_macro
+        logs["val_whole_dice_micro"] = val_soft_micro
+        logs["val_whole_dice_hard"] = val_hard_macro
+
+        dt = time.time() - t0
+        logger.info(
+            "Whole-brain val @epoch %d: soft_macro=%.5f soft_micro=%.5f hard_macro@thr%.2f=%.5f "
+            "(cases=%d, %.1fs)"
+            % (
+                epoch,
+                val_soft_macro,
+                val_soft_micro,
+                self.threshold,
+                val_hard_macro,
+                len(eval_pairs),
+                dt,
+            )
+        )
+
+
 # ---------------------------------------------------------------------------
 # Dataset inspection and loading
 # ---------------------------------------------------------------------------
@@ -1452,17 +1562,13 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     # - LOAD_FULL_IMAGE_FOR_PATCHING=True + FULL_RES_TARGET_SHAPE=None: keep native full volume.
     # - LOAD_FULL_IMAGE_FOR_PATCHING=True + FULL_RES_TARGET_SHAPE=(...): resample/crop full volume to that shape.
     # - LOAD_FULL_IMAGE_FOR_PATCHING=False: legacy behavior (load directly to patch/model shape).
-    case_target_shape = None
+    case_target_shape = _full_volume_target_shape(config)
     if bool(getattr(config, "LOAD_FULL_IMAGE_FOR_PATCHING", True)):
-        raw_full_shape = getattr(config, "FULL_RES_TARGET_SHAPE", None)
-        if raw_full_shape is not None:
-            case_target_shape = tuple(int(v) for v in raw_full_shape)
         logger.info(
             "Patch extraction source: full-volume mode "
             f"(target_shape={case_target_shape if case_target_shape is not None else 'native'})"
         )
     else:
-        case_target_shape = tuple(config.INPUT_SHAPE[:-1])
         logger.info(f"Patch extraction source: legacy patch-shaped loading {case_target_shape}")
 
     # --- Detect and log available GPUs ---
@@ -1636,10 +1742,13 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             tf.TensorSpec(shape=(batch_patches, *patch_size, 1), dtype=tf.float32),
         ),
     ).prefetch(tf.data.AUTOTUNE)
-    val_gen = DynamicDataGenerator(
-        val_pairs, config, is_training=False,
-        image_loader=_load_and_preprocess_image, mask_loader=_load_and_preprocess_mask
-    )
+    use_whole_brain_val = bool(getattr(config, "WHOLE_BRAIN_VAL_ENABLED", True))
+    val_gen = None
+    if not use_whole_brain_val:
+        val_gen = DynamicDataGenerator(
+            val_pairs, config, is_training=False,
+            image_loader=_load_and_preprocess_image, mask_loader=_load_and_preprocess_mask
+        )
 
     # --- Configure callbacks ---
     try:
@@ -1653,12 +1762,14 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         NvmlGpuMemLogger = None
         logger.warning("NVMLMemoryLogger not available; GPU telemetry callback disabled.")
 
+    monitor_metric = "val_dice_coefficient" if use_whole_brain_val else "val_loss"
+    monitor_mode = "max" if use_whole_brain_val else "min"
     checkpoint_cb = ModelCheckpoint(
         filepath=str(config.checkpoint_path),
-        monitor="val_loss",
+        monitor=monitor_metric,
         save_best_only=True,
         save_weights_only=True,
-        mode="min",
+        mode=monitor_mode,
         verbose=1,
     )
     latest_cb = ModelCheckpoint(
@@ -1695,7 +1806,8 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         except Exception as e:
             logger.warning(f"Unable to enable SWA: {e}")
 
-    callbacks = [cb for cb in (sampler_cb, diff_cb, loss_ramp_cb) if cb is not None]
+    whole_brain_val_cb = WholeBrainValidationCallback(val_pairs, config) if use_whole_brain_val else None
+    callbacks = [cb for cb in (sampler_cb, diff_cb, loss_ramp_cb, whole_brain_val_cb) if cb is not None]
     callbacks.extend([checkpoint_cb, latest_cb, csv_cb, memory_cb, progress_cb])
     callbacks.append(NonFiniteLossGuard())
     callbacks.append(tf.keras.callbacks.TerminateOnNaN())
@@ -1705,17 +1817,24 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         callbacks.append(swa_cb)
 
     # --- Train the model ---
-    history = model.fit(
-        train_ds,
+    if use_whole_brain_val and "validation_steps" in fit_kwargs:
+        logger.warning("Ignoring validation_steps override: whole-brain validation callback is enabled.")
+        fit_kwargs.pop("validation_steps", None)
+
+    fit_args = dict(
+        x=train_ds,
         epochs=config.TOTAL_EPOCHS,
-        validation_data=val_gen,
         callbacks=callbacks,
         initial_epoch=config.INITIAL_EPOCH,
         verbose=1,
         steps_per_epoch=config.EPOCH_STEPS,
-        validation_steps=len(val_gen),
-        **{k: v for k, v in fit_kwargs.items() if v is not None}
     )
+    if val_gen is not None:
+        fit_args["validation_data"] = val_gen
+        fit_args["validation_steps"] = len(val_gen)
+    fit_args.update({k: v for k, v in fit_kwargs.items() if v is not None})
+
+    history = model.fit(**fit_args)
     logger.info(f"Training complete: {history.history.keys()}")
     return history
 
@@ -1915,9 +2034,10 @@ def run_threshold_sweeps(
     stats = {}
     patch_size = tuple(cfg.PATCH_SIZE or cfg.INPUT_SHAPE[:-1])
     use_tta = cfg.USE_TTA_FLIPS if use_tta is None else bool(use_tta)
+    volume_target_shape = _full_volume_target_shape(cfg)
     for img_p, msk_p in pairs:
-        x = _load_and_preprocess_image(str(img_p), cfg.INPUT_SHAPE[:-1])
-        y_true = _load_and_preprocess_mask(str(msk_p), cfg.INPUT_SHAPE[:-1])
+        x = _load_and_preprocess_image(str(img_p), volume_target_shape)
+        y_true = _load_and_preprocess_mask(str(msk_p), volume_target_shape)
         brain_mask = compute_brain_mask(x)
         probs = gaussian_tta_predict(
             model,

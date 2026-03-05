@@ -242,6 +242,7 @@ class DynamicTrainingConfig:
     DIFF_BETA: float = 1.5
     DIFF_MAX_EVAL_CASES: int = 32
     EPOCH_STEPS: int = 2000
+    FIT_VERBOSE: int = 2
     LOSS_MODE: str = "combined"                          # "combined" | "tversky" | "focal_tversky"
     TVERSKY_ALPHA: float = 0.7
     TVERSKY_BETA: float = 0.3
@@ -1808,7 +1809,14 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
 
     whole_brain_val_cb = WholeBrainValidationCallback(val_pairs, config) if use_whole_brain_val else None
     callbacks = [cb for cb in (sampler_cb, diff_cb, loss_ramp_cb, whole_brain_val_cb) if cb is not None]
-    callbacks.extend([checkpoint_cb, latest_cb, csv_cb, memory_cb, progress_cb])
+    fit_verbose = int(getattr(config, "FIT_VERBOSE", 2))
+    if fit_verbose not in (0, 1, 2):
+        logger.warning(f"Unsupported FIT_VERBOSE={fit_verbose}; using 2 (epoch-only).")
+        fit_verbose = 2
+
+    callbacks.extend([checkpoint_cb, latest_cb, csv_cb, memory_cb])
+    if fit_verbose == 1:
+        callbacks.append(progress_cb)
     callbacks.append(NonFiniteLossGuard())
     callbacks.append(tf.keras.callbacks.TerminateOnNaN())
     if nvml_cb is not None:
@@ -1826,7 +1834,7 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         epochs=config.TOTAL_EPOCHS,
         callbacks=callbacks,
         initial_epoch=config.INITIAL_EPOCH,
-        verbose=1,
+        verbose=fit_verbose,
         steps_per_epoch=config.EPOCH_STEPS,
     )
     if val_gen is not None:

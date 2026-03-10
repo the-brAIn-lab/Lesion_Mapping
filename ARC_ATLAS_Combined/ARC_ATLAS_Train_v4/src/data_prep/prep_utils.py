@@ -116,6 +116,11 @@ def _key_from_name(name: str) -> str | None:
     return "_".join(parts) if parts else None
 
 
+def _sub_from_name(name: str) -> str | None:
+    m = re.search(r"(sub-[^_]+)", name)
+    return m.group(1) if m else None
+
+
 def _slug_from_raw(raw_root: Path, name: str) -> str:
     stem = raw_root.name
     safe = re.sub(r"[^a-zA-Z0-9]+", "-", f"{name}-{stem}").strip("-")
@@ -168,39 +173,106 @@ def _norm_key_from_name(name: str) -> str:
     return base
 
 
-def _match_pairs(t1s: list[Path], masks: list[Path]):
+def _match_pairs(
+    t1s: list[Path],
+    masks: list[Path],
+    *,
+    allow_subject_fallback: bool = False,
+    max_warning_examples: int = 10,
+):
     """Match T1 and mask by the most specific key available.
-    Priority: exact normalized basename -> unique; else sub/ses key unique. Ambiguous cases are skipped.
+    Priority:
+    1) exact normalized basename -> unique
+    2) sub/ses key -> unique
+    3) optional subject-only fallback -> unique
+    Ambiguous cases are skipped.
     """
     mask_by_base = defaultdict(list)
     mask_by_subses = defaultdict(list)
+    mask_by_sub = defaultdict(list)
     for m in masks:
         base = _norm_key_from_name(m.name)
         mask_by_base[base].append(m)
         key = _key_from_name(m.name) or base
         mask_by_subses[key].append(m)
+        sub = _sub_from_name(m.name)
+        if sub:
+            mask_by_sub[sub].append(m)
 
     pairs = []
+    matched_by = {"base": 0, "subses": 0, "subject": 0}
+    warn_ambiguous_base = []
+    warn_ambiguous_subses = []
+    warn_ambiguous_subject = []
+    warn_missing = []
+
     for t1 in t1s:
         base = _norm_key_from_name(t1.name)
         key = _key_from_name(t1.name) or base
+        sub = _sub_from_name(t1.name)
         chosen = None
         if mask_by_base.get(base):
             if len(mask_by_base[base]) == 1:
                 chosen = mask_by_base[base][0]
+                matched_by["base"] += 1
             else:
-                print(f"[warn] multiple masks share base {base}; skipping")
+                warn_ambiguous_base.append(base)
                 continue
         elif mask_by_subses.get(key):
             if len(mask_by_subses[key]) == 1:
                 chosen = mask_by_subses[key][0]
+                matched_by["subses"] += 1
             else:
-                print(f"[warn] ambiguous masks for {t1.name} (key {key}): {len(mask_by_subses[key])}; skipping")
+                warn_ambiguous_subses.append((t1.name, key, len(mask_by_subses[key])))
+                continue
+        elif allow_subject_fallback and sub and mask_by_sub.get(sub):
+            if len(mask_by_sub[sub]) == 1:
+                chosen = mask_by_sub[sub][0]
+                matched_by["subject"] += 1
+            else:
+                warn_ambiguous_subject.append((t1.name, sub, len(mask_by_sub[sub])))
                 continue
         if not chosen:
-            print(f"[warn] no mask for {t1.name} (key {key}); skipping")
+            warn_missing.append((t1.name, key, sub))
             continue
         pairs.append((t1, chosen, base))
+
+    print(
+        "[match] "
+        f"base={matched_by['base']} "
+        f"subses={matched_by['subses']} "
+        f"subject={matched_by['subject']} "
+        f"missing={len(warn_missing)} "
+        f"ambiguous_base={len(warn_ambiguous_base)} "
+        f"ambiguous_subses={len(warn_ambiguous_subses)} "
+        f"ambiguous_subject={len(warn_ambiguous_subject)}"
+    )
+
+    if warn_ambiguous_base:
+        for base in warn_ambiguous_base[:max_warning_examples]:
+            print(f"[warn] multiple masks share base {base}; skipping")
+        if len(warn_ambiguous_base) > max_warning_examples:
+            print(f"[warn] ... {len(warn_ambiguous_base) - max_warning_examples} more ambiguous base keys")
+
+    if warn_ambiguous_subses:
+        for name, key, n in warn_ambiguous_subses[:max_warning_examples]:
+            print(f"[warn] ambiguous masks for {name} (key {key}): {n}; skipping")
+        if len(warn_ambiguous_subses) > max_warning_examples:
+            print(f"[warn] ... {len(warn_ambiguous_subses) - max_warning_examples} more ambiguous sub/ses keys")
+
+    if warn_ambiguous_subject:
+        for name, sub, n in warn_ambiguous_subject[:max_warning_examples]:
+            print(f"[warn] ambiguous subject-only masks for {name} (sub {sub}): {n}; skipping")
+        if len(warn_ambiguous_subject) > max_warning_examples:
+            print(f"[warn] ... {len(warn_ambiguous_subject) - max_warning_examples} more ambiguous subject-only keys")
+
+    if warn_missing:
+        for name, key, sub in warn_missing[:max_warning_examples]:
+            extra = f", sub {sub}" if sub else ""
+            print(f"[warn] no mask for {name} (key {key}{extra}); skipping")
+        if len(warn_missing) > max_warning_examples:
+            print(f"[warn] ... {len(warn_missing) - max_warning_examples} more missing masks")
+
     return pairs
 
 
@@ -296,6 +368,35 @@ def _try_flips(mask: np.ndarray, brain: np.ndarray):
     return best
 
 
+def _nonzero_voxel_count(path: Path, eps: float = 1e-8) -> int:
+    data = np.asarray(nib.load(str(path)).get_fdata(dtype=np.float32))
+    finite = np.isfinite(data)
+    if not np.any(finite):
+        return 0
+    return int(np.count_nonzero(np.abs(data[finite]) > eps))
+
+
+def _usable_for_registration(path: Path, min_nonzero: int = 512) -> bool:
+    try:
+        return _nonzero_voxel_count(path) >= min_nonzero
+    except Exception:
+        return False
+
+
+def _cleanup_transforms(prefix: Path) -> None:
+    suffixes = (
+        "0GenericAffine.mat",
+        "1Warp.nii.gz",
+        "1InverseWarp.nii.gz",
+        "warped.nii.gz",
+        "invwarped.nii.gz",
+    )
+    for sfx in suffixes:
+        p = prefix.with_name(prefix.name + sfx)
+        if p.exists():
+            p.unlink()
+
+
 @dataclass
 class DatasetConfig:
     name: str
@@ -306,6 +407,8 @@ class DatasetConfig:
     mask_glob: str = "**/*mask*.nii.gz"
     overwrite: bool = False
     already_mni: bool = False
+    skull_strip: bool = False
+    allow_subject_fallback: bool = False
 
 
 def run_prep(datasets: Iterable[DatasetConfig], out_root: Path, force_overwrite: bool = False):
@@ -314,6 +417,7 @@ def run_prep(datasets: Iterable[DatasetConfig], out_root: Path, force_overwrite:
     out_root.mkdir(parents=True, exist_ok=True)
     qc_rows = []
     outputs = []
+    continue_on_case_error = _env_flag("PREP_CONTINUE_ON_CASE_ERROR", True)
 
     for ds in datasets:
         raw = Path(ds.raw_root).expanduser() if ds.raw_root else None
@@ -333,7 +437,7 @@ def run_prep(datasets: Iterable[DatasetConfig], out_root: Path, force_overwrite:
 
         t1s = list(img_root.glob(ds.t1_glob))
         mks = list(msk_root.glob(ds.mask_glob))
-        pairs = _match_pairs(t1s, mks)
+        pairs = _match_pairs(t1s, mks, allow_subject_fallback=ds.allow_subject_fallback)
         print(f"[{ds.name}] images: {len(t1s)} masks: {len(mks)} pairs found: {len(pairs)}")
         slug_base = raw or img_root
         slug = _slug_from_raw(slug_base, ds.name)
@@ -356,79 +460,128 @@ def run_prep(datasets: Iterable[DatasetConfig], out_root: Path, force_overwrite:
         out_norm = out_mni / 't1_norm'
         out_clean = out_mni / 'masks_clean'
         out_xfm = out_ds / 'xfm'
-        for d in (out_nat, out_mni, out_norm, out_clean, out_xfm):
+        out_skull = out_ds / 'skull_stripped'
+        dirs = [out_nat, out_mni, out_norm, out_clean, out_xfm]
+        if ds.skull_strip:
+            dirs.append(out_skull)
+        for d in dirs:
             d.mkdir(parents=True, exist_ok=True)
 
         for t1, mask, key in pairs:
-            mask_t1 = out_nat / f"{key}_lesion_mask_T1w_native.nii.gz"
-            prefix = out_xfm / f"{key}_t1_to_mni_"
-            t1_mni = out_mni / f"{key}_T1w_MNI.nii.gz"
-            mask_mni = out_mni / f"{key}_lesion_mask_MNI.nii.gz"
-            t1_norm = out_norm / f"{key}_T1w_MNI_norm.nii.gz"
-            mask_clean = out_clean / f"{key}_lesion_mask_MNI_clean.nii.gz"
+            try:
+                mask_t1 = out_nat / f"{key}_lesion_mask_T1w_native.nii.gz"
+                prefix = out_xfm / f"{key}_t1_to_mni_"
+                t1_mni = out_mni / f"{key}_T1w_MNI.nii.gz"
+                mask_mni = out_mni / f"{key}_lesion_mask_MNI.nii.gz"
+                t1_norm = out_norm / f"{key}_T1w_MNI_norm.nii.gz"
+                mask_clean = out_clean / f"{key}_lesion_mask_MNI_clean.nii.gz"
 
-            auto_mni = False
-            if not ds.already_mni and _env_flag("PREP_AUTO_MNI_DETECT", True):
-                if tpl is None:
-                    try:
+                auto_mni = False
+                if not ds.already_mni and _env_flag("PREP_AUTO_MNI_DETECT", True):
+                    if tpl is None:
+                        try:
+                            tpl = _tpl_path(resolution=1)
+                        except Exception as e:
+                            print(f"[{ds.name}] template unavailable ({e}); cannot auto-detect MNI for {t1.name}; running ANTs.")
+                    if tpl is not None:
+                        auto_mni = _looks_like_prealigned_mni(t1, tpl)
+                        if auto_mni:
+                            print(f"[{ds.name}] auto-detected prealigned MNI input for {t1.name}; skipping ANTs registration.")
+
+                if ds.already_mni or auto_mni:
+                    if not mask_t1.exists():
+                        resample_mask_to_t1(mask, t1, mask_t1)
+                    if not t1_mni.exists():
+                        shutil.copy2(t1, t1_mni)
+                    if not mask_mni.exists():
+                        shutil.copy2(mask_t1, mask_mni)
+                else:
+                    if tpl is None:
                         tpl = _tpl_path(resolution=1)
-                    except Exception as e:
-                        print(f"[{ds.name}] template unavailable ({e}); cannot auto-detect MNI for {t1.name}; running ANTs.")
-                if tpl is not None:
-                    auto_mni = _looks_like_prealigned_mni(t1, tpl)
-                    if auto_mni:
-                        print(f"[{ds.name}] auto-detected prealigned MNI input for {t1.name}; skipping ANTs registration.")
+                    if reg_bin is None or apply_bin is None:
+                        reg_bin, apply_bin = _ants_bins()
+                    if not mask_t1.exists():
+                        resample_mask_to_t1(mask, t1, mask_t1)
 
-            if ds.already_mni or auto_mni:
-                if not mask_t1.exists():
-                    resample_mask_to_t1(mask, t1, mask_t1)
-                if not t1_mni.exists():
-                    shutil.copy2(t1, t1_mni)
-                if not mask_mni.exists():
-                    shutil.copy2(mask_t1, mask_mni)
-            else:
-                if tpl is None:
-                    tpl = _tpl_path(resolution=1)
-                if reg_bin is None or apply_bin is None:
-                    reg_bin, apply_bin = _ants_bins()
-                if not mask_t1.exists():
-                    resample_mask_to_t1(mask, t1, mask_t1)
-                if not (prefix.with_name(prefix.name+'0GenericAffine.mat')).exists():
-                    ants_register(t1, prefix, tpl, reg_bin, use_2mm=True)
-                if not t1_mni.exists():
-                    ants_apply(t1, tpl, prefix, t1_mni, apply_bin, nn=False)
-                if not mask_mni.exists():
-                    ants_apply(mask_t1, tpl, prefix, mask_mni, apply_bin, nn=True)
-                    mi = nib.load(str(mask_mni)); data=(mi.get_fdata()>0.5).astype(np.uint8)
-                    nib.save(nib.Nifti1Image(data, mi.affine, mi.header), str(mask_mni))
-            if not t1_norm.exists():
-                vol = nib.load(str(t1_mni)).get_fdata().astype(np.float32)
-                norm = normalize_t1(vol)
-                nib.save(nib.Nifti1Image(norm, nib.load(str(t1_mni)).affine, nib.load(str(t1_mni)).header), str(t1_norm))
-            if not mask_clean.exists():
-                data = (nib.load(str(mask_mni)).get_fdata()>0.5).astype(np.uint8)
-                data = largest_component(data)
-                # alignment sanity check: ensure mask overlaps brain; try flips if not
-                brain = (nib.load(str(t1_mni)).get_fdata()>0).astype(np.uint8)
-                best_mask, best_score, tag = _try_flips(data, brain)
-                if best_score < 0.1:
-                    print(f"[warn] low overlap for {mask_mni.name} (score {best_score:.3f}); keeping original")
-                elif tag != "none":
-                    print(f"[info] flipped {tag} for {mask_mni.name} (overlap {best_score:.3f})")
-                    data = best_mask
-                nib.save(nib.Nifti1Image(data, nib.load(str(mask_mni)).affine, nib.load(str(mask_mni)).header), str(mask_clean))
+                    if ds.skull_strip:
+                        from .skull_strip import skull_strip_antspynet
+                        t1_brain = out_skull / f"{key}_T1w_brain.nii.gz"
+                        if not t1_brain.exists():
+                            skull_strip_antspynet(t1, t1_brain, verbose=False)
+                        if _usable_for_registration(t1_brain):
+                            t1_for_reg = t1_brain
+                        else:
+                            print(f"[warn] skull-stripped image empty/invalid for {key}; using raw T1 for registration")
+                            t1_for_reg = t1
+                    else:
+                        t1_for_reg = t1
 
-            ti = nib.load(str(t1_mni)); mi = nib.load(str(mask_clean))
-            qc_rows.append(dict(
-                dataset=ds.name,
-                slug=slug,
-                key=key,
-                t1_mni=str(t1_mni),
-                mask_mni=str(mask_clean),
-                t1_shape=str(ti.shape[:3]),
-                t1_zooms=str(tuple(round(z,3) for z in ti.header.get_zooms()[:3])),
-                mask_nonzero=int(np.count_nonzero(mi.get_fdata()>0)),
-            ))
+                    affine_mat = prefix.with_name(prefix.name + "0GenericAffine.mat")
+                    if not affine_mat.exists():
+                        try:
+                            ants_register(t1_for_reg, prefix, tpl, reg_bin, use_2mm=True)
+                        except Exception:
+                            if t1_for_reg != t1:
+                                print(f"[warn] ANTs registration failed on skull-stripped image for {key}; retrying raw T1")
+                                _cleanup_transforms(prefix)
+                                ants_register(t1, prefix, tpl, reg_bin, use_2mm=True)
+                                t1_for_reg = t1
+                            else:
+                                raise
+                    if not t1_mni.exists():
+                        ants_apply(t1_for_reg, tpl, prefix, t1_mni, apply_bin, nn=False)
+                    if not mask_mni.exists():
+                        ants_apply(mask_t1, tpl, prefix, mask_mni, apply_bin, nn=True)
+                        mi = nib.load(str(mask_mni)); data = (mi.get_fdata() > 0.5).astype(np.uint8)
+                        nib.save(nib.Nifti1Image(data, mi.affine, mi.header), str(mask_mni))
+
+                if not t1_norm.exists():
+                    vol = nib.load(str(t1_mni)).get_fdata().astype(np.float32)
+                    norm = normalize_t1(vol)
+                    nib.save(nib.Nifti1Image(norm, nib.load(str(t1_mni)).affine, nib.load(str(t1_mni)).header), str(t1_norm))
+                if not mask_clean.exists():
+                    data = (nib.load(str(mask_mni)).get_fdata() > 0.5).astype(np.uint8)
+                    data = largest_component(data)
+                    # Alignment sanity check: only flip when base overlap is clearly poor and
+                    # the gain is substantial. This prevents near-tie numerical flips.
+                    brain = (nib.load(str(t1_mni)).get_fdata() > 0).astype(np.uint8)
+                    base_score = _overlap_score(data, brain)
+                    best_mask, best_score, tag = _try_flips(data, brain)
+                    improvement = best_score - base_score
+                    should_flip = (
+                        tag != "none"
+                        and base_score < 0.7
+                        and improvement >= 0.05
+                    )
+                    if best_score < 0.1:
+                        print(f"[warn] low overlap for {mask_mni.name} (score {best_score:.3f}); keeping original")
+                    elif should_flip:
+                        print(
+                            f"[info] flipped {tag} for {mask_mni.name} "
+                            f"(base={base_score:.3f} -> best={best_score:.3f})"
+                        )
+                        data = best_mask
+                    nib.save(
+                        nib.Nifti1Image(data, nib.load(str(mask_mni)).affine, nib.load(str(mask_mni)).header),
+                        str(mask_clean),
+                    )
+
+                ti = nib.load(str(t1_mni)); mi = nib.load(str(mask_clean))
+                qc_rows.append(dict(
+                    dataset=ds.name,
+                    slug=slug,
+                    key=key,
+                    t1_mni=str(t1_mni),
+                    mask_mni=str(mask_clean),
+                    t1_shape=str(ti.shape[:3]),
+                    t1_zooms=str(tuple(round(z, 3) for z in ti.header.get_zooms()[:3])),
+                    mask_nonzero=int(np.count_nonzero(mi.get_fdata() > 0)),
+                ))
+            except Exception as e:
+                print(f"[error] {ds.name}:{key} failed: {e}")
+                if continue_on_case_error:
+                    continue
+                raise
         marker.parent.mkdir(parents=True, exist_ok=True)
         marker.write_text(json.dumps({"raw_root": str(slug_base), "slug": slug}, indent=2))
         outputs.append(out_ds)

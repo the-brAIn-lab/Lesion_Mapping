@@ -243,6 +243,8 @@ class DynamicTrainingConfig:
     DIFF_MAX_EVAL_CASES: int = 32
     EPOCH_STEPS: int = 2000
     FIT_VERBOSE: int = 2
+    MEMORY_LOGS_ENABLED: bool = False
+    MEMORY_LOG_BATCH_FREQUENCY: int = 0
     LOSS_MODE: str = "combined"                          # "combined" | "tversky" | "focal_tversky"
     TVERSKY_ALPHA: float = 0.7
     TVERSKY_BETA: float = 0.3
@@ -528,6 +530,9 @@ def build_dynamic_model(config: DynamicTrainingConfig) -> tf.keras.Model:
 # Utility functions for memory monitoring
 # ---------------------------------------------------------------------------
 def log_memory_usage(stage: str) -> None:
+    cfg = globals().get("_ACTIVE_CONFIG")
+    if cfg is not None and not bool(getattr(cfg, "MEMORY_LOGS_ENABLED", False)):
+        return
     process = psutil.Process(os.getpid())
     gb_used = process.memory_info().rss / 1024**3
     gpu_mem = []
@@ -549,7 +554,7 @@ def log_memory_usage(stage: str) -> None:
 class MemoryMonitoringCallback(tf.keras.callbacks.Callback):
     def __init__(self, log_frequency=10):
         super().__init__()
-        self.log_frequency = int(log_frequency)
+        self.log_frequency = max(0, int(log_frequency))
         self._batch = 0
 
     def on_train_begin(self, logs=None):
@@ -560,7 +565,7 @@ class MemoryMonitoringCallback(tf.keras.callbacks.Callback):
 
     def on_train_batch_end(self, batch, logs=None):
         self._batch += 1
-        if self._batch % self.log_frequency == 0:
+        if self.log_frequency > 0 and self._batch % self.log_frequency == 0:
             log_memory_usage(f"batch_{self._batch}")
 
     def on_epoch_end(self, epoch, logs=None):
@@ -1780,7 +1785,11 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         verbose=0,
     )
     csv_cb = CSVLogger(LOG_DIR / "training_log.csv", append=True)
-    memory_cb = MemoryMonitoringCallback(log_frequency=10)
+    memory_cb = None
+    if bool(getattr(config, "MEMORY_LOGS_ENABLED", False)):
+        memory_cb = MemoryMonitoringCallback(
+            log_frequency=int(getattr(config, "MEMORY_LOG_BATCH_FREQUENCY", 0))
+        )
     progress_cb = tf.keras.callbacks.ProgbarLogger()
 
     nvml_cb = None
@@ -1814,7 +1823,7 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         logger.warning(f"Unsupported FIT_VERBOSE={fit_verbose}; using 2 (epoch-only).")
         fit_verbose = 2
 
-    callbacks.extend([checkpoint_cb, latest_cb, csv_cb, memory_cb])
+    callbacks.extend([cb for cb in (checkpoint_cb, latest_cb, csv_cb, memory_cb) if cb is not None])
     if fit_verbose == 1:
         callbacks.append(progress_cb)
     callbacks.append(NonFiniteLossGuard())

@@ -22,6 +22,7 @@ evaluation:
 import os
 import sys
 import logging
+import csv
 from pathlib import Path
 import tensorflow as tf
 from tensorflow.keras import mixed_precision
@@ -109,7 +110,7 @@ try:
     import numpy as np
     import nibabel as nib
     from scipy.ndimage import zoom, binary_dilation, rotate, binary_closing, binary_opening, label, generate_binary_structure, gaussian_filter
-    from sklearn.model_selection import KFold
+    from sklearn.model_selection import StratifiedShuffleSplit
     from skimage import measure
     from skimage.filters import threshold_otsu
     import json
@@ -255,6 +256,10 @@ class DynamicTrainingConfig:
     WHOLE_BRAIN_VAL_EVERY_N_EPOCHS: int = 1
     WHOLE_BRAIN_VAL_MAX_CASES: Optional[int] = None
     WHOLE_BRAIN_VAL_TTA: bool = False
+    DIAGNOSTICS_ENABLED: bool = True
+    BATCH_LOG_EVERY_N_STEPS: int = 1
+    VAL_DIAGNOSTICS_TOP_K: int = 5
+    VAL_THRESHOLD_SWEEP: tuple[float, ...] = (0.30, 0.40, 0.50, 0.60, 0.70)
 
     def __post_init__(self):
         if self.DATA_DIR is None:
@@ -271,6 +276,12 @@ class DynamicTrainingConfig:
             raise ValueError("HEMISPHERE_AXIS must be 0, 1, or 2.")
         self.HEMISPHERE_AXIS = int(self.HEMISPHERE_AXIS)
         self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS = max(1, int(self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS))
+        self.BATCH_LOG_EVERY_N_STEPS = max(1, int(self.BATCH_LOG_EVERY_N_STEPS))
+        self.VAL_DIAGNOSTICS_TOP_K = max(1, int(self.VAL_DIAGNOSTICS_TOP_K))
+        thresholds = [float(np.clip(t, 0.0, 1.0)) for t in (self.VAL_THRESHOLD_SWEEP or ())]
+        if float(np.clip(self.DECISION_THRESHOLD, 0.0, 1.0)) not in thresholds:
+            thresholds.append(float(np.clip(self.DECISION_THRESHOLD, 0.0, 1.0)))
+        self.VAL_THRESHOLD_SWEEP = tuple(sorted(set(thresholds))) if thresholds else (float(self.DECISION_THRESHOLD),)
         self.MODEL_DIR.mkdir(parents=True, exist_ok=True)
         self.CALLBACKS_DIR.mkdir(parents=True, exist_ok=True)
         self._write_config()
@@ -290,6 +301,7 @@ class DynamicTrainingConfig:
             "PATCH_SIZE",
             "FULL_RES_TARGET_SHAPE",
             "OTSU_CLAMP",
+            "VAL_THRESHOLD_SWEEP",
         )
         for key in tuple_fields:
             if payload.get(key) is not None:
@@ -570,6 +582,367 @@ class MemoryMonitoringCallback(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         log_memory_usage(f"epoch_{epoch}_end")
+
+
+def _path_case_id(path: str | Path) -> str:
+    name = Path(path).name
+    if name.endswith(".nii.gz"):
+        return name[:-7]
+    if name.endswith(".nii"):
+        return name[:-4]
+    return Path(path).stem
+
+
+def _path_source(path: str | Path) -> str:
+    name = Path(path).name
+    if "__" in name:
+        return name.split("__", 1)[0]
+    return name.split("_", 1)[0]
+
+
+def _optimizer_lr_value(model: tf.keras.Model) -> float:
+    opt = getattr(model, "optimizer", None)
+    if opt is None:
+        return float("nan")
+    lr_obj = getattr(opt, "learning_rate", None)
+    try:
+        if callable(lr_obj):
+            return float(tf.keras.backend.get_value(lr_obj(opt.iterations)))
+        return float(tf.keras.backend.get_value(lr_obj))
+    except Exception:
+        try:
+            return float(lr_obj)
+        except Exception:
+            return float("nan")
+
+
+class BatchMetricsCSVLogger(tf.keras.callbacks.Callback):
+    """Write per-train-batch metrics to CSV for fine-grained debugging."""
+
+    def __init__(self, out_csv: Path, log_every_n_steps: int = 1):
+        super().__init__()
+        self.out_csv = Path(out_csv)
+        self.log_every_n_steps = max(1, int(log_every_n_steps))
+        self._fh = None
+        self._writer = None
+        self._global_step = 0
+        self._epoch = 0
+
+    def on_train_begin(self, logs=None):
+        self.out_csv.parent.mkdir(parents=True, exist_ok=True)
+        self._fh = open(self.out_csv, "w", newline="", encoding="utf-8")
+        self._writer = csv.writer(self._fh)
+        self._writer.writerow(
+            ["epoch", "batch", "global_step", "lr", "loss", "dice_coefficient", "safe_binary_iou"]
+        )
+        self._fh.flush()
+
+    def on_epoch_begin(self, epoch, logs=None):
+        self._epoch = int(epoch)
+
+    def on_train_batch_end(self, batch, logs=None):
+        self._global_step += 1
+        if self._writer is None or (self._global_step % self.log_every_n_steps) != 0:
+            return
+        logs = logs or {}
+        self._writer.writerow(
+            [
+                self._epoch,
+                int(batch),
+                self._global_step,
+                _optimizer_lr_value(self.model),
+                float(logs.get("loss", np.nan)),
+                float(logs.get("dice_coefficient", np.nan)),
+                float(logs.get("safe_binary_iou", np.nan)),
+            ]
+        )
+        self._fh.flush()
+
+    def on_train_end(self, logs=None):
+        if self._fh is not None:
+            self._fh.close()
+            self._fh = None
+            self._writer = None
+
+
+class EpochMetricsJSONLLogger(tf.keras.callbacks.Callback):
+    """Append one JSON record per epoch (after validation callbacks)."""
+
+    def __init__(self, out_jsonl: Path):
+        super().__init__()
+        self.out_jsonl = Path(out_jsonl)
+        self._t0 = None
+
+    def on_train_begin(self, logs=None):
+        self.out_jsonl.parent.mkdir(parents=True, exist_ok=True)
+        self._t0 = time.time()
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        record = {
+            "epoch": int(epoch),
+            "elapsed_sec": float(time.time() - self._t0) if self._t0 is not None else None,
+            "lr": _optimizer_lr_value(self.model),
+            "metrics": {k: float(v) for k, v in logs.items() if isinstance(v, (int, float, np.floating))},
+        }
+        with open(self.out_jsonl, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(record) + "\n")
+
+
+def _lesion_size_bin(lesion_voxels: int) -> str:
+    v = int(lesion_voxels)
+    if v <= 0:
+        return "none"
+    if v < 2000:
+        return "tiny"
+    if v < 10000:
+        return "small"
+    if v < 50000:
+        return "medium"
+    return "large"
+
+
+def _write_split_diagnostics(
+    train_pairs,
+    val_pairs,
+    pair_lookup: dict[tuple[str, str], int],
+    lesion_sizes_all: np.ndarray,
+    out_dir: Path,
+) -> None:
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for split_name, pairs in (("train", train_pairs), ("val", val_pairs)):
+        for img_p, msk_p in pairs:
+            idx = pair_lookup.get((str(img_p), str(msk_p)))
+            lesion_voxels = int(lesion_sizes_all[idx]) if idx is not None else -1
+            rows.append(
+                {
+                    "split": split_name,
+                    "source": _path_source(img_p),
+                    "case_id": _path_case_id(img_p),
+                    "lesion_voxels": lesion_voxels,
+                    "lesion_bin": _lesion_size_bin(lesion_voxels),
+                    "image": str(img_p),
+                    "mask": str(msk_p),
+                }
+            )
+    with open(out_dir / "split_cases.csv", "w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(
+            fh,
+            fieldnames=["split", "source", "case_id", "lesion_voxels", "lesion_bin", "image", "mask"],
+        )
+        writer.writeheader()
+        writer.writerows(rows)
+
+    summary = {"total_cases": len(rows), "splits": {}}
+    for split_name in ("train", "val"):
+        split_rows = [r for r in rows if r["split"] == split_name]
+        lesions = np.asarray([r["lesion_voxels"] for r in split_rows], dtype=np.int64)
+        src_counts = {}
+        bin_counts = {}
+        for r in split_rows:
+            src_counts[r["source"]] = src_counts.get(r["source"], 0) + 1
+            bin_counts[r["lesion_bin"]] = bin_counts.get(r["lesion_bin"], 0) + 1
+        summary["splits"][split_name] = {
+            "count": len(split_rows),
+            "source_counts": src_counts,
+            "lesion_bin_counts": bin_counts,
+            "lesion_presence_pct": float(np.mean(lesions > 0) * 100.0) if lesions.size else 0.0,
+            "lesion_voxels": {
+                "mean": float(np.mean(lesions)) if lesions.size else 0.0,
+                "median": float(np.median(lesions)) if lesions.size else 0.0,
+                "p90": float(np.percentile(lesions, 90)) if lesions.size else 0.0,
+                "max": int(np.max(lesions)) if lesions.size else 0,
+            },
+        }
+    with open(out_dir / "split_summary.json", "w", encoding="utf-8") as fh:
+        json.dump(summary, fh, indent=2)
+    logger.info("🧪 Wrote split diagnostics to %s", out_dir)
+
+
+def _best_epoch_stat(values, mode: str = "max") -> dict[str, float | int] | None:
+    arr = np.asarray(values, dtype=np.float64)
+    if arr.size == 0:
+        return None
+    finite_mask = np.isfinite(arr)
+    if not np.any(finite_mask):
+        return None
+    finite_idx = np.where(finite_mask)[0]
+    finite_vals = arr[finite_mask]
+    if mode == "min":
+        local_best = int(np.argmin(finite_vals))
+    else:
+        local_best = int(np.argmax(finite_vals))
+    best_idx = int(finite_idx[local_best])
+    return {"epoch": best_idx, "value": float(arr[best_idx])}
+
+
+def _write_training_summary(history, config: DynamicTrainingConfig) -> None:
+    """Write compact run-level diagnostics summary from epoch history + callbacks outputs."""
+    callbacks_dir = Path(config.CALLBACKS_DIR)
+    out_dir = callbacks_dir / "diagnostics"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    hist = getattr(history, "history", {}) or {}
+    metric_names = sorted(hist.keys())
+    epoch_count = max((len(v) for v in hist.values()), default=0)
+
+    best_by_metric = {}
+    for metric in metric_names:
+        values = hist.get(metric, [])
+        mode = "min" if ("loss" in metric and "dice" not in metric and "iou" not in metric) else "max"
+        best_stat = _best_epoch_stat(values, mode=mode)
+        if best_stat is not None:
+            best_by_metric[metric] = best_stat
+
+    final_metrics = {
+        k: float(v[-1]) for k, v in hist.items() if isinstance(v, list) and len(v) > 0 and np.isfinite(v[-1])
+    }
+
+    # Basic training health checks to quickly identify failure modes.
+    warnings = []
+    train_d = final_metrics.get("dice_coefficient")
+    val_d = final_metrics.get("val_dice_coefficient")
+    val_h = final_metrics.get("val_whole_dice_hard")
+    if train_d is not None and val_d is not None and (train_d - val_d) > 0.15:
+        warnings.append("Large train/val dice gap detected (>0.15): possible overfitting or split/domain mismatch.")
+    if val_d is not None and val_d < 0.02:
+        warnings.append("Validation dice stayed very low (<0.02): likely training collapse or severe class/domain mismatch.")
+    if val_h is not None and val_d is not None and val_h < 0.01 and val_d > 0.05:
+        warnings.append(
+            "Hard whole-brain dice is much lower than soft dice: check threshold calibration and predicted volume bias."
+        )
+
+    batch_csv = callbacks_dir / "batch_metrics.csv"
+    batch_summary = {}
+    if batch_csv.exists():
+        losses, dices, ious = [], [], []
+        with open(batch_csv, "r", encoding="utf-8") as fh:
+            reader = csv.DictReader(fh)
+            for row in reader:
+                try:
+                    losses.append(float(row.get("loss", "nan")))
+                    dices.append(float(row.get("dice_coefficient", "nan")))
+                    ious.append(float(row.get("safe_binary_iou", "nan")))
+                except Exception:
+                    continue
+        if losses:
+            loss_arr = np.asarray(losses, dtype=np.float64)
+            dice_arr = np.asarray(dices, dtype=np.float64)
+            iou_arr = np.asarray(ious, dtype=np.float64)
+            batch_summary = {
+                "rows": int(len(loss_arr)),
+                "loss": {
+                    "mean": float(np.nanmean(loss_arr)),
+                    "p95": float(np.nanpercentile(loss_arr, 95)),
+                    "max": float(np.nanmax(loss_arr)),
+                },
+                "dice": {
+                    "mean": float(np.nanmean(dice_arr)),
+                    "p05": float(np.nanpercentile(dice_arr, 5)),
+                    "min": float(np.nanmin(dice_arr)),
+                },
+                "iou": {
+                    "mean": float(np.nanmean(iou_arr)),
+                    "p05": float(np.nanpercentile(iou_arr, 5)),
+                    "min": float(np.nanmin(iou_arr)),
+                },
+            }
+
+    whole_summary_path = callbacks_dir / "whole_val_summary.jsonl"
+    whole_epoch_rows = []
+    if whole_summary_path.exists():
+        with open(whole_summary_path, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    whole_epoch_rows.append(json.loads(line))
+                except Exception:
+                    continue
+
+    source_best = {}
+    for row in whole_epoch_rows:
+        src_vals = row.get("source_soft_macro", {}) or {}
+        epoch = int(row.get("epoch", -1))
+        for src, val in src_vals.items():
+            cur = source_best.get(src)
+            fv = float(val)
+            if cur is None or fv > cur["value"]:
+                source_best[src] = {"epoch": epoch, "value": fv}
+
+    summary_payload = {
+        "run_dir": str(Path(config.CALLBACKS_DIR).parent),
+        "callbacks_dir": str(callbacks_dir),
+        "epochs_recorded": int(epoch_count),
+        "metrics": metric_names,
+        "best_by_metric": best_by_metric,
+        "final_metrics": final_metrics,
+        "warnings": warnings,
+        "batch_summary": batch_summary,
+        "source_best_soft_macro": source_best,
+        "artifacts": {
+            "training_log_csv": str(callbacks_dir / "training_log.csv"),
+            "batch_metrics_csv": str(batch_csv),
+            "epoch_metrics_jsonl": str(callbacks_dir / "epoch_metrics.jsonl"),
+            "whole_val_summary_jsonl": str(whole_summary_path),
+            "split_summary_json": str(out_dir / "split_summary.json"),
+            "split_cases_csv": str(out_dir / "split_cases.csv"),
+        },
+    }
+
+    out_json = out_dir / "training_summary.json"
+    with open(out_json, "w", encoding="utf-8") as fh:
+        json.dump(summary_payload, fh, indent=2)
+
+    lines = [
+        "# Training Diagnostics Summary",
+        "",
+        f"- Epochs recorded: {summary_payload['epochs_recorded']}",
+        f"- Run dir: `{summary_payload['run_dir']}`",
+        "",
+        "## Final Metrics",
+    ]
+    if final_metrics:
+        for k in sorted(final_metrics.keys()):
+            lines.append(f"- `{k}`: {final_metrics[k]:.6f}")
+    else:
+        lines.append("- No final metrics found.")
+
+    lines.extend(["", "## Best Metrics (Epoch, Value)"])
+    if best_by_metric:
+        for k in sorted(best_by_metric.keys()):
+            st = best_by_metric[k]
+            lines.append(f"- `{k}`: epoch {st['epoch']} -> {st['value']:.6f}")
+    else:
+        lines.append("- No best-metric stats available.")
+
+    lines.extend(["", "## Source Best Soft Dice"])
+    if source_best:
+        for src in sorted(source_best.keys()):
+            st = source_best[src]
+            lines.append(f"- `{src}`: epoch {st['epoch']} -> {st['value']:.6f}")
+    else:
+        lines.append("- No source-level whole-brain summaries found.")
+
+    lines.extend(["", "## Warnings"])
+    if warnings:
+        for w in warnings:
+            lines.append(f"- {w}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Artifacts"])
+    for k, v in summary_payload["artifacts"].items():
+        lines.append(f"- `{k}`: `{v}`")
+
+    out_md = out_dir / "training_summary.md"
+    with open(out_md, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+    logger.info("🧪 Wrote training diagnostics summary to %s", out_json)
 
 
 # ---------------------------------------------------------------------------
@@ -861,6 +1234,124 @@ def compute_lesion_sizes(pairs, load_mask_fn, target_shape=None):
     return np.asarray(sizes, dtype=np.int64)
 
 
+def create_stratified_splits(
+    pairs,
+    lesion_presence,
+    batch_size,
+    test_size=0.1,
+    random_state: int = 42,
+):
+    """Create deterministic train/val splits, preferring source+lesion stratification."""
+    total = len(pairs)
+    if total == 0:
+        return [], []
+    if total == 1:
+        return list(pairs), []
+
+    y = np.asarray(lesion_presence, dtype=np.int64).reshape(-1)
+    if y.size != total:
+        logger.warning(
+            "Lesion labels length (%d) does not match pairs (%d); using non-stratified split.",
+            y.size, total,
+        )
+        y = np.zeros(total, dtype=np.int64)
+
+    batch_size = max(1, int(batch_size))
+    ratio = float(np.clip(float(test_size), 0.01, 0.99))
+    val_count = max(1, int(round(total * ratio)))
+    val_count = min(val_count, total - 1)
+
+    # Keep splits batch-aligned when there is enough data for that constraint.
+    if batch_size > 1 and total >= (2 * batch_size):
+        val_count = max(batch_size, int(round(val_count / batch_size)) * batch_size)
+        val_count = min(val_count, total - batch_size)
+        val_count = max(batch_size, val_count)
+    train_count = total - val_count
+    if train_count < 1:
+        train_count, val_count = total - 1, 1
+
+    def _can_stratify(labels: np.ndarray):
+        unique, counts = np.unique(labels, return_counts=True)
+        ok = (
+            unique.size >= 2
+            and np.all(counts >= 2)
+            and val_count >= unique.size
+            and train_count >= unique.size
+        )
+        return unique, counts, ok
+
+    def _source_key(pair):
+        img_p, _ = pair
+        name = Path(str(img_p)).name
+        if "__" in name:
+            return name.split("__", 1)[0]
+        return name.split("_", 1)[0]
+
+    source_labels = np.asarray([_source_key(p) for p in pairs], dtype=object)
+    source_lesion_labels = np.asarray(
+        [f"{src}|lesion={int(lbl)}" for src, lbl in zip(source_labels, y)],
+        dtype=object,
+    )
+
+    split_mode = "random_fallback"
+    strat_labels = None
+    class_counts = None
+
+    for mode_name, labels in (
+        ("stratified_source+lesion", source_lesion_labels),
+        ("stratified_source", source_labels),
+        ("stratified_lesion", y),
+    ):
+        unique, counts, ok = _can_stratify(np.asarray(labels))
+        if ok:
+            split_mode = mode_name
+            strat_labels = np.asarray(labels)
+            class_counts = dict(zip(unique.tolist(), counts.tolist()))
+            break
+
+    if strat_labels is not None:
+        splitter = StratifiedShuffleSplit(
+            n_splits=1, test_size=val_count, random_state=random_state
+        )
+        train_idx, val_idx = next(
+            splitter.split(np.zeros(total, dtype=np.int8), strat_labels)
+        )
+    else:
+        rng = np.random.default_rng(random_state)
+        order = np.arange(total)
+        rng.shuffle(order)
+        val_idx = order[:val_count]
+        train_idx = order[val_count:]
+        unique, counts, _ = _can_stratify(y)
+        class_counts = dict(zip(unique.tolist(), counts.tolist()))
+        logger.warning(
+            "Stratified split unavailable (class_counts=%s); using deterministic random split.",
+            class_counts,
+        )
+
+    train_pairs = [pairs[i] for i in train_idx]
+    val_pairs = [pairs[i] for i in val_idx]
+
+    train_lesion = float(np.mean(y[train_idx])) if len(train_idx) else 0.0
+    val_lesion = float(np.mean(y[val_idx])) if len(val_idx) else 0.0
+    logger.info(
+        "🧮 Dataset split (%s): Train=%d (%.1f%%), Validation=%d (%.1f%%)",
+        split_mode,
+        len(train_pairs),
+        (len(train_pairs) / total) * 100.0,
+        len(val_pairs),
+        (len(val_pairs) / total) * 100.0,
+    )
+    if class_counts is not None:
+        logger.info("🧩 Stratification groups: %s", class_counts)
+    logger.info(
+        "⚖️ Lesion prevalence: Train=%.2f%%, Validation=%.2f%%",
+        train_lesion * 100.0,
+        val_lesion * 100.0,
+    )
+    return train_pairs, val_pairs
+
+
 def apply_augmentations(image: np.ndarray, mask: np.ndarray, cfg, rng) -> tuple[np.ndarray, np.ndarray]:
     """Shared augmentation pipeline for patch and full-volume loaders."""
     if cfg.AUGMENTATION_INTENSITY <= 0 or rng.random() > cfg.AUGMENTATION_INTENSITY:
@@ -1127,6 +1618,11 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         self.every_n = max(1, int(cfg.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS))
         self.threshold = float(cfg.DECISION_THRESHOLD)
         self.max_cases = None if cfg.WHOLE_BRAIN_VAL_MAX_CASES in (None, 0) else int(cfg.WHOLE_BRAIN_VAL_MAX_CASES)
+        self.threshold_sweep = tuple(float(t) for t in getattr(cfg, "VAL_THRESHOLD_SWEEP", (self.threshold,)))
+        self.top_k = max(1, int(getattr(cfg, "VAL_DIAGNOSTICS_TOP_K", 5)))
+        self.diagnostics_enabled = bool(getattr(cfg, "DIAGNOSTICS_ENABLED", True))
+        self.out_dir = Path(cfg.CALLBACKS_DIR)
+        self.summary_jsonl = self.out_dir / "whole_val_summary.jsonl"
         self._eps = 1e-6
 
     def _iter_pairs(self):
@@ -1146,6 +1642,10 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
 
         case_soft = []
         case_hard = []
+        source_soft: dict[str, list[float]] = {}
+        source_hard: dict[str, list[float]] = {}
+        threshold_case_scores: dict[float, list[float]] = {t: [] for t in self.threshold_sweep}
+        case_rows: list[dict[str, object]] = []
         inter_soft = pred_soft = true_sum = 0.0
         t0 = time.time()
 
@@ -1171,10 +1671,35 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
             pred_soft += pred
             true_sum += true
 
-            case_soft.append(float((2.0 * inter + self._eps) / (pred + true + self._eps)))
+            case_soft_i = float((2.0 * inter + self._eps) / (pred + true + self._eps))
+            case_soft.append(case_soft_i)
             inter_hard = float(np.sum(y * pred_hard))
             pred_hard_sum = float(np.sum(pred_hard))
-            case_hard.append(float((2.0 * inter_hard + self._eps) / (pred_hard_sum + true + self._eps)))
+            case_hard_i = float((2.0 * inter_hard + self._eps) / (pred_hard_sum + true + self._eps))
+            case_hard.append(case_hard_i)
+
+            src_name = _path_source(img_p)
+            source_soft.setdefault(src_name, []).append(case_soft_i)
+            source_hard.setdefault(src_name, []).append(case_hard_i)
+            row = {
+                "source": src_name,
+                "case_id": _path_case_id(img_p),
+                "soft_dice": case_soft_i,
+                "hard_dice": case_hard_i,
+                "true_voxels": int(true),
+                "pred_soft_voxels": float(pred),
+                "pred_hard_voxels": float(pred_hard_sum),
+                "image": str(img_p),
+                "mask": str(msk_p),
+            }
+            for thr in self.threshold_sweep:
+                pred_thr = (probs >= thr).astype(np.float32, copy=False)
+                inter_thr = float(np.sum(y * pred_thr))
+                pred_thr_sum = float(np.sum(pred_thr))
+                hard_thr = float((2.0 * inter_thr + self._eps) / (pred_thr_sum + true + self._eps))
+                threshold_case_scores[thr].append(hard_thr)
+                row[f"hard_dice_thr_{thr:.2f}"] = hard_thr
+            case_rows.append(row)
 
             if i % 8 == 0 or i == len(eval_pairs):
                 logger.info(f"Whole-brain val progress: {i}/{len(eval_pairs)} cases")
@@ -1186,6 +1711,13 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         logs["val_dice_coefficient"] = val_soft_macro
         logs["val_whole_dice_micro"] = val_soft_micro
         logs["val_whole_dice_hard"] = val_hard_macro
+        hard_sweep_macro = {
+            thr: float(np.mean(scores)) if scores else 0.0
+            for thr, scores in threshold_case_scores.items()
+        }
+        for thr, val in hard_sweep_macro.items():
+            key = f"val_whole_dice_hard_thr_{thr:.2f}".replace(".", "p")
+            logs[key] = val
 
         dt = time.time() - t0
         logger.info(
@@ -1201,6 +1733,90 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
                 dt,
             )
         )
+        if case_soft:
+            soft_arr = np.asarray(case_soft, dtype=np.float32)
+            hard_arr = np.asarray(case_hard, dtype=np.float32)
+            logger.info(
+                "Whole-brain val case stats: soft[min=%.5f p25=%.5f med=%.5f p75=%.5f max=%.5f] "
+                "hard[min=%.5f p25=%.5f med=%.5f p75=%.5f max=%.5f]",
+                float(np.min(soft_arr)),
+                float(np.percentile(soft_arr, 25)),
+                float(np.median(soft_arr)),
+                float(np.percentile(soft_arr, 75)),
+                float(np.max(soft_arr)),
+                float(np.min(hard_arr)),
+                float(np.percentile(hard_arr, 25)),
+                float(np.median(hard_arr)),
+                float(np.percentile(hard_arr, 75)),
+                float(np.max(hard_arr)),
+            )
+            worst_soft = sorted(case_rows, key=lambda r: float(r["soft_dice"]))[: self.top_k]
+            logger.info(
+                "Whole-brain val worst soft-dice cases: %s",
+                [
+                    {
+                        "case_id": r["case_id"],
+                        "source": r["source"],
+                        "soft_dice": round(float(r["soft_dice"]), 5),
+                        "true_voxels": int(r["true_voxels"]),
+                    }
+                    for r in worst_soft
+                ],
+            )
+        if source_soft:
+            per_source_soft = {k: float(np.mean(v)) for k, v in sorted(source_soft.items())}
+            per_source_hard = {k: float(np.mean(v)) for k, v in sorted(source_hard.items())}
+            logger.info("Whole-brain val by source (soft_macro): %s", per_source_soft)
+            logger.info("Whole-brain val by source (hard_macro@thr%.2f): %s", self.threshold, per_source_hard)
+        if hard_sweep_macro:
+            logger.info(
+                "Whole-brain val threshold sweep (hard_macro): %s",
+                {f"{k:.2f}": round(v, 5) for k, v in hard_sweep_macro.items()},
+            )
+
+        if case_rows:
+            bin_soft: dict[str, list[float]] = {}
+            for r in case_rows:
+                b = _lesion_size_bin(int(r["true_voxels"]))
+                bin_soft.setdefault(b, []).append(float(r["soft_dice"]))
+            logger.info(
+                "Whole-brain val by lesion-size bin (soft_macro): %s",
+                {k: float(np.mean(v)) for k, v in sorted(bin_soft.items())},
+            )
+
+        if self.diagnostics_enabled:
+            self.out_dir.mkdir(parents=True, exist_ok=True)
+            csv_path = self.out_dir / f"whole_val_epoch_{int(epoch):04d}.csv"
+            base_fields = [
+                "source",
+                "case_id",
+                "soft_dice",
+                "hard_dice",
+                "true_voxels",
+                "pred_soft_voxels",
+                "pred_hard_voxels",
+                "image",
+                "mask",
+            ]
+            thr_fields = [f"hard_dice_thr_{thr:.2f}" for thr in self.threshold_sweep]
+            with open(csv_path, "w", newline="", encoding="utf-8") as fh:
+                writer = csv.DictWriter(fh, fieldnames=base_fields + thr_fields)
+                writer.writeheader()
+                for r in case_rows:
+                    writer.writerow(r)
+            summary = {
+                "epoch": int(epoch),
+                "elapsed_sec": float(dt),
+                "n_cases": int(len(case_rows)),
+                "val_soft_macro": float(val_soft_macro),
+                "val_soft_micro": float(val_soft_micro),
+                "val_hard_macro": float(val_hard_macro),
+                "hard_sweep_macro": {f"{k:.2f}": float(v) for k, v in hard_sweep_macro.items()},
+                "source_soft_macro": {k: float(np.mean(v)) for k, v in sorted(source_soft.items())},
+                "source_hard_macro": {k: float(np.mean(v)) for k, v in sorted(source_hard.items())},
+            }
+            with open(self.summary_jsonl, "a", encoding="utf-8") as fh:
+                fh.write(json.dumps(summary) + "\n")
 
 
 # ---------------------------------------------------------------------------
@@ -1269,8 +1885,6 @@ def detect_input_shape(data_dir: Path) -> tuple:
     )
     return rounded_shape
 
-
-0
 # --- Flexible loader: supports single-folder (preprocessed) or two-folder (raw) ---
 import gc, re, json
 import numpy as np
@@ -1654,28 +2268,40 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             return output
     lesion_sizes_all = compute_lesion_sizes(pairs, mask_preprocess_fn, case_target_shape)
     pair_lookup = {(str(img_p), str(msk_p)): idx for idx, (img_p, msk_p) in enumerate(pairs)}
-    split_fn = globals().get("create_stratified_splits")
-    if split_fn is None:
-        logger.warning("create_stratified_splits not found; using simple random split fallback.")
-        def split_fn(pairs_seq, lesion_arr, batch_size, test_size):
-            total = len(pairs_seq)
-            if total <= batch_size:
-                return list(pairs_seq), []
-            rng = np.random.default_rng(42)
-            indices = np.arange(total)
-            rng.shuffle(indices)
-            desired = max(batch_size, int(round(total * test_size)))
-            val_count = max(1, min(total - batch_size, desired))
-            val_idx = indices[:val_count]
-            train_idx = indices[val_count:]
-            return [pairs_seq[i] for i in train_idx], [pairs_seq[i] for i in val_idx]
-    train_pairs, val_pairs = split_fn(
+    train_pairs, val_pairs = create_stratified_splits(
         pairs, lesion_presence, batch_size=config.BATCH_SIZE, test_size=config.VALIDATION_SPLIT
     )
     train_pairs = list(train_pairs)
     val_pairs = list(val_pairs)
+    train_source_counts = {}
+    for img_p, _ in train_pairs:
+        src = _path_source(img_p)
+        train_source_counts[src] = train_source_counts.get(src, 0) + 1
+    val_source_counts = {}
+    for img_p, _ in val_pairs:
+        src = _path_source(img_p)
+        val_source_counts[src] = val_source_counts.get(src, 0) + 1
+    logger.info("Train source composition: %s", train_source_counts)
+    logger.info("Val source composition: %s", val_source_counts)
     train_indices = np.asarray([pair_lookup[(str(img), str(msk))] for img, msk in train_pairs], dtype=np.int64)
+    val_indices = np.asarray([pair_lookup[(str(img), str(msk))] for img, msk in val_pairs], dtype=np.int64)
     train_lesion_sizes = lesion_sizes_all[train_indices]
+    val_lesion_sizes = lesion_sizes_all[val_indices] if len(val_indices) else np.asarray([], dtype=np.int64)
+    logger.info(
+        "Split lesion voxels: train_mean=%.1f train_median=%.1f | val_mean=%.1f val_median=%.1f",
+        float(np.mean(train_lesion_sizes)) if len(train_lesion_sizes) else 0.0,
+        float(np.median(train_lesion_sizes)) if len(train_lesion_sizes) else 0.0,
+        float(np.mean(val_lesion_sizes)) if len(val_lesion_sizes) else 0.0,
+        float(np.median(val_lesion_sizes)) if len(val_lesion_sizes) else 0.0,
+    )
+    if bool(getattr(config, "DIAGNOSTICS_ENABLED", True)):
+        _write_split_diagnostics(
+            train_pairs=train_pairs,
+            val_pairs=val_pairs,
+            pair_lookup=pair_lookup,
+            lesion_sizes_all=lesion_sizes_all,
+            out_dir=Path(config.CALLBACKS_DIR) / "diagnostics",
+        )
     case_sampler = SizeAwareCaseSampler(train_lesion_sizes, config) if len(train_pairs) else None
     patch_size = tuple(config.INPUT_SHAPE[:-1])
     batch_cases = max(config.BATCH_SIZE, 1)
@@ -1784,11 +2410,27 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         save_freq="epoch",
         verbose=0,
     )
-    csv_cb = CSVLogger(LOG_DIR / "training_log.csv", append=True)
+    csv_cb = CSVLogger(Path(config.CALLBACKS_DIR) / "training_log.csv", append=False)
     memory_cb = None
     if bool(getattr(config, "MEMORY_LOGS_ENABLED", False)):
         memory_cb = MemoryMonitoringCallback(
             log_frequency=int(getattr(config, "MEMORY_LOG_BATCH_FREQUENCY", 0))
+        )
+    batch_metrics_cb = None
+    epoch_jsonl_cb = None
+    if bool(getattr(config, "DIAGNOSTICS_ENABLED", True)):
+        batch_metrics_cb = BatchMetricsCSVLogger(
+            out_csv=Path(config.CALLBACKS_DIR) / "batch_metrics.csv",
+            log_every_n_steps=int(getattr(config, "BATCH_LOG_EVERY_N_STEPS", 1)),
+        )
+        epoch_jsonl_cb = EpochMetricsJSONLLogger(
+            out_jsonl=Path(config.CALLBACKS_DIR) / "epoch_metrics.jsonl"
+        )
+        logger.info(
+            "Diagnostics enabled: batch=%s epoch=%s whole-val-summary=%s",
+            Path(config.CALLBACKS_DIR) / "batch_metrics.csv",
+            Path(config.CALLBACKS_DIR) / "epoch_metrics.jsonl",
+            Path(config.CALLBACKS_DIR) / "whole_val_summary.jsonl",
         )
     progress_cb = tf.keras.callbacks.ProgbarLogger()
 
@@ -1817,13 +2459,13 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             logger.warning(f"Unable to enable SWA: {e}")
 
     whole_brain_val_cb = WholeBrainValidationCallback(val_pairs, config) if use_whole_brain_val else None
-    callbacks = [cb for cb in (sampler_cb, diff_cb, loss_ramp_cb, whole_brain_val_cb) if cb is not None]
+    callbacks = [cb for cb in (sampler_cb, diff_cb, loss_ramp_cb, whole_brain_val_cb, epoch_jsonl_cb) if cb is not None]
     fit_verbose = int(getattr(config, "FIT_VERBOSE", 2))
     if fit_verbose not in (0, 1, 2):
         logger.warning(f"Unsupported FIT_VERBOSE={fit_verbose}; using 2 (epoch-only).")
         fit_verbose = 2
 
-    callbacks.extend([cb for cb in (checkpoint_cb, latest_cb, csv_cb, memory_cb) if cb is not None])
+    callbacks.extend([cb for cb in (checkpoint_cb, latest_cb, csv_cb, memory_cb, batch_metrics_cb) if cb is not None])
     if fit_verbose == 1:
         callbacks.append(progress_cb)
     callbacks.append(NonFiniteLossGuard())
@@ -1853,6 +2495,11 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
 
     history = model.fit(**fit_args)
     logger.info(f"Training complete: {history.history.keys()}")
+    if bool(getattr(config, "DIAGNOSTICS_ENABLED", True)):
+        try:
+            _write_training_summary(history, config)
+        except Exception as e:
+            logger.warning(f"Could not write training diagnostics summary: {e}")
     return history
 
 

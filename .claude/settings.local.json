@@ -15,7 +15,22 @@
       "Bash(/home/rbielski/stroke_cleaned/.venv/bin/python:*)",
       "Bash(/usr/bin/python3:*)",
       "Bash(ls /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v3/runs/20251110_101813/test_eval/*.csv)",
-      "Bash(head -10 grep -r \"mf_fwhm_mm\\\\|mf_hi_freq_energy\\\\|mf_lap_var\" /home/rbielski/stroke_cleaned/ --include=\"*.ipynb\" -l)"
+      "Bash(head -10 grep -r \"mf_fwhm_mm\\\\|mf_hi_freq_energy\\\\|mf_lap_var\" /home/rbielski/stroke_cleaned/ --include=\"*.ipynb\" -l)",
+      "Bash(# Find manifests in v3 that list the hires test set subjects find /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v3/ -name \"\"*manifest*\"\" -o -name \"\"*split*\"\")",
+      "Bash(# Look for preprocessing notebooks in the project find /home/rbielski/stroke_cleaned/ -name \"\"*.ipynb\"\" | xargs grep -l \"\"MNI\\\\|ANTs\\\\|ants\\\\|registration\\\\|normalize\\\\|standardize\"\")",
+      "Bash(head -5 python3 -c \" import pandas as pd df = pd.read_csv\\(''/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/data/processed/train_combined/manifest.csv''\\) print\\(''Columns:'', list\\(df.columns[:10]\\)\\) print\\(''Shape:'', df.shape\\) print\\(df.head\\(3\\).to_string\\(\\)\\) \")",
+      "Bash(conda info --envs)",
+      "Bash(/home/rbielski/miniconda3/envs/tf_310/bin/python3 -c \":*)",
+      "Bash(# Check saved model config to get actual INPUT_SHAPE used in v3 run cat /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v3/runs/20251110_101813/models/config.json | python3 -c \"\" import json, sys cfg = json.load\\(sys.stdin\\) print\\(''INPUT_SHAPE:'', cfg.get\\(''INPUT_SHAPE''\\)\\) print\\(''PATCH_SIZE:'', cfg.get\\(''PATCH_SIZE''\\)\\) print\\(''BATCH_SIZE:'', cfg.get\\(''BATCH_SIZE''\\)\\) # Show a few more relevant keys for k, v in cfg.items\\(\\): if k not in \\(''INPUT_SHAPE'', ''PATCH_SIZE'', ''BATCH_SIZE''\\) and not isinstance\\(v, \\(dict, list\\)\\): print\\(f''{k}: {v}''\\) \"\")",
+      "Bash(# Find ANTs binaries find /home/rbielski/ -name \"\"antsRegistration\"\")",
+      "Bash(# Check the MNI template used ls /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/data/templateflow/)",
+      "Bash(BASE=/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/A_A_Combined_Data/Downsampled_Data for v in Crude ThickSlices InPlaneCoarse ReducedSNR RigidJitter)",
+      "Bash(do echo:*)",
+      "Read(//home/rbielski/stroke_cleaned/$BASE/$v/**)",
+      "Bash(pip show:*)",
+      "Bash(conda run:*)",
+      "Bash(head -20 echo --- find /home/rbielski/stroke_cleaned /home/rbielski/ARC -name *.py)",
+      "Bash(find /home/rbielski -name *.py)"
     ]
   }
 }

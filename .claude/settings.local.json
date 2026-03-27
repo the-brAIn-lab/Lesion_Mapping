@@ -30,7 +30,10 @@
       "Bash(pip show:*)",
       "Bash(conda run:*)",
       "Bash(head -20 echo --- find /home/rbielski/stroke_cleaned /home/rbielski/ARC -name *.py)",
-      "Bash(find /home/rbielski -name *.py)"
+      "Bash(find /home/rbielski -name *.py)",
+      "Bash(python3 -c \":*)",
+      "Bash(find /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined -name *manifest*.csv)",
+      "Bash(nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv,noheader)"
     ]
   }
 }

@@ -208,6 +208,8 @@ class DynamicTrainingConfig:
     DEEP_SUPERVISION_WEIGHTS: tuple[float, ...] = (0.1, 0.2, 0.3)
     DICE_WEIGHT: float = 0.6
     BOUNDARY_WEIGHT: float = 0.4
+    BCE_WEIGHT: float = 0.0
+    VOLUME_RATIO_WEIGHT: float = 0.0
     BOUNDARY_WARMUP_DICE: float = 0.6
     BOUNDARY_WARMUP_BOUNDARY: float = 0.4
     BOUNDARY_WARMUP_FRACTION: float = 0.33
@@ -238,6 +240,8 @@ class DynamicTrainingConfig:
     HEMISPHERE_AXIS: int = 2                           # RAS x-axis after canonicalization
     HEMISPHERE_BALANCED: bool = True
     MAX_PATCHES_PER_CASE_PER_EPOCH: int = 64
+    SOURCE_BALANCED_SAMPLING: bool = True
+    OUTPUT_BIAS_INIT_PROB: float = 0.015
     DIFF_AWARE_ENABLED: bool = True
     DIFF_EMA_LAMBDA: float = 0.8
     DIFF_BETA: float = 1.5
@@ -278,6 +282,7 @@ class DynamicTrainingConfig:
         self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS = max(1, int(self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS))
         self.BATCH_LOG_EVERY_N_STEPS = max(1, int(self.BATCH_LOG_EVERY_N_STEPS))
         self.VAL_DIAGNOSTICS_TOP_K = max(1, int(self.VAL_DIAGNOSTICS_TOP_K))
+        self.OUTPUT_BIAS_INIT_PROB = float(np.clip(self.OUTPUT_BIAS_INIT_PROB, 1e-5, 1.0 - 1e-5))
         thresholds = [float(np.clip(t, 0.0, 1.0)) for t in (self.VAL_THRESHOLD_SWEEP or ())]
         if float(np.clip(self.DECISION_THRESHOLD, 0.0, 1.0)) not in thresholds:
             thresholds.append(float(np.clip(self.DECISION_THRESHOLD, 0.0, 1.0)))
@@ -503,6 +508,8 @@ class SAM2Attention(layers.Layer):
 # Build the segmentation model (UNet-like with your custom blocks)
 # ---------------------------------------------------------------------------
 def build_dynamic_model(config: DynamicTrainingConfig) -> tf.keras.Model:
+    prior = float(np.clip(getattr(config, "OUTPUT_BIAS_INIT_PROB", 0.015), 1e-5, 1.0 - 1e-5))
+    prior_bias = float(np.log(prior / (1.0 - prior)))
     inputs = tf.keras.Input(shape=config.INPUT_SHAPE)  # (D,H,W,1)
 
     x = inputs
@@ -529,9 +536,14 @@ def build_dynamic_model(config: DynamicTrainingConfig) -> tf.keras.Model:
         x = ResidualConvBlock(filters, kernel_reg=tf.keras.regularizers.l2(config.L2_REG), dropout_rate=config.DROPOUT_RATE)(x)
         x = VisionMambaBlock(filters, dropout_rate=config.DROPOUT_RATE)(x)
 
-    # IMPORTANT: output logits (no activation). Dice in your loss applies sigmoid.
-    # Build model – replace the head
-    outputs = layers.Conv3D(1, kernel_size=1, activation="sigmoid", name="probs")(x)
+    # Start with a low foreground prior so the model does not begin near 50% occupancy.
+    outputs = layers.Conv3D(
+        1,
+        kernel_size=1,
+        activation="sigmoid",
+        bias_initializer=tf.keras.initializers.Constant(prior_bias),
+        name="probs",
+    )(x)
 
 
     return tf.keras.Model(inputs=inputs, outputs=outputs, name="SmartSOTA_Dynamic")
@@ -1008,6 +1020,22 @@ def boundary_loss(y_true, y_pred):
     grad_pred = tf.sqrt(gxp**2 + gyp**2 + gzp**2 + 1e-7)
     return tf.reduce_mean(tf.abs(grad_true - grad_pred))
 
+
+@register_keras_serializable(package="custom")
+def foreground_ratio_loss(y_true, y_pred, eps=1e-6, delta=1.0):
+    """Penalize patch-level foreground volume mismatch in log space."""
+    y_true = tf.where(tf.math.is_finite(y_true), y_true, tf.zeros_like(y_true))
+    y_pred = tf.where(tf.math.is_finite(y_pred), y_pred, tf.zeros_like(y_pred))
+    y_true = tf.cast(tf.clip_by_value(y_true, 0.0, 1.0), tf.float32)
+    y_pred = tf.cast(tf.clip_by_value(y_pred, eps, 1.0 - eps), tf.float32)
+    axes = tuple(range(1, len(y_true.shape)))
+    true_frac = tf.reduce_mean(y_true, axis=axes)
+    pred_frac = tf.reduce_mean(y_pred, axis=axes)
+    diff = tf.math.log(pred_frac + eps) - tf.math.log(true_frac + eps)
+    abs_diff = tf.abs(diff)
+    huber = tf.where(abs_diff <= delta, 0.5 * tf.square(diff), delta * (abs_diff - 0.5 * delta))
+    return tf.reduce_mean(huber)
+
 @register_keras_serializable(package="custom")
 class CombinedLoss(tf.keras.losses.Loss):
     def __init__(self, alpha=0.6, beta=0.4, name="combined_loss"):
@@ -1064,6 +1092,8 @@ class HybridLoss(tf.keras.losses.Loss):
         self,
         dice_weight=0.6,
         boundary_weight=0.4,
+        bce_weight=0.0,
+        volume_ratio_weight=0.0,
         focal_weight=0.0,
         tversky_alpha=0.7,
         tversky_beta=0.3,
@@ -1073,6 +1103,8 @@ class HybridLoss(tf.keras.losses.Loss):
         super().__init__(name=name)
         self.dice_weight = float(dice_weight)
         self.boundary_weight = float(boundary_weight)
+        self.bce_weight = float(bce_weight)
+        self.volume_ratio_weight = float(volume_ratio_weight)
         self.focal_weight = float(focal_weight)
         self.tversky_alpha = float(tversky_alpha)
         self.tversky_beta = float(tversky_beta)
@@ -1082,22 +1114,33 @@ class HybridLoss(tf.keras.losses.Loss):
         return {
             "dice_weight": self.dice_weight,
             "boundary_weight": self.boundary_weight,
+            "bce_weight": self.bce_weight,
+            "volume_ratio_weight": self.volume_ratio_weight,
             "focal_weight": self.focal_weight,
             "tversky_alpha": self.tversky_alpha,
             "tversky_beta": self.tversky_beta,
             "focal_gamma": self.focal_gamma,
         }
 
-    def set_weights(self, dice_weight=None, boundary_weight=None, focal_weight=None):
+    def set_weights(self, dice_weight=None, boundary_weight=None, bce_weight=None, volume_ratio_weight=None, focal_weight=None):
         if dice_weight is not None:
             self.dice_weight = float(dice_weight)
         if boundary_weight is not None:
             self.boundary_weight = float(boundary_weight)
+        if bce_weight is not None:
+            self.bce_weight = float(bce_weight)
+        if volume_ratio_weight is not None:
+            self.volume_ratio_weight = float(volume_ratio_weight)
         if focal_weight is not None:
             self.focal_weight = float(focal_weight)
 
     def call(self, y_true, y_pred):
         loss_val = self.dice_weight * dice_loss(y_true, y_pred) + self.boundary_weight * boundary_loss(y_true, y_pred)
+        if self.bce_weight > 0.0:
+            bce = tf.keras.losses.binary_crossentropy(y_true, y_pred)
+            loss_val += self.bce_weight * tf.reduce_mean(bce)
+        if self.volume_ratio_weight > 0.0:
+            loss_val += self.volume_ratio_weight * foreground_ratio_loss(y_true, y_pred)
         if self.focal_weight > 0.0:
             loss_val += self.focal_weight * focal_tversky_loss(
                 y_true, y_pred, alpha=self.tversky_alpha, beta=self.tversky_beta, gamma=self.focal_gamma
@@ -1130,7 +1173,15 @@ class LossRampScheduler(tf.keras.callbacks.Callback):
         else:
             dice_w, boundary_w = self.target_dice, self.target_boundary
         self.loss_obj.set_weights(dice_weight=dice_w, boundary_weight=boundary_w)
-        logger.info(f"📉 Loss mix @epoch {epoch}: dice={dice_w:.3f}, boundary={boundary_w:.3f}, focal={self.loss_obj.focal_weight:.3f}")
+        logger.info(
+            "📉 Loss mix @epoch %d: dice=%.3f, boundary=%.3f, bce=%.3f, volume=%.3f, focal=%.3f",
+            epoch,
+            dice_w,
+            boundary_w,
+            self.loss_obj.bce_weight,
+            self.loss_obj.volume_ratio_weight,
+            self.loss_obj.focal_weight,
+        )
 
 
 class NonFiniteLossGuard(tf.keras.callbacks.Callback):
@@ -1238,6 +1289,7 @@ def create_stratified_splits(
     pairs,
     lesion_presence,
     batch_size,
+    lesion_sizes=None,
     test_size=0.1,
     random_state: int = 42,
 ):
@@ -1288,8 +1340,16 @@ def create_stratified_splits(
         return name.split("_", 1)[0]
 
     source_labels = np.asarray([_source_key(p) for p in pairs], dtype=object)
+    if lesion_sizes is not None and len(lesion_sizes) == total:
+        size_labels = np.asarray([_lesion_size_bin(int(v)) for v in lesion_sizes], dtype=object)
+    else:
+        size_labels = np.asarray(["unknown"] * total, dtype=object)
     source_lesion_labels = np.asarray(
         [f"{src}|lesion={int(lbl)}" for src, lbl in zip(source_labels, y)],
+        dtype=object,
+    )
+    source_size_labels = np.asarray(
+        [f"{src}|size={size_lbl}" for src, size_lbl in zip(source_labels, size_labels)],
         dtype=object,
     )
 
@@ -1298,8 +1358,10 @@ def create_stratified_splits(
     class_counts = None
 
     for mode_name, labels in (
+        ("stratified_source+size", source_size_labels),
         ("stratified_source+lesion", source_lesion_labels),
         ("stratified_source", source_labels),
+        ("stratified_size", size_labels),
         ("stratified_lesion", y),
     ):
         unique, counts, ok = _can_stratify(np.asarray(labels))
@@ -1415,21 +1477,44 @@ def apply_augmentations(image: np.ndarray, mask: np.ndarray, cfg, rng) -> tuple[
     return image, mask
 
 class SizeAwareCaseSampler:
-    def __init__(self, lesion_sizes: np.ndarray, cfg: DynamicTrainingConfig):
+    def __init__(self, lesion_sizes: np.ndarray, cfg: DynamicTrainingConfig, source_labels: np.ndarray | None = None):
         self.cfg = cfg
         self.sizes = lesion_sizes.astype(np.int64)
         self.N = len(self.sizes)
+        self.source_labels = None if source_labels is None else np.asarray(source_labels, dtype=object)
         self.weights = self._init_weights()
         self.patch_quota = np.zeros(self.N, dtype=np.int64)
+
+    def _apply_source_balance(self, weights: np.ndarray) -> np.ndarray:
+        w = np.asarray(weights, dtype=np.float64).copy()
+        if (
+            not bool(getattr(self.cfg, "SOURCE_BALANCED_SAMPLING", True))
+            or self.source_labels is None
+            or len(self.source_labels) != self.N
+            or self.N == 0
+        ):
+            w = np.clip(w, 1e-12, None)
+            return w / w.sum()
+        unique_sources = np.unique(self.source_labels)
+        per_source_mass = 1.0 / max(len(unique_sources), 1)
+        out = np.zeros_like(w)
+        for src in unique_sources:
+            idx = np.where(self.source_labels == src)[0]
+            if idx.size == 0:
+                continue
+            local = np.clip(w[idx], 1e-12, None)
+            out[idx] = per_source_mass * (local / local.sum())
+        out = np.clip(out, 1e-12, None)
+        return out / out.sum()
 
     def _init_weights(self):
         if not self.cfg.SIZE_AWARE_ENABLED or self.N == 0:
             w = np.ones(self.N, dtype=np.float64)
-            return w / w.sum()
+            return self._apply_source_balance(w)
         if self.cfg.SIZE_AWARE_MODE == "inverse":
             w = 1.0 / np.power(self.sizes + self.cfg.INV_VOL_EPS, self.cfg.INV_VOL_ALPHA)
             w = np.clip(w, 1e-12, None)
-            return w / w.sum()
+            return self._apply_source_balance(w)
         edges = np.asarray(self.cfg.SIZE_BUCKET_EDGES, dtype=np.int64)
         probs = np.asarray(self.cfg.SIZE_BUCKET_PROBS, dtype=np.float64)
         bins = np.digitize(self.sizes, edges, right=False)
@@ -1440,7 +1525,7 @@ class SizeAwareCaseSampler:
                 continue
             w[idx] = probs[b] / idx.size
         w = np.clip(w, 1e-12, None)
-        return w / w.sum()
+        return self._apply_source_balance(w)
 
     def sample_indices(self, k: int) -> np.ndarray:
         if self.N == 0:
@@ -1476,7 +1561,7 @@ class SizeAwareCaseSampler:
             self.cfg.DIFF_EMA_LAMBDA * self.weights
             + (1.0 - self.cfg.DIFF_EMA_LAMBDA) * (badness / badness.sum())
         )
-        self.weights = (w_new / w_new.sum()).astype(np.float64)
+        self.weights = self._apply_source_balance(w_new).astype(np.float64)
 
 def bin_index(v, edges):
     import numpy as _np
@@ -1522,13 +1607,30 @@ def sample_patch_center(
         hemi_center = [Z // 2, Y // 2, X // 2]
 
     if rng.random() < p_fg and fg.size > 0:
-        cz, cy, cx = fg[rng.integers(len(fg))]
+        fg_mins = fg.min(axis=0)
+        fg_maxs = fg.max(axis=0)
+        fg_center = _np.round((fg_mins + fg_maxs) / 2.0).astype(_np.int64)
+        fg_span = _np.maximum(fg_maxs - fg_mins + 1, 1)
+        bbox_jitter = _np.minimum(_np.maximum(fg_span // 6, 2), 16)
+        if rng.random() < 0.7:
+            cz, cy, cx = fg_center
+            jitter = _np.asarray(
+                [
+                    rng.integers(-int(bbox_jitter[0]), int(bbox_jitter[0]) + 1),
+                    rng.integers(-int(bbox_jitter[1]), int(bbox_jitter[1]) + 1),
+                    rng.integers(-int(bbox_jitter[2]), int(bbox_jitter[2]) + 1),
+                ],
+                dtype=_np.int64,
+            )
+        else:
+            cz, cy, cx = fg[rng.integers(len(fg))]
+            jitter = rng.integers(low=-4, high=5, size=3)
     elif bg.size > 0:
         cz, cy, cx = bg[rng.integers(len(bg))]
+        jitter = rng.integers(low=-4, high=5, size=3)
     else:
         cz, cy, cx = hemi_center
-
-    jitter = rng.integers(low=-4, high=5, size=3)
+        jitter = rng.integers(low=-4, high=5, size=3)
     centers = [int(cz + jitter[0]), int(cy + jitter[1]), int(cx + jitter[2])]
     starts = []
     for center, dim, p in zip(centers, dims, patch_dims):
@@ -2218,6 +2320,8 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             loss_obj = HybridLoss(
                 dice_weight=config.DICE_WEIGHT,
                 boundary_weight=config.BOUNDARY_WEIGHT,
+                bce_weight=config.BCE_WEIGHT,
+                volume_ratio_weight=config.VOLUME_RATIO_WEIGHT,
                 focal_weight=config.FOCAL_TVERSKY_WEIGHT,
                 tversky_alpha=config.TVERSKY_ALPHA,
                 tversky_beta=config.TVERSKY_BETA,
@@ -2269,7 +2373,11 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     lesion_sizes_all = compute_lesion_sizes(pairs, mask_preprocess_fn, case_target_shape)
     pair_lookup = {(str(img_p), str(msk_p)): idx for idx, (img_p, msk_p) in enumerate(pairs)}
     train_pairs, val_pairs = create_stratified_splits(
-        pairs, lesion_presence, batch_size=config.BATCH_SIZE, test_size=config.VALIDATION_SPLIT
+        pairs,
+        lesion_presence,
+        lesion_sizes=lesion_sizes_all,
+        batch_size=config.BATCH_SIZE,
+        test_size=config.VALIDATION_SPLIT,
     )
     train_pairs = list(train_pairs)
     val_pairs = list(val_pairs)
@@ -2302,7 +2410,18 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             lesion_sizes_all=lesion_sizes_all,
             out_dir=Path(config.CALLBACKS_DIR) / "diagnostics",
         )
-    case_sampler = SizeAwareCaseSampler(train_lesion_sizes, config) if len(train_pairs) else None
+    train_source_labels = np.asarray([_path_source(img_p) for img_p, _ in train_pairs], dtype=object) if len(train_pairs) else None
+    case_sampler = (
+        SizeAwareCaseSampler(train_lesion_sizes, config, source_labels=train_source_labels)
+        if len(train_pairs)
+        else None
+    )
+    if case_sampler is not None and bool(getattr(config, "SOURCE_BALANCED_SAMPLING", True)):
+        logger.info(
+            "Source-balanced sampling enabled across %d sources: %s",
+            len(np.unique(train_source_labels)),
+            {src: int(np.sum(train_source_labels == src)) for src in np.unique(train_source_labels)},
+        )
     patch_size = tuple(config.INPUT_SHAPE[:-1])
     batch_cases = max(config.BATCH_SIZE, 1)
     patch_sampling = str(getattr(config, "PATCH_SAMPLING_STRATEGY", "random")).strip().lower()

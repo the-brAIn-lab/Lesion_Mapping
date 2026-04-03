@@ -270,6 +270,9 @@ class DynamicTrainingConfig:
     OUTPUT_BIAS_INIT_PROB: float = 0.015
     USE_SYMMETRIC_FLIP_CHANNEL: bool = True
     CASE_SIZE_BINS: tuple[int, ...] = (100, 1000, 10000)
+    CASE_SIZE_GROUP_PROBS: tuple[float, ...] = (0.45, 0.25, 0.15, 0.10)
+    CASE_NONE_PROB: float = 0.05
+    USE_COMPONENT_AWARE_PATCH_SAMPLING: bool = False
     MSL_COMPONENT_THRESHOLDS: tuple[int, ...] = (100, 1000, 10000)
     USE_AUX_MSL_HEAD: bool = True
     USE_AUX_DBL_HEAD: bool = True
@@ -285,7 +288,8 @@ class DynamicTrainingConfig:
     EXTERNAL_VAL_MASKS_DIR: Optional[Path] = None
     EXTERNAL_VAL_MANIFEST: Optional[Path] = field(default_factory=lambda: _env_path("SMARTSOTA_EXTERNAL_VAL_MANIFEST"))
     GROUPED_CV_FOLDS: int = 3
-    USE_COMPONENT_SCORING_POSTPROC: bool = True
+    USE_BRAINMASK_POSTPROC: bool = False
+    USE_COMPONENT_SCORING_POSTPROC: bool = False
     COMPONENT_SCORE_TINY_MIN_MEAN: float = 0.22
     COMPONENT_SCORE_TINY_MIN_MAX: float = 0.40
     COMPONENT_SCORE_SMALL_MIN_MEAN: float = 0.16
@@ -313,6 +317,7 @@ class DynamicTrainingConfig:
     BATCH_LOG_EVERY_N_STEPS: int = 1
     VAL_DIAGNOSTICS_TOP_K: int = 5
     VAL_THRESHOLD_SWEEP: tuple[float, ...] = (0.30, 0.40, 0.50, 0.60, 0.70)
+    DIAGNOSTICS_COMPARE_POSTPROC: bool = True
 
     def __post_init__(self):
         if self.DATA_DIR is None:
@@ -376,6 +381,7 @@ class DynamicTrainingConfig:
             "OTSU_CLAMP",
             "VAL_THRESHOLD_SWEEP",
             "CASE_SIZE_BINS",
+            "CASE_SIZE_GROUP_PROBS",
             "MSL_COMPONENT_THRESHOLDS",
         )
         for key in tuple_fields:
@@ -1032,7 +1038,9 @@ def _write_training_summary(history, config: DynamicTrainingConfig) -> None:
     warnings = []
     train_d = _final_metric("dice_coefficient", "probs_dice_coefficient")
     val_d = _final_metric("val_dice_coefficient", "val_probs_dice_coefficient")
-    val_h = final_metrics.get("val_whole_dice_hard")
+    val_h = _final_metric("val_whole_dice_hard_raw", "val_whole_dice_hard_brainmask", "val_whole_dice_hard")
+    val_h_post = final_metrics.get("val_whole_dice_hard")
+    val_h_raw = final_metrics.get("val_whole_dice_hard_raw")
     if train_d is not None and val_d is not None and (train_d - val_d) > 0.15:
         warnings.append("Large train/val dice gap detected (>0.15): possible overfitting or split/domain mismatch.")
     if val_d is not None and val_d < 0.02:
@@ -1040,6 +1048,10 @@ def _write_training_summary(history, config: DynamicTrainingConfig) -> None:
     if val_h is not None and val_d is not None and val_h < 0.01 and val_d > 0.05:
         warnings.append(
             "Hard whole-brain dice is much lower than soft dice: check threshold calibration and predicted volume bias."
+        )
+    if val_h_post is not None and val_h_raw is not None and (val_h_post - val_h_raw) < -0.02:
+        warnings.append(
+            "Postprocessed hard Dice is materially below raw hard Dice (<-0.02): brain-mask clipping or component filtering is likely suppressing true positives."
         )
 
     batch_csv = callbacks_dir / "batch_metrics.csv"
@@ -1913,7 +1925,16 @@ class SizeAwareCaseSampler:
             w = np.clip(w, 1e-12, None)
             return self._apply_source_balance(w)
         edges = np.asarray(getattr(self.cfg, "CASE_SIZE_BINS", (100, 1000, 10000)), dtype=np.int64)
-        group_weights = np.asarray([1.0, 0.70, 0.35, 0.18], dtype=np.float64)
+        group_weights = np.asarray(
+            getattr(self.cfg, "CASE_SIZE_GROUP_PROBS", (0.45, 0.25, 0.15, 0.10)),
+            dtype=np.float64,
+        )
+        if group_weights.size != (len(edges) + 1):
+            fallback = np.asarray(getattr(self.cfg, "SIZE_BUCKET_PROBS", (0.45, 0.25, 0.15, 0.10, 0.05)), dtype=np.float64)
+            if fallback.size >= (len(edges) + 1):
+                group_weights = fallback[: len(edges) + 1]
+            else:
+                group_weights = np.asarray([1.0, 0.70, 0.35, 0.18], dtype=np.float64)
         bins = np.digitize(self.sizes, edges, right=False)
         w = np.zeros(self.N, dtype=np.float64)
         for b in range(len(group_weights)):
@@ -1923,7 +1944,10 @@ class SizeAwareCaseSampler:
             w[idx] = group_weights[b] / idx.size
         none_idx = np.where(self.sizes <= 0)[0]
         if none_idx.size:
-            w[none_idx] = 0.02 / none_idx.size
+            none_weight = float(getattr(self.cfg, "CASE_NONE_PROB", 0.05))
+            if none_weight <= 0.0:
+                none_weight = 0.02
+            w[none_idx] = none_weight / none_idx.size
         w = np.clip(w, 1e-12, None)
         return self._apply_source_balance(w)
 
@@ -1974,6 +1998,7 @@ def sample_patch_center(
     rng,
     component_records: list[dict[str, object]] | None = None,
     case_size_bins: tuple[int, ...] = (100, 1000, 10000),
+    use_component_aware_sampling: bool = False,
     hemisphere_axis: int | None = None,
     hemisphere_side: int | None = None,
 ):
@@ -2010,8 +2035,27 @@ def sample_patch_center(
         hemi_center = [Z // 2, Y // 2, X // 2]
 
     if rng.random() < p_fg and fg.size > 0:
-        chosen_component = None
-        if component_records:
+        if not use_component_aware_sampling or not component_records:
+            fg_mins = fg.min(axis=0)
+            fg_maxs = fg.max(axis=0)
+            fg_center = _np.round((fg_mins + fg_maxs) / 2.0).astype(_np.int64)
+            fg_span = _np.maximum(fg_maxs - fg_mins + 1, 1)
+            bbox_jitter = _np.minimum(_np.maximum(fg_span // 6, 2), 16)
+            if rng.random() < 0.7:
+                cz, cy, cx = fg_center
+                jitter = _np.asarray(
+                    [
+                        rng.integers(-int(bbox_jitter[0]), int(bbox_jitter[0]) + 1),
+                        rng.integers(-int(bbox_jitter[1]), int(bbox_jitter[1]) + 1),
+                        rng.integers(-int(bbox_jitter[2]), int(bbox_jitter[2]) + 1),
+                    ],
+                    dtype=_np.int64,
+                )
+            else:
+                cz, cy, cx = fg[rng.integers(len(fg))]
+                jitter = rng.integers(low=-4, high=5, size=3)
+        else:
+            chosen_component = None
             comp_candidates = component_records
             if use_hemi:
                 axis = int(hemisphere_axis)
@@ -2036,33 +2080,25 @@ def sample_patch_center(
             comp_weights = _np.asarray(comp_weights, dtype=_np.float64)
             comp_weights /= _np.clip(comp_weights.sum(), 1e-12, None)
             chosen_component = comp_candidates[int(rng.choice(len(comp_candidates), p=comp_weights))]
-        if chosen_component is not None:
             fg_mins = chosen_component["mins"]
             fg_maxs = chosen_component["maxs"]
             fg_center = chosen_component["centroid"]
-        else:
-            fg_mins = fg.min(axis=0)
-            fg_maxs = fg.max(axis=0)
-            fg_center = _np.round((fg_mins + fg_maxs) / 2.0).astype(_np.int64)
-        fg_span = _np.maximum(fg_maxs - fg_mins + 1, 1)
-        bbox_jitter = _np.minimum(_np.maximum(fg_span // 6, 2), 16)
-        if rng.random() < 0.8:
-            cz, cy, cx = fg_center
-            jitter = _np.asarray(
-                [
-                    rng.integers(-int(bbox_jitter[0]), int(bbox_jitter[0]) + 1),
-                    rng.integers(-int(bbox_jitter[1]), int(bbox_jitter[1]) + 1),
-                    rng.integers(-int(bbox_jitter[2]), int(bbox_jitter[2]) + 1),
-                ],
-                dtype=_np.int64,
-            )
-        elif chosen_component is not None:
-            coords = chosen_component["coords"]
-            cz, cy, cx = coords[rng.integers(len(coords))]
-            jitter = rng.integers(low=-3, high=4, size=3)
-        else:
-            cz, cy, cx = fg[rng.integers(len(fg))]
-            jitter = rng.integers(low=-4, high=5, size=3)
+            fg_span = _np.maximum(fg_maxs - fg_mins + 1, 1)
+            bbox_jitter = _np.minimum(_np.maximum(fg_span // 6, 2), 16)
+            if rng.random() < 0.8:
+                cz, cy, cx = fg_center
+                jitter = _np.asarray(
+                    [
+                        rng.integers(-int(bbox_jitter[0]), int(bbox_jitter[0]) + 1),
+                        rng.integers(-int(bbox_jitter[1]), int(bbox_jitter[1]) + 1),
+                        rng.integers(-int(bbox_jitter[2]), int(bbox_jitter[2]) + 1),
+                    ],
+                    dtype=_np.int64,
+                )
+            else:
+                coords = chosen_component["coords"]
+                cz, cy, cx = coords[rng.integers(len(coords))]
+                jitter = rng.integers(low=-3, high=4, size=3)
     elif bg.size > 0:
         cz, cy, cx = bg[rng.integers(len(bg))]
         jitter = rng.integers(low=-4, high=5, size=3)
@@ -2298,11 +2334,23 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
 
         case_soft = []
         case_hard = []
+        case_hard_brainmask = []
+        case_hard_raw = []
         source_soft: dict[str, list[float]] = {}
         source_hard: dict[str, list[float]] = {}
+        source_hard_brainmask: dict[str, list[float]] = {}
+        source_hard_raw: dict[str, list[float]] = {}
         lesion_recall_bins: dict[str, dict[str, float]] = {}
         threshold_case_scores: dict[float, list[float]] = {t: [] for t in self.threshold_sweep}
+        threshold_case_scores_brainmask: dict[float, list[float]] = {t: [] for t in self.threshold_sweep}
+        threshold_case_scores_raw: dict[float, list[float]] = {t: [] for t in self.threshold_sweep}
         case_rows: list[dict[str, object]] = []
+        pred_soft_true_ratio = []
+        pred_hard_true_ratio = []
+        pred_hard_brainmask_true_ratio = []
+        pred_hard_raw_true_ratio = []
+        brainmask_hard_delta = []
+        postproc_hard_delta = []
         inter_soft = pred_soft = true_sum = 0.0
         t0 = time.time()
 
@@ -2320,13 +2368,24 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
             probs = np.nan_to_num(probs, nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32, copy=False)
             probs = np.clip(probs, 0.0, 1.0)
             brain_mask = compute_brain_mask(x)
+            pred_hard_raw = (probs >= self.threshold).astype(np.float32, copy=False)
+            pred_hard_brainmask = apply_postprocessing(
+                probs,
+                threshold=self.threshold,
+                min_size=0,
+                closing=0,
+                use_component_scoring=False,
+                brain_mask=brain_mask,
+                clamp=self.cfg.OTSU_CLAMP,
+                min_prob=self.cfg.OTSU_MIN_PROB,
+            )
             pred_hard = apply_postprocessing(
                 probs,
                 threshold=self.threshold,
                 min_size=0,
                 closing=0,
                 use_component_scoring=bool(getattr(self.cfg, "USE_COMPONENT_SCORING_POSTPROC", False)),
-                brain_mask=brain_mask,
+                brain_mask=brain_mask if bool(getattr(self.cfg, "USE_BRAINMASK_POSTPROC", False)) else None,
                 clamp=self.cfg.OTSU_CLAMP,
                 min_prob=self.cfg.OTSU_MIN_PROB,
             )
@@ -2341,22 +2400,51 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
 
             case_soft_i = float((2.0 * inter + self._eps) / (pred + true + self._eps))
             case_soft.append(case_soft_i)
+            inter_hard_raw = float(np.sum(y * pred_hard_raw))
+            pred_hard_raw_sum = float(np.sum(pred_hard_raw))
+            case_hard_raw_i = float((2.0 * inter_hard_raw + self._eps) / (pred_hard_raw_sum + true + self._eps))
+            case_hard_raw.append(case_hard_raw_i)
+            inter_hard_brainmask = float(np.sum(y * pred_hard_brainmask))
+            pred_hard_brainmask_sum = float(np.sum(pred_hard_brainmask))
+            case_hard_brainmask_i = float(
+                (2.0 * inter_hard_brainmask + self._eps) / (pred_hard_brainmask_sum + true + self._eps)
+            )
+            case_hard_brainmask.append(case_hard_brainmask_i)
             inter_hard = float(np.sum(y * pred_hard))
             pred_hard_sum = float(np.sum(pred_hard))
             case_hard_i = float((2.0 * inter_hard + self._eps) / (pred_hard_sum + true + self._eps))
             case_hard.append(case_hard_i)
+            source_ratio_denom = max(true, 1.0)
+            pred_soft_true_ratio.append(float(pred / source_ratio_denom))
+            pred_hard_raw_true_ratio.append(float(pred_hard_raw_sum / source_ratio_denom))
+            pred_hard_brainmask_true_ratio.append(float(pred_hard_brainmask_sum / source_ratio_denom))
+            pred_hard_true_ratio.append(float(pred_hard_sum / source_ratio_denom))
+            brainmask_hard_delta.append(float(case_hard_brainmask_i - case_hard_raw_i))
+            postproc_hard_delta.append(float(case_hard_i - case_hard_raw_i))
 
             src_name = _path_source(img_p)
             source_soft.setdefault(src_name, []).append(case_soft_i)
             source_hard.setdefault(src_name, []).append(case_hard_i)
+            source_hard_brainmask.setdefault(src_name, []).append(case_hard_brainmask_i)
+            source_hard_raw.setdefault(src_name, []).append(case_hard_raw_i)
             row = {
                 "source": src_name,
                 "case_id": _path_case_id(img_p),
                 "soft_dice": case_soft_i,
                 "hard_dice": case_hard_i,
+                "hard_dice_brainmask": case_hard_brainmask_i,
+                "hard_dice_raw": case_hard_raw_i,
                 "true_voxels": int(true),
                 "pred_soft_voxels": float(pred),
                 "pred_hard_voxels": float(pred_hard_sum),
+                "pred_hard_brainmask_voxels": float(pred_hard_brainmask_sum),
+                "pred_hard_raw_voxels": float(pred_hard_raw_sum),
+                "brainmask_hard_delta": float(case_hard_brainmask_i - case_hard_raw_i),
+                "postproc_hard_delta": float(case_hard_i - case_hard_raw_i),
+                "pred_soft_to_true_ratio": float(pred / source_ratio_denom),
+                "pred_hard_to_true_ratio": float(pred_hard_sum / source_ratio_denom),
+                "pred_hard_brainmask_to_true_ratio": float(pred_hard_brainmask_sum / source_ratio_denom),
+                "pred_hard_raw_to_true_ratio": float(pred_hard_raw_sum / source_ratio_denom),
                 "tiny_component_hits": float(comp_recall.get("1_99", {}).get("hits", 0.0)),
                 "tiny_component_total": float(comp_recall.get("1_99", {}).get("components", 0.0)),
                 "image": str(img_p),
@@ -2367,13 +2455,36 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
                 bucket["components"] += float(vals.get("components", 0.0))
                 bucket["hits"] += float(vals.get("hits", 0.0))
             for thr in self.threshold_sweep:
+                pred_thr_raw = (probs >= float(thr)).astype(np.float32, copy=False)
+                inter_thr_raw = float(np.sum(y * pred_thr_raw))
+                pred_thr_raw_sum = float(np.sum(pred_thr_raw))
+                hard_thr_raw = float((2.0 * inter_thr_raw + self._eps) / (pred_thr_raw_sum + true + self._eps))
+                threshold_case_scores_raw[thr].append(hard_thr_raw)
+                row[f"hard_dice_raw_thr_{thr:.2f}"] = hard_thr_raw
+                pred_thr_brainmask = apply_postprocessing(
+                    probs,
+                    threshold=thr,
+                    min_size=0,
+                    closing=0,
+                    use_component_scoring=False,
+                    brain_mask=brain_mask,
+                    clamp=self.cfg.OTSU_CLAMP,
+                    min_prob=self.cfg.OTSU_MIN_PROB,
+                )
+                inter_thr_brainmask = float(np.sum(y * pred_thr_brainmask))
+                pred_thr_brainmask_sum = float(np.sum(pred_thr_brainmask))
+                hard_thr_brainmask = float(
+                    (2.0 * inter_thr_brainmask + self._eps) / (pred_thr_brainmask_sum + true + self._eps)
+                )
+                threshold_case_scores_brainmask[thr].append(hard_thr_brainmask)
+                row[f"hard_dice_brainmask_thr_{thr:.2f}"] = hard_thr_brainmask
                 pred_thr = apply_postprocessing(
                     probs,
                     threshold=thr,
                     min_size=0,
                     closing=0,
                     use_component_scoring=bool(getattr(self.cfg, "USE_COMPONENT_SCORING_POSTPROC", False)),
-                    brain_mask=brain_mask,
+                    brain_mask=brain_mask if bool(getattr(self.cfg, "USE_BRAINMASK_POSTPROC", False)) else None,
                     clamp=self.cfg.OTSU_CLAMP,
                     min_prob=self.cfg.OTSU_MIN_PROB,
                 )
@@ -2390,28 +2501,73 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         val_soft_macro = float(np.mean(case_soft)) if case_soft else 0.0
         val_soft_micro = float((2.0 * inter_soft + self._eps) / (pred_soft + true_sum + self._eps))
         val_hard_macro = float(np.mean(case_hard)) if case_hard else 0.0
+        val_hard_macro_brainmask = float(np.mean(case_hard_brainmask)) if case_hard_brainmask else 0.0
+        val_hard_macro_raw = float(np.mean(case_hard_raw)) if case_hard_raw else 0.0
 
         logs["val_dice_coefficient"] = val_soft_macro
         logs["val_whole_dice_micro"] = val_soft_micro
         logs["val_whole_dice_hard"] = val_hard_macro
+        logs["val_whole_dice_hard_brainmask"] = val_hard_macro_brainmask
+        logs["val_whole_dice_hard_raw"] = val_hard_macro_raw
+        logs["val_whole_dice_hard_brainmask_delta"] = float(val_hard_macro_brainmask - val_hard_macro_raw)
+        logs["val_whole_dice_hard_postproc_delta"] = float(val_hard_macro - val_hard_macro_raw)
         hard_sweep_macro = {
             thr: float(np.mean(scores)) if scores else 0.0
             for thr, scores in threshold_case_scores.items()
         }
+        hard_sweep_macro_brainmask = {
+            thr: float(np.mean(scores)) if scores else 0.0
+            for thr, scores in threshold_case_scores_brainmask.items()
+        }
+        hard_sweep_macro_raw = {
+            thr: float(np.mean(scores)) if scores else 0.0
+            for thr, scores in threshold_case_scores_raw.items()
+        }
         for thr, val in hard_sweep_macro.items():
             key = f"val_whole_dice_hard_thr_{thr:.2f}".replace(".", "p")
             logs[key] = val
+        for thr, val in hard_sweep_macro_raw.items():
+            key = f"val_whole_dice_hard_raw_thr_{thr:.2f}".replace(".", "p")
+            logs[key] = val
+        for thr, val in hard_sweep_macro_brainmask.items():
+            key = f"val_whole_dice_hard_brainmask_thr_{thr:.2f}".replace(".", "p")
+            logs[key] = val
+        if hard_sweep_macro:
+            best_thr, best_thr_val = max(hard_sweep_macro.items(), key=lambda kv: kv[1])
+            logs["val_whole_dice_hard_best_thr"] = float(best_thr)
+            logs["val_whole_dice_hard_best_thr_score"] = float(best_thr_val)
+        else:
+            best_thr, best_thr_val = self.threshold, val_hard_macro
+        if hard_sweep_macro_raw:
+            best_thr_raw, best_thr_raw_val = max(hard_sweep_macro_raw.items(), key=lambda kv: kv[1])
+            logs["val_whole_dice_hard_raw_best_thr"] = float(best_thr_raw)
+            logs["val_whole_dice_hard_raw_best_thr_score"] = float(best_thr_raw_val)
+        else:
+            best_thr_raw, best_thr_raw_val = self.threshold, val_hard_macro_raw
+        if hard_sweep_macro_brainmask:
+            best_thr_brainmask, best_thr_brainmask_val = max(hard_sweep_macro_brainmask.items(), key=lambda kv: kv[1])
+            logs["val_whole_dice_hard_brainmask_best_thr"] = float(best_thr_brainmask)
+            logs["val_whole_dice_hard_brainmask_best_thr_score"] = float(best_thr_brainmask_val)
+        else:
+            best_thr_brainmask, best_thr_brainmask_val = self.threshold, val_hard_macro_brainmask
 
         dt = time.time() - t0
         logger.info(
-            "Whole-brain val @epoch %d: soft_macro=%.5f soft_micro=%.5f hard_macro@thr%.2f=%.5f "
+            "Whole-brain val @epoch %d: soft_macro=%.5f soft_micro=%.5f hard_raw@thr%.2f=%.5f "
+            "hard_brainmask@thr%.2f=%.5f delta_brain=%.5f hard_post@thr%.2f=%.5f delta_post=%.5f "
             "(cases=%d, %.1fs)"
             % (
                 epoch,
                 val_soft_macro,
                 val_soft_micro,
                 self.threshold,
+                val_hard_macro_raw,
+                self.threshold,
+                val_hard_macro_brainmask,
+                val_hard_macro_brainmask - val_hard_macro_raw,
+                self.threshold,
                 val_hard_macro,
+                val_hard_macro - val_hard_macro_raw,
                 len(eval_pairs),
                 dt,
             )
@@ -2419,14 +2575,28 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         if case_soft:
             soft_arr = np.asarray(case_soft, dtype=np.float32)
             hard_arr = np.asarray(case_hard, dtype=np.float32)
+            hard_brainmask_arr = np.asarray(case_hard_brainmask, dtype=np.float32)
+            hard_raw_arr = np.asarray(case_hard_raw, dtype=np.float32)
             logger.info(
                 "Whole-brain val case stats: soft[min=%.5f p25=%.5f med=%.5f p75=%.5f max=%.5f] "
-                "hard[min=%.5f p25=%.5f med=%.5f p75=%.5f max=%.5f]",
+                "hard_raw[min=%.5f p25=%.5f med=%.5f p75=%.5f max=%.5f] "
+                "hard_brainmask[min=%.5f p25=%.5f med=%.5f p75=%.5f max=%.5f] "
+                "hard_post[min=%.5f p25=%.5f med=%.5f p75=%.5f max=%.5f]",
                 float(np.min(soft_arr)),
                 float(np.percentile(soft_arr, 25)),
                 float(np.median(soft_arr)),
                 float(np.percentile(soft_arr, 75)),
                 float(np.max(soft_arr)),
+                float(np.min(hard_raw_arr)),
+                float(np.percentile(hard_raw_arr, 25)),
+                float(np.median(hard_raw_arr)),
+                float(np.percentile(hard_raw_arr, 75)),
+                float(np.max(hard_raw_arr)),
+                float(np.min(hard_brainmask_arr)),
+                float(np.percentile(hard_brainmask_arr, 25)),
+                float(np.median(hard_brainmask_arr)),
+                float(np.percentile(hard_brainmask_arr, 75)),
+                float(np.max(hard_brainmask_arr)),
                 float(np.min(hard_arr)),
                 float(np.percentile(hard_arr, 25)),
                 float(np.median(hard_arr)),
@@ -2449,12 +2619,58 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         if source_soft:
             per_source_soft = {k: float(np.mean(v)) for k, v in sorted(source_soft.items())}
             per_source_hard = {k: float(np.mean(v)) for k, v in sorted(source_hard.items())}
+            per_source_hard_brainmask = {k: float(np.mean(v)) for k, v in sorted(source_hard_brainmask.items())}
+            per_source_hard_raw = {k: float(np.mean(v)) for k, v in sorted(source_hard_raw.items())}
             logger.info("Whole-brain val by source (soft_macro): %s", per_source_soft)
+            logger.info("Whole-brain val by source (hard_raw@thr%.2f): %s", self.threshold, per_source_hard_raw)
+            logger.info("Whole-brain val by source (hard_brainmask@thr%.2f): %s", self.threshold, per_source_hard_brainmask)
             logger.info("Whole-brain val by source (hard_macro@thr%.2f): %s", self.threshold, per_source_hard)
         if hard_sweep_macro:
             logger.info(
                 "Whole-brain val threshold sweep (hard_macro): %s",
                 {f"{k:.2f}": round(v, 5) for k, v in hard_sweep_macro.items()},
+            )
+            logger.info(
+                "Whole-brain val threshold sweep (hard_brainmask_macro): %s",
+                {f"{k:.2f}": round(v, 5) for k, v in hard_sweep_macro_brainmask.items()},
+            )
+            logger.info(
+                "Whole-brain val threshold sweep (hard_raw_macro): %s",
+                {f"{k:.2f}": round(v, 5) for k, v in hard_sweep_macro_raw.items()},
+            )
+            logger.info(
+                "Whole-brain best thresholds: raw=%.2f(%.5f) brainmask=%.2f(%.5f) post=%.2f(%.5f)",
+                float(best_thr_raw),
+                float(best_thr_raw_val),
+                float(best_thr_brainmask),
+                float(best_thr_brainmask_val),
+                float(best_thr),
+                float(best_thr_val),
+            )
+        if pred_soft_true_ratio:
+            logger.info(
+                "Whole-brain voxel ratios vs truth: soft[med=%.3f p90=%.3f] raw_hard[med=%.3f p90=%.3f] "
+                "brainmask_hard[med=%.3f p90=%.3f] post_hard[med=%.3f p90=%.3f]",
+                float(np.median(pred_soft_true_ratio)),
+                float(np.percentile(pred_soft_true_ratio, 90)),
+                float(np.median(pred_hard_raw_true_ratio)),
+                float(np.percentile(pred_hard_raw_true_ratio, 90)),
+                float(np.median(pred_hard_brainmask_true_ratio)),
+                float(np.percentile(pred_hard_brainmask_true_ratio, 90)),
+                float(np.median(pred_hard_true_ratio)),
+                float(np.percentile(pred_hard_true_ratio, 90)),
+            )
+            logger.info(
+                "Whole-brain brain-mask hard-dice delta: mean=%.5f med=%.5f p75=%.5f",
+                float(np.mean(brainmask_hard_delta)),
+                float(np.median(brainmask_hard_delta)),
+                float(np.percentile(brainmask_hard_delta, 75)),
+            )
+            logger.info(
+                "Whole-brain postprocessing hard-dice delta: mean=%.5f med=%.5f p75=%.5f",
+                float(np.mean(postproc_hard_delta)),
+                float(np.median(postproc_hard_delta)),
+                float(np.percentile(postproc_hard_delta, 75)),
             )
 
         if case_rows:
@@ -2485,15 +2701,29 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
                 "case_id",
                 "soft_dice",
                 "hard_dice",
+                "hard_dice_brainmask",
+                "hard_dice_raw",
                 "true_voxels",
                 "pred_soft_voxels",
                 "pred_hard_voxels",
+                "pred_hard_brainmask_voxels",
+                "pred_hard_raw_voxels",
+                "brainmask_hard_delta",
+                "postproc_hard_delta",
+                "pred_soft_to_true_ratio",
+                "pred_hard_to_true_ratio",
+                "pred_hard_brainmask_to_true_ratio",
+                "pred_hard_raw_to_true_ratio",
                 "image",
                 "mask",
                 "tiny_component_hits",
                 "tiny_component_total",
             ]
-            thr_fields = [f"hard_dice_thr_{thr:.2f}" for thr in self.threshold_sweep]
+            thr_fields = []
+            for thr in self.threshold_sweep:
+                thr_fields.append(f"hard_dice_thr_{thr:.2f}")
+                thr_fields.append(f"hard_dice_brainmask_thr_{thr:.2f}")
+                thr_fields.append(f"hard_dice_raw_thr_{thr:.2f}")
             with open(csv_path, "w", newline="", encoding="utf-8") as fh:
                 writer = csv.DictWriter(fh, fieldnames=base_fields + thr_fields)
                 writer.writeheader()
@@ -2505,10 +2735,34 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
                 "n_cases": int(len(case_rows)),
                 "val_soft_macro": float(val_soft_macro),
                 "val_soft_micro": float(val_soft_micro),
+                "val_hard_macro_brainmask": float(val_hard_macro_brainmask),
+                "val_hard_macro_raw": float(val_hard_macro_raw),
                 "val_hard_macro": float(val_hard_macro),
+                "val_hard_macro_brainmask_delta": float(val_hard_macro_brainmask - val_hard_macro_raw),
+                "val_hard_macro_postproc_delta": float(val_hard_macro - val_hard_macro_raw),
                 "hard_sweep_macro": {f"{k:.2f}": float(v) for k, v in hard_sweep_macro.items()},
+                "hard_sweep_macro_brainmask": {f"{k:.2f}": float(v) for k, v in hard_sweep_macro_brainmask.items()},
+                "hard_sweep_macro_raw": {f"{k:.2f}": float(v) for k, v in hard_sweep_macro_raw.items()},
+                "best_threshold_by_hard_macro": float(best_thr),
+                "best_threshold_hard_macro": float(best_thr_val),
+                "best_threshold_by_hard_macro_brainmask": float(best_thr_brainmask),
+                "best_threshold_hard_macro_brainmask": float(best_thr_brainmask_val),
+                "best_threshold_by_hard_macro_raw": float(best_thr_raw),
+                "best_threshold_hard_macro_raw": float(best_thr_raw_val),
                 "source_soft_macro": {k: float(np.mean(v)) for k, v in sorted(source_soft.items())},
+                "source_hard_macro_brainmask": {k: float(np.mean(v)) for k, v in sorted(source_hard_brainmask.items())},
+                "source_hard_macro_raw": {k: float(np.mean(v)) for k, v in sorted(source_hard_raw.items())},
                 "source_hard_macro": {k: float(np.mean(v)) for k, v in sorted(source_hard.items())},
+                "pred_true_ratio_summary": {
+                    "soft_median": float(np.median(pred_soft_true_ratio)) if pred_soft_true_ratio else 0.0,
+                    "soft_p90": float(np.percentile(pred_soft_true_ratio, 90)) if pred_soft_true_ratio else 0.0,
+                    "hard_raw_median": float(np.median(pred_hard_raw_true_ratio)) if pred_hard_raw_true_ratio else 0.0,
+                    "hard_raw_p90": float(np.percentile(pred_hard_raw_true_ratio, 90)) if pred_hard_raw_true_ratio else 0.0,
+                    "hard_brainmask_median": float(np.median(pred_hard_brainmask_true_ratio)) if pred_hard_brainmask_true_ratio else 0.0,
+                    "hard_brainmask_p90": float(np.percentile(pred_hard_brainmask_true_ratio, 90)) if pred_hard_brainmask_true_ratio else 0.0,
+                    "hard_post_median": float(np.median(pred_hard_true_ratio)) if pred_hard_true_ratio else 0.0,
+                    "hard_post_p90": float(np.percentile(pred_hard_true_ratio, 90)) if pred_hard_true_ratio else 0.0,
+                },
                 "lesion_component_recall": {
                     grp: {
                         "components": float(vals["components"]),
@@ -2877,12 +3131,20 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     logger.info(f"🔧 Config: {config.model_path.name}")
     log_memory_usage("start")
     logger.info(
-        "Small-lesion trainer enabled: flip_channel=%s aux_msl=%s aux_dbl=%s topk=%.2f lesion_insertion=%.2f",
+        "Small-lesion trainer enabled: flip_channel=%s aux_msl=%s aux_dbl=%s topk=%.2f "
+        "lesion_insertion=%.2f component_patch_sampling=%s brainmask_postproc=%s component_postproc=%s "
+        "case_group_probs=%s case_none_prob=%.3f patch_fg_probs=%s",
         bool(getattr(config, "USE_SYMMETRIC_FLIP_CHANNEL", False)),
         bool(getattr(config, "USE_AUX_MSL_HEAD", False)),
         bool(getattr(config, "USE_AUX_DBL_HEAD", False)),
         float(getattr(config, "TOPK_VOXEL_FRACTION", 0.0)),
         float(getattr(config, "LESION_INSERTION_PROB", 0.0)),
+        bool(getattr(config, "USE_COMPONENT_AWARE_PATCH_SAMPLING", False)),
+        bool(getattr(config, "USE_BRAINMASK_POSTPROC", False)),
+        bool(getattr(config, "USE_COMPONENT_SCORING_POSTPROC", False)),
+        tuple(getattr(config, "CASE_SIZE_GROUP_PROBS", (0.45, 0.25, 0.15, 0.10))),
+        float(getattr(config, "CASE_NONE_PROB", 0.05)),
+        tuple(getattr(config, "PATCH_FG_PROB_BY_BIN", ())),
     )
 
     if getattr(config, "INPUT_SHAPE", None) in (None, (), []):
@@ -3151,7 +3413,11 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         patches_per_case = max(patches_per_case, 2)
     batch_patches = batch_cases * patches_per_case
     rng = np.random.default_rng(config.RNG_SEED)
-    lesion_bank = build_small_lesion_bank(train_pairs, config, target_shape=case_target_shape)
+    lesion_bank = (
+        build_small_lesion_bank(train_pairs, config, target_shape=case_target_shape)
+        if float(getattr(config, "LESION_INSERTION_PROB", 0.0)) > 0.0
+        else []
+    )
 
     def training_batch_generator():
         if not train_pairs:
@@ -3186,6 +3452,7 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                         rng,
                         component_records=component_records,
                         case_size_bins=tuple(getattr(config, "CASE_SIZE_BINS", (100, 1000, 10000))),
+                        use_component_aware_sampling=bool(getattr(config, "USE_COMPONENT_AWARE_PATCH_SAMPLING", False)),
                         hemisphere_axis=hemisphere_axis if hemisphere_mode else None,
                         hemisphere_side=hemisphere_side,
                     )
@@ -3265,8 +3532,9 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         NvmlGpuMemLogger = None
         logger.warning("NVMLMemoryLogger not available; GPU telemetry callback disabled.")
 
-    monitor_metric = "val_dice_coefficient" if use_whole_brain_val else "val_loss"
+    monitor_metric = "val_whole_dice_hard_raw" if use_whole_brain_val else "val_loss"
     monitor_mode = "max" if use_whole_brain_val else "min"
+    logger.info("Checkpoint monitor: %s (%s)", monitor_metric, monitor_mode)
     checkpoint_cb = ModelCheckpoint(
         filepath=str(config.checkpoint_path),
         monitor=monitor_metric,
@@ -3618,6 +3886,7 @@ def run_threshold_sweeps(
         x = _load_and_preprocess_image(str(img_p), volume_target_shape)
         y_true = _load_and_preprocess_mask(str(msk_p), volume_target_shape)
         brain_mask = compute_brain_mask(x)
+        active_brain_mask = brain_mask if bool(getattr(cfg, "USE_BRAINMASK_POSTPROC", False)) else None
         probs = gaussian_tta_predict(
             model,
             x,
@@ -3638,7 +3907,7 @@ def run_threshold_sweeps(
                             min_size=min_sz,
                             closing=closing,
                             use_component_scoring=bool(use_components),
-                            brain_mask=brain_mask,
+                            brain_mask=active_brain_mask,
                             clamp=cfg.OTSU_CLAMP,
                             min_prob=cfg.OTSU_MIN_PROB,
                         )
@@ -3655,7 +3924,7 @@ def run_threshold_sweeps(
                             min_size=min_sz,
                             closing=closing,
                             use_component_scoring=bool(use_components),
-                            brain_mask=brain_mask,
+                            brain_mask=active_brain_mask,
                             clamp=cfg.OTSU_CLAMP,
                             min_prob=cfg.OTSU_MIN_PROB,
                         )
@@ -3671,7 +3940,7 @@ def run_threshold_sweeps(
                     closing=0,
                     hysteresis=(t_low, t_high),
                     use_component_scoring=bool(use_components),
-                    brain_mask=brain_mask,
+                    brain_mask=active_brain_mask,
                     clamp=cfg.OTSU_CLAMP,
                     min_prob=cfg.OTSU_MIN_PROB,
                 )

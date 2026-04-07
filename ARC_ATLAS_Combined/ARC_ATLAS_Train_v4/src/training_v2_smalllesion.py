@@ -272,12 +272,45 @@ class DynamicTrainingConfig:
     CASE_SIZE_BINS: tuple[int, ...] = (100, 1000, 10000)
     CASE_SIZE_GROUP_PROBS: tuple[float, ...] = (0.45, 0.25, 0.15, 0.10)
     CASE_NONE_PROB: float = 0.05
+    USE_SIZE_CURRICULUM: bool = True
+    CURRICULUM_EPOCHS: int = 12
+    CURRICULUM_START_CASE_GROUP_PROBS: tuple[float, ...] = (0.70, 0.20, 0.07, 0.03)
+    CURRICULUM_START_PATCH_FG_PROB_BY_BIN: tuple[float, ...] = (0.995, 0.99, 0.92, 0.78)
+    CURRICULUM_START_CASE_NONE_PROB: float = 0.02
+    USE_ATLAS_FINE_TUNE: bool = True
+    ATLAS_FINE_TUNE_START_EPOCH: int = 70
+    ATLAS_FINE_TUNE_SOURCE_PREFIXES: tuple[str, ...] = ("ATLAS",)
+    ATLAS_FINE_TUNE_SOURCE_MASS: float = 0.70
+    ATLAS_FINE_TUNE_CASE_GROUP_PROBS: tuple[float, ...] = (0.60, 0.25, 0.10, 0.05)
+    ATLAS_FINE_TUNE_PATCH_FG_PROB_BY_BIN: tuple[float, ...] = (0.995, 0.985, 0.94, 0.82)
+    ATLAS_FINE_TUNE_CASE_NONE_PROB: float = 0.02
     USE_COMPONENT_AWARE_PATCH_SAMPLING: bool = False
+    USE_TINY_COMPONENT_CENTERING: bool = True
+    TINY_COMPONENT_CENTER_PROB: float = 0.95
+    SMALL_COMPONENT_CENTER_PROB: float = 0.85
+    TINY_COMPONENT_MAX_JITTER: int = 2
+    SMALL_COMPONENT_MAX_JITTER: int = 4
     MSL_COMPONENT_THRESHOLDS: tuple[int, ...] = (100, 1000, 10000)
     USE_AUX_MSL_HEAD: bool = True
     USE_AUX_DBL_HEAD: bool = True
     AUX_MSL_WEIGHT: float = 0.15
     AUX_DBL_WEIGHT: float = 0.10
+    AUX_MSL_CLASS_WEIGHTS: tuple[float, ...] = (0.02, 4.0, 2.5, 1.0, 0.6)
+    AUX_DBL_CLASS_WEIGHTS: tuple[float, ...] = (0.02, 1.15, 1.0)
+    USE_CENTER_HEATMAP_HEAD: bool = False
+    USE_SIZE_HEAD: bool = False
+    CENTER_HEATMAP_SIGMA: float = 4.0
+    CENTER_POSITIVE_WEIGHT: float = 10.0
+    AUX_CENTER_WEIGHT: float = 0.12
+    AUX_SIZE_WEIGHT: float = 0.05
+    SIZE_HEAD_CLASS_WEIGHTS: tuple[float, ...] = (0.02, 4.0, 2.5, 1.0, 0.6)
+    CENTER_TOPK_VALUES: tuple[int, ...] = (1, 3, 5, 10)
+    CENTER_MATCH_RADIUS: float = 6.0
+    CENTER_NMS_RADIUS: int = 6
+    CENTER_MIN_CONFIDENCE: float = 0.01
+    CENTER_HEAD_BIAS_INIT_PROB: float = 0.01
+    CENTER_LOSS_GAMMA: float = 2.0
+    CENTER_LOSS_BETA: float = 4.0
     TOPK_VOXEL_FRACTION: float = 0.10
     TOPK_WEIGHT: float = 0.20
     LESION_INSERTION_PROB: float = 0.20
@@ -343,6 +376,14 @@ class DynamicTrainingConfig:
         self.OUTPUT_BIAS_INIT_PROB = float(np.clip(self.OUTPUT_BIAS_INIT_PROB, 1e-5, 1.0 - 1e-5))
         self.TOPK_VOXEL_FRACTION = float(np.clip(self.TOPK_VOXEL_FRACTION, 0.0, 1.0))
         self.GROUPED_CV_FOLDS = max(2, int(self.GROUPED_CV_FOLDS))
+        center_topks = [max(1, int(v)) for v in (self.CENTER_TOPK_VALUES or ())]
+        self.CENTER_TOPK_VALUES = tuple(sorted(set(center_topks))) if center_topks else (1, 3, 5, 10)
+        self.CENTER_HEATMAP_SIGMA = max(0.5, float(self.CENTER_HEATMAP_SIGMA))
+        self.CENTER_MATCH_RADIUS = max(0.0, float(self.CENTER_MATCH_RADIUS))
+        self.CENTER_NMS_RADIUS = max(1, int(self.CENTER_NMS_RADIUS))
+        self.CENTER_MIN_CONFIDENCE = float(np.clip(self.CENTER_MIN_CONFIDENCE, 0.0, 1.0))
+        self.CENTER_HEAD_BIAS_INIT_PROB = float(np.clip(self.CENTER_HEAD_BIAS_INIT_PROB, 1e-5, 1.0 - 1e-5))
+        self.CENTER_POSITIVE_WEIGHT = max(1.0, float(self.CENTER_POSITIVE_WEIGHT))
         if self.INPUT_SHAPE is not None:
             spatial = tuple(int(v) for v in self.INPUT_SHAPE[:-1])
             self.INPUT_SHAPE = spatial + (self.input_channels,)
@@ -382,7 +423,16 @@ class DynamicTrainingConfig:
             "VAL_THRESHOLD_SWEEP",
             "CASE_SIZE_BINS",
             "CASE_SIZE_GROUP_PROBS",
+            "CURRICULUM_START_CASE_GROUP_PROBS",
+            "CURRICULUM_START_PATCH_FG_PROB_BY_BIN",
+            "ATLAS_FINE_TUNE_SOURCE_PREFIXES",
+            "ATLAS_FINE_TUNE_CASE_GROUP_PROBS",
+            "ATLAS_FINE_TUNE_PATCH_FG_PROB_BY_BIN",
             "MSL_COMPONENT_THRESHOLDS",
+            "AUX_MSL_CLASS_WEIGHTS",
+            "AUX_DBL_CLASS_WEIGHTS",
+            "SIZE_HEAD_CLASS_WEIGHTS",
+            "CENTER_TOPK_VALUES",
         )
         for key in tuple_fields:
             if payload.get(key) is not None:
@@ -590,6 +640,8 @@ class SAM2Attention(layers.Layer):
 def build_dynamic_model(config: DynamicTrainingConfig) -> tf.keras.Model:
     prior = float(np.clip(getattr(config, "OUTPUT_BIAS_INIT_PROB", 0.015), 1e-5, 1.0 - 1e-5))
     prior_bias = float(np.log(prior / (1.0 - prior)))
+    center_prior = float(np.clip(getattr(config, "CENTER_HEAD_BIAS_INIT_PROB", 0.01), 1e-5, 1.0 - 1e-5))
+    center_prior_bias = float(np.log(center_prior / (1.0 - center_prior)))
     inputs = tf.keras.Input(shape=config.INPUT_SHAPE)  # (D,H,W,1)
 
     x = inputs
@@ -625,6 +677,21 @@ def build_dynamic_model(config: DynamicTrainingConfig) -> tf.keras.Model:
         name="probs",
     )(x)
     outputs: dict[str, tf.Tensor] = {"probs": probs}
+    if bool(getattr(config, "USE_CENTER_HEATMAP_HEAD", False)):
+        outputs["center_heatmap"] = layers.Conv3D(
+            1,
+            kernel_size=1,
+            activation="sigmoid",
+            bias_initializer=tf.keras.initializers.Constant(center_prior_bias),
+            name="center_heatmap",
+        )(x)
+    if bool(getattr(config, "USE_SIZE_HEAD", False)):
+        outputs["size_head"] = layers.Conv3D(
+            5,
+            kernel_size=1,
+            activation="softmax",
+            name="size_head",
+        )(x)
     if bool(getattr(config, "USE_AUX_MSL_HEAD", True)):
         outputs["msl_head"] = layers.Conv3D(
             5,
@@ -644,15 +711,23 @@ def build_dynamic_model(config: DynamicTrainingConfig) -> tf.keras.Model:
     return tf.keras.Model(inputs=inputs, outputs=outputs, name="SmartSOTA_SmallLesion")
 
 
-def _binary_output_from_prediction(pred):
+def _prediction_output(pred, model: tf.keras.Model | None = None, output_name: str = "probs"):
     if isinstance(pred, dict):
-        out = pred.get("probs")
+        out = pred.get(output_name)
         if out is None:
             out = next(iter(pred.values()))
         return out
     if isinstance(pred, (list, tuple)):
+        if model is not None:
+            names = list(getattr(model, "output_names", []) or [])
+            if output_name in names:
+                return pred[names.index(output_name)]
         return pred[0]
     return pred
+
+
+def _binary_output_from_prediction(pred, model: tf.keras.Model | None = None):
+    return _prediction_output(pred, model=model, output_name="probs")
 
 
 def _make_input_channels(image: np.ndarray, cfg: DynamicTrainingConfig) -> np.ndarray:
@@ -1127,6 +1202,7 @@ def _write_training_summary(history, config: DynamicTrainingConfig) -> None:
             "training_log_csv": str(callbacks_dir / "training_log.csv"),
             "batch_metrics_csv": str(batch_csv),
             "epoch_metrics_jsonl": str(callbacks_dir / "epoch_metrics.jsonl"),
+            "sampling_schedule_jsonl": str(callbacks_dir / "sampling_schedule.jsonl"),
             "whole_val_summary_jsonl": str(whole_summary_path),
             "split_summary_json": str(out_dir / "split_summary.json"),
             "split_cases_csv": str(out_dir / "split_cases.csv"),
@@ -1416,6 +1492,84 @@ class WeightedSparseCategoricalCrossentropy(tf.keras.losses.Loss):
         return tf.reduce_mean(tf.cast(sample_w, per_voxel.dtype) * per_voxel)
 
 
+@register_keras_serializable(package="custom")
+class WeightedBinaryCrossentropy(tf.keras.losses.Loss):
+    def __init__(self, positive_weight=1.0, negative_weight=1.0, name="weighted_bce"):
+        super().__init__(name=name)
+        self.positive_weight = float(positive_weight)
+        self.negative_weight = float(negative_weight)
+
+    def get_config(self):
+        return {"positive_weight": self.positive_weight, "negative_weight": self.negative_weight}
+
+    def call(self, y_true, y_pred):
+        y_true = tf.cast(y_true, tf.float32)
+        y_pred = tf.cast(tf.clip_by_value(y_pred, 1e-6, 1.0 - 1e-6), tf.float32)
+        per_voxel = tf.keras.losses.binary_crossentropy(y_true, y_pred)
+        weights = tf.where(y_true > 0.5, self.positive_weight, self.negative_weight)
+        if weights.shape.rank is not None and per_voxel.shape.rank is not None and weights.shape.rank == per_voxel.shape.rank + 1:
+            weights = tf.squeeze(weights, axis=-1)
+        else:
+            while weights.shape.rank is not None and per_voxel.shape.rank is not None and weights.shape.rank > per_voxel.shape.rank:
+                weights = tf.squeeze(weights, axis=-1)
+        return tf.reduce_mean(tf.cast(weights, per_voxel.dtype) * per_voxel)
+
+
+@register_keras_serializable(package="custom")
+class GaussianHeatmapFocalLoss(tf.keras.losses.Loss):
+    """CenterNet-style focal loss for sparse heatmap targets with Gaussian falloff."""
+
+    def __init__(self, gamma=2.0, beta=4.0, name="gaussian_heatmap_focal_loss"):
+        super().__init__(name=name)
+        self.gamma = float(gamma)
+        self.beta = float(beta)
+
+    def get_config(self):
+        return {"gamma": self.gamma, "beta": self.beta}
+
+    def call(self, y_true, y_pred):
+        y_true = tf.cast(y_true, tf.float32)
+        y_pred = tf.cast(tf.clip_by_value(y_pred, 1e-6, 1.0 - 1e-6), tf.float32)
+
+        pos_inds = tf.cast(tf.equal(y_true, 1.0), tf.float32)
+        neg_inds = tf.cast(tf.less(y_true, 1.0), tf.float32)
+        neg_weights = tf.pow(1.0 - y_true, self.beta)
+
+        pos_loss = -tf.math.log(y_pred) * tf.pow(1.0 - y_pred, self.gamma) * pos_inds
+        neg_loss = -tf.math.log(1.0 - y_pred) * tf.pow(y_pred, self.gamma) * neg_weights * neg_inds
+
+        num_pos = tf.reduce_sum(pos_inds)
+        pos_loss = tf.reduce_sum(pos_loss)
+        neg_loss = tf.reduce_sum(neg_loss)
+        return tf.where(num_pos > 0.0, (pos_loss + neg_loss) / num_pos, neg_loss)
+
+
+def _size_class_index(size: int, thresholds: tuple[int, ...]) -> int:
+    size = int(size)
+    if size <= 0:
+        return 0
+    if size < int(thresholds[0]):
+        return 1
+    if size < int(thresholds[1]):
+        return 2
+    if size < int(thresholds[2]):
+        return 3
+    return 4
+
+
+def _component_peak_coord(component_mask: np.ndarray) -> tuple[int, int, int] | None:
+    component_mask = np.asarray(component_mask > 0, dtype=np.uint8)
+    if not np.any(component_mask):
+        return None
+    dist = distance_transform_edt(component_mask)
+    if np.any(dist > 0):
+        return tuple(int(v) for v in np.unravel_index(int(np.argmax(dist)), dist.shape))
+    coords = np.argwhere(component_mask > 0)
+    if coords.size == 0:
+        return None
+    return tuple(int(v) for v in coords[len(coords) // 2])
+
+
 def build_msl_labels(mask: np.ndarray, thresholds: tuple[int, ...]) -> np.ndarray:
     mask_bin = np.asarray(mask > 0.5, dtype=np.uint8)
     labels = np.zeros(mask_bin.shape, dtype=np.int32)
@@ -1450,9 +1604,61 @@ def build_dbl_labels(mask: np.ndarray, boundary_distance: float = np.sqrt(4.5)) 
     return labels
 
 
+def build_center_heatmap(mask: np.ndarray, sigma: float = 2.0) -> np.ndarray:
+    mask_bin = np.asarray(mask > 0.5, dtype=np.uint8)
+    heatmap = np.zeros(mask_bin.shape, dtype=np.float32)
+    if not np.any(mask_bin):
+        return heatmap[..., np.newaxis]
+    lbl, n = label(mask_bin, structure=generate_binary_structure(3, 1))
+    for comp_id in range(1, n + 1):
+        peak = _component_peak_coord(lbl == comp_id)
+        if peak is not None:
+            heatmap[peak] = 1.0
+    if float(sigma) > 0.0 and np.any(heatmap > 0):
+        heatmap = gaussian_filter(heatmap, sigma=float(sigma), mode="constant")
+    mx = float(np.max(heatmap)) if heatmap.size else 0.0
+    if mx > 0.0:
+        heatmap /= mx
+    return heatmap[..., np.newaxis].astype(np.float32, copy=False)
+
+
+def build_size_head_labels(mask: np.ndarray, thresholds: tuple[int, ...]) -> np.ndarray:
+    return build_msl_labels(mask, thresholds)
+
+
+def extract_component_seed_records(mask: np.ndarray, case_size_bins=(100, 1000, 10000)) -> list[dict[str, object]]:
+    mask_bin = np.asarray(mask > 0.5, dtype=np.uint8)
+    if not np.any(mask_bin):
+        return []
+    lbl, n = label(mask_bin, structure=generate_binary_structure(3, 1))
+    counts = np.bincount(lbl.ravel())
+    thresholds = tuple(int(v) for v in case_size_bins)
+    records = []
+    for comp_id in range(1, n + 1):
+        size = int(counts[comp_id]) if comp_id < counts.size else 0
+        if size <= 0:
+            continue
+        peak = _component_peak_coord(lbl == comp_id)
+        if peak is None:
+            continue
+        records.append(
+            {
+                "coord": tuple(int(v) for v in peak),
+                "size": size,
+                "group": _case_size_group(size, thresholds),
+                "class_index": _size_class_index(size, thresholds),
+            }
+        )
+    return records
+
+
 def _format_training_targets(mask: np.ndarray, cfg: DynamicTrainingConfig):
     y_main = np.asarray(mask > 0.5, dtype=np.float32)[..., np.newaxis]
     targets: dict[str, np.ndarray] = {"probs": y_main}
+    if bool(getattr(cfg, "USE_CENTER_HEATMAP_HEAD", False)):
+        targets["center_heatmap"] = build_center_heatmap(mask, sigma=float(getattr(cfg, "CENTER_HEATMAP_SIGMA", 2.0)))
+    if bool(getattr(cfg, "USE_SIZE_HEAD", False)):
+        targets["size_head"] = build_size_head_labels(mask, tuple(getattr(cfg, "CASE_SIZE_BINS", (100, 1000, 10000))))
     if bool(getattr(cfg, "USE_AUX_MSL_HEAD", True)):
         targets["msl_head"] = build_msl_labels(mask, tuple(getattr(cfg, "MSL_COMPONENT_THRESHOLDS", (100, 1000, 10000))))
     if bool(getattr(cfg, "USE_AUX_DBL_HEAD", True)):
@@ -1889,7 +2095,10 @@ class SizeAwareCaseSampler:
         self.sizes = lesion_sizes.astype(np.int64)
         self.N = len(self.sizes)
         self.source_labels = None if source_labels is None else np.asarray(source_labels, dtype=object)
-        self.weights = self._init_weights()
+        self.source_mass_overrides: dict[str, float] | None = None
+        self.base_case_weights = self._compute_base_case_weights()
+        self.diff_multiplier = np.ones(self.N, dtype=np.float64) if self.N > 0 else np.empty(0, dtype=np.float64)
+        self.weights = self._compose_weights()
         self.patch_quota = np.zeros(self.N, dtype=np.int64)
 
     def _apply_source_balance(self, weights: np.ndarray) -> np.ndarray:
@@ -1903,27 +2112,41 @@ class SizeAwareCaseSampler:
             w = np.clip(w, 1e-12, None)
             return w / w.sum()
         unique_sources = np.unique(self.source_labels)
-        per_source_mass = 1.0 / max(len(unique_sources), 1)
+        mass_by_source = {}
+        if self.source_mass_overrides:
+            remaining_sources = [src for src in unique_sources if src not in self.source_mass_overrides]
+            override_mass = float(sum(max(0.0, float(v)) for v in self.source_mass_overrides.values()))
+            override_mass = min(max(override_mass, 0.0), 1.0)
+            remaining_mass = max(0.0, 1.0 - override_mass)
+            default_mass = remaining_mass / max(len(remaining_sources), 1) if remaining_sources else 0.0
+            for src in unique_sources:
+                mass_by_source[src] = max(0.0, float(self.source_mass_overrides.get(src, default_mass)))
+            total_mass = sum(mass_by_source.values())
+            if total_mass > 0:
+                for src in list(mass_by_source.keys()):
+                    mass_by_source[src] = mass_by_source[src] / total_mass
+        else:
+            per_source_mass = 1.0 / max(len(unique_sources), 1)
+            mass_by_source = {src: per_source_mass for src in unique_sources}
         out = np.zeros_like(w)
         for src in unique_sources:
             idx = np.where(self.source_labels == src)[0]
             if idx.size == 0:
                 continue
             local = np.clip(w[idx], 1e-12, None)
-            out[idx] = per_source_mass * (local / local.sum())
+            out[idx] = float(mass_by_source.get(src, 0.0)) * (local / local.sum())
         out = np.clip(out, 1e-12, None)
         return out / out.sum()
 
-    def _init_weights(self):
+    def _compute_base_case_weights(self):
         if not self.cfg.SIZE_AWARE_ENABLED or self.N == 0:
-            w = np.ones(self.N, dtype=np.float64)
-            return self._apply_source_balance(w)
+            return np.ones(self.N, dtype=np.float64)
         if self.cfg.SIZE_AWARE_MODE == "inverse":
             safe_sizes = np.where(self.sizes > 0, self.sizes, 1)
             w = 1.0 / np.power(safe_sizes + min(float(self.cfg.INV_VOL_EPS), 100.0), self.cfg.INV_VOL_ALPHA)
             w[self.sizes <= 0] *= 0.05
             w = np.clip(w, 1e-12, None)
-            return self._apply_source_balance(w)
+            return w
         edges = np.asarray(getattr(self.cfg, "CASE_SIZE_BINS", (100, 1000, 10000)), dtype=np.int64)
         group_weights = np.asarray(
             getattr(self.cfg, "CASE_SIZE_GROUP_PROBS", (0.45, 0.25, 0.15, 0.10)),
@@ -1949,7 +2172,25 @@ class SizeAwareCaseSampler:
                 none_weight = 0.02
             w[none_idx] = none_weight / none_idx.size
         w = np.clip(w, 1e-12, None)
-        return self._apply_source_balance(w)
+        return w
+
+    def _compose_weights(self):
+        if self.N == 0:
+            return np.empty(0, dtype=np.float64)
+        raw = np.clip(self.base_case_weights * self.diff_multiplier, 1e-12, None)
+        return self._apply_source_balance(raw)
+
+    def refresh_weights(self):
+        self.base_case_weights = self._compute_base_case_weights()
+        if self.diff_multiplier.shape != self.base_case_weights.shape:
+            self.diff_multiplier = np.ones_like(self.base_case_weights, dtype=np.float64)
+        self.weights = self._compose_weights()
+
+    def set_source_mass_overrides(self, overrides: dict[str, float] | None):
+        self.source_mass_overrides = None if not overrides else {
+            str(k): float(v) for k, v in overrides.items() if float(v) > 0.0
+        }
+        self.weights = self._compose_weights()
 
     def sample_indices(self, k: int) -> np.ndarray:
         if self.N == 0:
@@ -1981,11 +2222,12 @@ class SizeAwareCaseSampler:
         dice = np.clip(val_case_dice, 0.0, 1.0)
         badness = np.power(1.0 - dice, self.cfg.DIFF_BETA)
         badness = np.clip(badness, 1e-6, None)
-        w_new = (
-            self.cfg.DIFF_EMA_LAMBDA * self.weights
-            + (1.0 - self.cfg.DIFF_EMA_LAMBDA) * (badness / badness.sum())
+        badness /= np.clip(np.mean(badness), 1e-6, None)
+        self.diff_multiplier = (
+            self.cfg.DIFF_EMA_LAMBDA * self.diff_multiplier
+            + (1.0 - self.cfg.DIFF_EMA_LAMBDA) * badness
         )
-        self.weights = self._apply_source_balance(w_new).astype(np.float64)
+        self.weights = self._compose_weights().astype(np.float64)
 
 def bin_index(v, edges):
     import numpy as _np
@@ -1999,6 +2241,11 @@ def sample_patch_center(
     component_records: list[dict[str, object]] | None = None,
     case_size_bins: tuple[int, ...] = (100, 1000, 10000),
     use_component_aware_sampling: bool = False,
+    use_tiny_component_centering: bool = False,
+    tiny_component_center_prob: float = 0.95,
+    small_component_center_prob: float = 0.85,
+    tiny_component_max_jitter: int = 2,
+    small_component_max_jitter: int = 4,
     hemisphere_axis: int | None = None,
     hemisphere_side: int | None = None,
 ):
@@ -2035,7 +2282,52 @@ def sample_patch_center(
         hemi_center = [Z // 2, Y // 2, X // 2]
 
     if rng.random() < p_fg and fg.size > 0:
-        if not use_component_aware_sampling or not component_records:
+        chosen_component = None
+        comp_candidates = component_records
+        if component_records and (use_component_aware_sampling or use_tiny_component_centering):
+            if use_hemi:
+                axis = int(hemisphere_axis)
+                mid = dims[axis] // 2
+                if hemisphere_side == 0:
+                    comp_candidates = [c for c in component_records if int(c["centroid"][axis]) < mid]
+                else:
+                    comp_candidates = [c for c in component_records if int(c["centroid"][axis]) >= mid]
+                if not comp_candidates:
+                    comp_candidates = component_records
+
+            if use_tiny_component_centering:
+                small_limit = int(case_size_bins[1]) if len(case_size_bins) > 1 else int(case_size_bins[0])
+                preferred = [c for c in comp_candidates if int(c["size"]) < small_limit]
+                if preferred:
+                    comp_weights = np.asarray(
+                        [
+                            8.0 / np.sqrt(max(1.0, float(c["size"])))
+                            if int(c["size"]) < int(case_size_bins[0])
+                            else 3.0 / np.sqrt(max(1.0, float(c["size"])))
+                            for c in preferred
+                        ],
+                        dtype=np.float64,
+                    )
+                    comp_weights /= np.clip(comp_weights.sum(), 1e-12, None)
+                    chosen_component = preferred[int(rng.choice(len(preferred), p=comp_weights))]
+
+            if chosen_component is None and use_component_aware_sampling and comp_candidates:
+                comp_weights = []
+                for comp in comp_candidates:
+                    size = max(1, int(comp["size"]))
+                    weight = 1.0 / np.sqrt(float(size))
+                    if size < int(case_size_bins[0]):
+                        weight *= 6.0
+                    elif size < int(case_size_bins[1]):
+                        weight *= 3.0
+                    elif size < int(case_size_bins[2]):
+                        weight *= 1.5
+                    comp_weights.append(weight)
+                comp_weights = _np.asarray(comp_weights, dtype=_np.float64)
+                comp_weights /= _np.clip(comp_weights.sum(), 1e-12, None)
+                chosen_component = comp_candidates[int(rng.choice(len(comp_candidates), p=comp_weights))]
+
+        if chosen_component is None:
             fg_mins = fg.min(axis=0)
             fg_maxs = fg.max(axis=0)
             fg_center = _np.round((fg_mins + fg_maxs) / 2.0).astype(_np.int64)
@@ -2055,37 +2347,21 @@ def sample_patch_center(
                 cz, cy, cx = fg[rng.integers(len(fg))]
                 jitter = rng.integers(low=-4, high=5, size=3)
         else:
-            chosen_component = None
-            comp_candidates = component_records
-            if use_hemi:
-                axis = int(hemisphere_axis)
-                mid = dims[axis] // 2
-                if hemisphere_side == 0:
-                    comp_candidates = [c for c in component_records if int(c["centroid"][axis]) < mid]
-                else:
-                    comp_candidates = [c for c in component_records if int(c["centroid"][axis]) >= mid]
-                if not comp_candidates:
-                    comp_candidates = component_records
-            comp_weights = []
-            for comp in comp_candidates:
-                size = max(1, int(comp["size"]))
-                weight = 1.0 / np.sqrt(float(size))
-                if size < int(case_size_bins[0]):
-                    weight *= 6.0
-                elif size < int(case_size_bins[1]):
-                    weight *= 3.0
-                elif size < int(case_size_bins[2]):
-                    weight *= 1.5
-                comp_weights.append(weight)
-            comp_weights = _np.asarray(comp_weights, dtype=_np.float64)
-            comp_weights /= _np.clip(comp_weights.sum(), 1e-12, None)
-            chosen_component = comp_candidates[int(rng.choice(len(comp_candidates), p=comp_weights))]
             fg_mins = chosen_component["mins"]
             fg_maxs = chosen_component["maxs"]
             fg_center = chosen_component["centroid"]
             fg_span = _np.maximum(fg_maxs - fg_mins + 1, 1)
-            bbox_jitter = _np.minimum(_np.maximum(fg_span // 6, 2), 16)
-            if rng.random() < 0.8:
+            comp_size = int(chosen_component["size"])
+            if comp_size < int(case_size_bins[0]):
+                bbox_jitter = _np.full(3, max(0, int(tiny_component_max_jitter)), dtype=_np.int64)
+                center_prob = float(tiny_component_center_prob)
+            elif comp_size < int(case_size_bins[1]):
+                bbox_jitter = _np.full(3, max(0, int(small_component_max_jitter)), dtype=_np.int64)
+                center_prob = float(small_component_center_prob)
+            else:
+                bbox_jitter = _np.minimum(_np.maximum(fg_span // 6, 2), 16)
+                center_prob = 0.80
+            if rng.random() < center_prob:
                 cz, cy, cx = fg_center
                 jitter = _np.asarray(
                     [
@@ -2136,6 +2412,192 @@ class SizeAwareSamplerCallback(tf.keras.callbacks.Callback):
     def on_epoch_begin(self, epoch, logs=None):
         if self.sampler:
             self.sampler.start_epoch()
+
+
+class PrimaryOutputMetricAliasCallback(tf.keras.callbacks.Callback):
+    """Expose primary-output metric names even when auxiliary heads are enabled."""
+
+    @staticmethod
+    def _alias(logs):
+        if not logs:
+            return
+        if "dice_coefficient" not in logs and "probs_dice_coefficient" in logs:
+            logs["dice_coefficient"] = logs["probs_dice_coefficient"]
+        if "safe_binary_iou" not in logs and "probs_safe_binary_iou" in logs:
+            logs["safe_binary_iou"] = logs["probs_safe_binary_iou"]
+
+    def on_train_batch_end(self, batch, logs=None):
+        self._alias(logs)
+
+    def on_epoch_end(self, epoch, logs=None):
+        self._alias(logs)
+
+
+class SamplingPolicyController(tf.keras.callbacks.Callback):
+    """Drive curriculum and late ATLAS-focused fine-tuning for the case sampler."""
+
+    def __init__(self, sampler: SizeAwareCaseSampler | None, cfg: DynamicTrainingConfig, train_source_labels: np.ndarray | None):
+        super().__init__()
+        self.sampler = sampler
+        self.cfg = cfg
+        self.train_source_labels = np.asarray(train_source_labels, dtype=object) if train_source_labels is not None else np.asarray([], dtype=object)
+        self.out_jsonl = Path(cfg.CALLBACKS_DIR) / "sampling_schedule.jsonl"
+        self._last_signature = None
+        self.base_case_group_probs = tuple(float(v) for v in getattr(cfg, "CASE_SIZE_GROUP_PROBS", (0.45, 0.25, 0.15, 0.10)))
+        self.base_patch_fg_probs = tuple(float(v) for v in getattr(cfg, "PATCH_FG_PROB_BY_BIN", (0.98, 0.95, 0.85, 0.70)))
+        self.base_case_none_prob = float(getattr(cfg, "CASE_NONE_PROB", 0.05))
+
+    @staticmethod
+    def _align_tuple(values, length: int, fallback):
+        arr = np.asarray(values if values is not None else fallback, dtype=np.float64).reshape(-1)
+        fb = np.asarray(fallback, dtype=np.float64).reshape(-1)
+        if arr.size == length:
+            return arr
+        if arr.size == 0:
+            arr = fb.copy()
+        if arr.size > length:
+            return arr[:length]
+        fill = arr[-1] if arr.size > 0 else (fb[-1] if fb.size > 0 else 0.0)
+        return np.pad(arr, (0, length - arr.size), constant_values=float(fill))
+
+    def _interp(self, start, end, progress: float):
+        start_arr = np.asarray(start, dtype=np.float64)
+        end_arr = np.asarray(end, dtype=np.float64)
+        return ((1.0 - progress) * start_arr) + (progress * end_arr)
+
+    def _resolve_target_sources(self):
+        prefixes = tuple(str(x) for x in getattr(self.cfg, "ATLAS_FINE_TUNE_SOURCE_PREFIXES", ("ATLAS",)))
+        if self.train_source_labels.size == 0:
+            return []
+        unique_sources = sorted(set(self.train_source_labels.tolist()))
+        matched = [
+            src for src in unique_sources
+            if any(src.startswith(pref) or pref in src for pref in prefixes)
+        ]
+        return matched
+
+    def _compute_policy(self, epoch: int):
+        target_case_probs = self._align_tuple(
+            self.base_case_group_probs,
+            len(getattr(self.cfg, "CASE_SIZE_BINS", (100, 1000, 10000))) + 1,
+            self.base_case_group_probs,
+        )
+        target_patch_fg = self._align_tuple(
+            self.base_patch_fg_probs,
+            len(target_case_probs),
+            self.base_patch_fg_probs,
+        )
+        none_prob = float(self.base_case_none_prob)
+        phase = "steady"
+
+        if bool(getattr(self.cfg, "USE_SIZE_CURRICULUM", False)) and int(getattr(self.cfg, "CURRICULUM_EPOCHS", 0)) > 0:
+            start_case_probs = self._align_tuple(
+                getattr(self.cfg, "CURRICULUM_START_CASE_GROUP_PROBS", target_case_probs),
+                len(target_case_probs),
+                target_case_probs,
+            )
+            start_patch_fg = self._align_tuple(
+                getattr(self.cfg, "CURRICULUM_START_PATCH_FG_PROB_BY_BIN", target_patch_fg),
+                len(target_patch_fg),
+                target_patch_fg,
+            )
+            start_none_prob = float(getattr(self.cfg, "CURRICULUM_START_CASE_NONE_PROB", none_prob))
+            denom = max(1, int(getattr(self.cfg, "CURRICULUM_EPOCHS", 1)) - 1)
+            progress = min(1.0, float(epoch) / float(denom))
+            case_probs = self._interp(start_case_probs, target_case_probs, progress)
+            patch_fg = self._interp(start_patch_fg, target_patch_fg, progress)
+            none_prob = float((1.0 - progress) * start_none_prob + progress * none_prob)
+            phase = "curriculum" if progress < 1.0 else "steady"
+        else:
+            case_probs = target_case_probs
+            patch_fg = target_patch_fg
+
+        source_overrides = None
+        if bool(getattr(self.cfg, "USE_ATLAS_FINE_TUNE", False)) and epoch >= int(getattr(self.cfg, "ATLAS_FINE_TUNE_START_EPOCH", 1)):
+            target_sources = self._resolve_target_sources()
+            if target_sources:
+                atlas_mass = float(np.clip(getattr(self.cfg, "ATLAS_FINE_TUNE_SOURCE_MASS", 0.70), 0.0, 1.0))
+                per_source_mass = atlas_mass / max(len(target_sources), 1)
+                source_overrides = {src: per_source_mass for src in target_sources}
+                case_probs = self._align_tuple(
+                    getattr(self.cfg, "ATLAS_FINE_TUNE_CASE_GROUP_PROBS", case_probs),
+                    len(case_probs),
+                    case_probs,
+                )
+                patch_fg = self._align_tuple(
+                    getattr(self.cfg, "ATLAS_FINE_TUNE_PATCH_FG_PROB_BY_BIN", patch_fg),
+                    len(patch_fg),
+                    patch_fg,
+                )
+                none_prob = float(getattr(self.cfg, "ATLAS_FINE_TUNE_CASE_NONE_PROB", none_prob))
+                phase = "atlas_finetune"
+
+        return {
+            "phase": phase,
+            "case_group_probs": tuple(float(v) for v in case_probs.tolist()),
+            "patch_fg_probs": tuple(float(v) for v in patch_fg.tolist()),
+            "case_none_prob": float(none_prob),
+            "source_overrides": source_overrides,
+        }
+
+    def _weight_summary(self):
+        if self.sampler is None or self.sampler.N == 0:
+            return {}, {}
+        source_mass = {}
+        if self.sampler.source_labels is not None:
+            for src in np.unique(self.sampler.source_labels):
+                source_mass[str(src)] = float(np.sum(self.sampler.weights[self.sampler.source_labels == src]))
+        size_mass = {}
+        edges = np.asarray(getattr(self.cfg, "CASE_SIZE_BINS", (100, 1000, 10000)), dtype=np.int64)
+        labels = ["1_99", "100_999", "1000_9999", "10000_plus"]
+        bins = np.digitize(self.sampler.sizes, edges, right=False)
+        for idx, label_name in enumerate(labels[: int(np.max(bins)) + 1 if bins.size else len(labels)]):
+            size_mass[label_name] = float(np.sum(self.sampler.weights[bins == idx]))
+        return source_mass, size_mass
+
+    def on_train_begin(self, logs=None):
+        self.out_jsonl.parent.mkdir(parents=True, exist_ok=True)
+
+    def on_epoch_begin(self, epoch, logs=None):
+        if self.sampler is None:
+            return
+        policy = self._compute_policy(int(epoch))
+        self.cfg.CASE_SIZE_GROUP_PROBS = tuple(policy["case_group_probs"])
+        self.cfg.PATCH_FG_PROB_BY_BIN = tuple(policy["patch_fg_probs"])
+        self.cfg.CASE_NONE_PROB = float(policy["case_none_prob"])
+        self.sampler.set_source_mass_overrides(policy["source_overrides"])
+        self.sampler.refresh_weights()
+        source_mass, size_mass = self._weight_summary()
+        record = {
+            "epoch": int(epoch),
+            "phase": str(policy["phase"]),
+            "case_group_probs": list(self.cfg.CASE_SIZE_GROUP_PROBS),
+            "patch_fg_probs": list(self.cfg.PATCH_FG_PROB_BY_BIN),
+            "case_none_prob": float(self.cfg.CASE_NONE_PROB),
+            "source_overrides": policy["source_overrides"] or {},
+            "effective_source_mass": source_mass,
+            "effective_case_group_mass": size_mass,
+        }
+        with open(self.out_jsonl, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(record) + "\n")
+        signature = (
+            record["phase"],
+            tuple(round(v, 6) for v in record["case_group_probs"]),
+            tuple(round(v, 6) for v in record["patch_fg_probs"]),
+            round(record["case_none_prob"], 6),
+            tuple(sorted((record["source_overrides"] or {}).items())),
+        )
+        if signature != self._last_signature:
+            logger.info(
+                "Sampling policy @epoch %d: phase=%s case_group_probs=%s patch_fg_probs=%s case_none_prob=%.3f source_overrides=%s",
+                int(epoch),
+                record["phase"],
+                tuple(round(v, 3) for v in record["case_group_probs"]),
+                tuple(round(v, 3) for v in record["patch_fg_probs"]),
+                float(record["case_none_prob"]),
+                record["source_overrides"] or {},
+            )
+            self._last_signature = signature
 
 class DifficultyAwareCallback(tf.keras.callbacks.Callback):
     def __init__(self, sampler, cfg, train_pairs):
@@ -2291,6 +2753,120 @@ def component_recall_summary(y_true: np.ndarray, pred_mask: np.ndarray, case_siz
     return out
 
 
+def extract_topk_centers(
+    center_map: np.ndarray,
+    topk: int,
+    min_confidence: float | None = 0.10,
+    nms_radius: int = 6,
+) -> list[dict[str, object]]:
+    work = np.asarray(center_map, dtype=np.float32).copy()
+    work = np.nan_to_num(work, nan=0.0, posinf=0.0, neginf=0.0)
+    candidates: list[dict[str, object]] = []
+    topk = max(1, int(topk))
+    nms_radius = max(1, int(nms_radius))
+    min_conf = None if min_confidence is None else float(min_confidence)
+    for _ in range(topk):
+        flat_idx = int(np.argmax(work))
+        score = float(work.flat[flat_idx])
+        if min_conf is not None and score < min_conf:
+            break
+        coord = tuple(int(v) for v in np.unravel_index(flat_idx, work.shape))
+        candidates.append({"coord": coord, "score": score})
+        z, y, x = coord
+        z0, z1 = max(0, z - nms_radius), min(work.shape[0], z + nms_radius + 1)
+        y0, y1 = max(0, y - nms_radius), min(work.shape[1], y + nms_radius + 1)
+        x0, x1 = max(0, x - nms_radius), min(work.shape[2], x + nms_radius + 1)
+        work[z0:z1, y0:y1, x0:x1] = 0.0
+    return candidates
+
+
+def proposal_recall_summary(
+    y_true: np.ndarray,
+    center_map: np.ndarray,
+    topk_values=(1, 3, 5, 10),
+    case_size_bins=(100, 1000, 10000),
+    match_radius: float = 6.0,
+    min_confidence: float = 0.10,
+    nms_radius: int = 6,
+    size_map: np.ndarray | None = None,
+) -> dict[str, object]:
+    gt_records = extract_component_seed_records(y_true, case_size_bins=case_size_bins)
+    if not gt_records:
+        return {
+            "candidates": [],
+            "topk": {},
+            "best_candidate_score": 0.0,
+            "size_seed_acc": None,
+            "size_seed_acc_by_group": {},
+        }
+    topk_values = tuple(sorted(set(max(1, int(v)) for v in topk_values)))
+    candidates = extract_topk_centers(
+        center_map,
+        topk=max(topk_values),
+        min_confidence=min_confidence,
+        nms_radius=nms_radius,
+    )
+    out: dict[str, object] = {
+        "candidates": candidates,
+        "best_candidate_score": 0.0,
+        "candidates_above_threshold": 0,
+        "topk": {},
+        "size_seed_acc": None,
+        "size_seed_acc_by_group": {},
+    }
+    raw_candidates = extract_topk_centers(
+        center_map,
+        topk=max(topk_values),
+        min_confidence=None,
+        nms_radius=nms_radius,
+    )
+    out["best_candidate_score"] = float(raw_candidates[0]["score"]) if raw_candidates else 0.0
+    out["candidates_above_threshold"] = int(len(candidates))
+    for k in topk_values:
+        cand_subset = raw_candidates[:k]
+        hits = 0.0
+        best_distances = []
+        by_group: dict[str, dict[str, float]] = {}
+        for rec in gt_records:
+            grp = str(rec["group"])
+            bucket = by_group.setdefault(grp, {"components": 0.0, "hits": 0.0})
+            bucket["components"] += 1.0
+            best_dist = float("inf")
+            for cand in cand_subset:
+                dist = float(np.linalg.norm(np.subtract(cand["coord"], rec["coord"])))
+                if dist < best_dist:
+                    best_dist = dist
+            best_distances.append(best_dist)
+            hit = float(best_dist <= float(match_radius))
+            hits += hit
+            bucket["hits"] += hit
+        for grp, vals in by_group.items():
+            vals["recall"] = float(vals["hits"] / max(vals["components"], 1.0))
+        finite_best = [d for d in best_distances if np.isfinite(d)]
+        out["topk"][k] = {
+            "components": float(len(gt_records)),
+            "hits": float(hits),
+            "recall": float(hits / max(len(gt_records), 1)),
+            "mean_best_dist": float(np.mean(finite_best)) if finite_best else float("inf"),
+            "by_group": by_group,
+        }
+    if size_map is not None:
+        size_map = np.asarray(size_map)
+        size_hits = []
+        size_by_group: dict[str, list[float]] = {}
+        for rec in gt_records:
+            z, y, x = rec["coord"]
+            pred_cls = int(np.argmax(size_map[z, y, x]))
+            hit = float(pred_cls == int(rec["class_index"]))
+            size_hits.append(hit)
+            size_by_group.setdefault(str(rec["group"]), []).append(hit)
+        out["size_seed_acc"] = float(np.mean(size_hits)) if size_hits else None
+        out["size_seed_acc_by_group"] = {
+            grp: float(np.mean(vals)) for grp, vals in sorted(size_by_group.items()) if vals
+        }
+    return out
+
+
 class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
     """
     Compute validation Dice on full brain volumes by stitching patch predictions.
@@ -2312,6 +2888,12 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         self.max_cases = None if cfg.WHOLE_BRAIN_VAL_MAX_CASES in (None, 0) else int(cfg.WHOLE_BRAIN_VAL_MAX_CASES)
         self.threshold_sweep = tuple(float(t) for t in getattr(cfg, "VAL_THRESHOLD_SWEEP", (self.threshold,)))
         self.top_k = max(1, int(getattr(cfg, "VAL_DIAGNOSTICS_TOP_K", 5)))
+        self.center_topk_values = tuple(int(v) for v in getattr(cfg, "CENTER_TOPK_VALUES", (1, 3, 5, 10)))
+        self.center_match_radius = float(getattr(cfg, "CENTER_MATCH_RADIUS", 6.0))
+        self.center_nms_radius = int(getattr(cfg, "CENTER_NMS_RADIUS", 6))
+        self.center_min_confidence = float(getattr(cfg, "CENTER_MIN_CONFIDENCE", 0.10))
+        self.use_center_head = bool(getattr(cfg, "USE_CENTER_HEATMAP_HEAD", False))
+        self.use_size_head = bool(getattr(cfg, "USE_SIZE_HEAD", False))
         self.diagnostics_enabled = bool(getattr(cfg, "DIAGNOSTICS_ENABLED", True))
         self.out_dir = Path(cfg.CALLBACKS_DIR)
         self.summary_jsonl = self.out_dir / "whole_val_summary.jsonl"
@@ -2345,6 +2927,11 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         threshold_case_scores_brainmask: dict[float, list[float]] = {t: [] for t in self.threshold_sweep}
         threshold_case_scores_raw: dict[float, list[float]] = {t: [] for t in self.threshold_sweep}
         case_rows: list[dict[str, object]] = []
+        center_recall_macro: dict[int, list[float]] = {k: [] for k in self.center_topk_values}
+        center_recall_by_group: dict[int, dict[str, dict[str, float]]] = {k: {} for k in self.center_topk_values}
+        source_center_recall: dict[int, dict[str, list[float]]] = {k: {} for k in self.center_topk_values}
+        size_seed_acc_all: list[float] = []
+        source_size_seed_acc: dict[str, list[float]] = {}
         pred_soft_true_ratio = []
         pred_hard_true_ratio = []
         pred_hard_brainmask_true_ratio = []
@@ -2357,14 +2944,21 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         for i, (img_p, msk_p) in enumerate(eval_pairs, start=1):
             x = _load_and_preprocess_image(str(img_p), self.volume_target_shape)
             y = _load_and_preprocess_mask(str(msk_p), self.volume_target_shape).astype(np.float32)
-            probs = gaussian_tta_predict(
+            requested_outputs = ["probs"]
+            if self.use_center_head:
+                requested_outputs.append("center_heatmap")
+            if self.use_size_head:
+                requested_outputs.append("size_head")
+            pred_maps = gaussian_tta_predict_outputs(
                 self.model,
                 x,
                 patch_size=self.patch_size,
                 overlap=self.overlap,
                 sigma=self.sigma,
                 tta=self.tta,
+                output_names=tuple(requested_outputs),
             )
+            probs = pred_maps["probs"]
             probs = np.nan_to_num(probs, nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32, copy=False)
             probs = np.clip(probs, 0.0, 1.0)
             brain_mask = compute_brain_mask(x)
@@ -2450,6 +3044,38 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
                 "image": str(img_p),
                 "mask": str(msk_p),
             }
+            if self.use_center_head:
+                center_map = np.asarray(pred_maps.get("center_heatmap"), dtype=np.float32)
+                size_map = np.asarray(pred_maps.get("size_head"), dtype=np.float32) if self.use_size_head and "size_head" in pred_maps else None
+                proposal_stats = proposal_recall_summary(
+                    y_true=y,
+                    center_map=center_map,
+                    topk_values=self.center_topk_values,
+                    case_size_bins=tuple(getattr(self.cfg, "CASE_SIZE_BINS", (100, 1000, 10000))),
+                    match_radius=self.center_match_radius,
+                    min_confidence=self.center_min_confidence,
+                    nms_radius=self.center_nms_radius,
+                    size_map=size_map,
+                )
+                row["center_candidates"] = int(len(proposal_stats.get("candidates", [])))
+                row["center_candidates_above_threshold"] = int(proposal_stats.get("candidates_above_threshold", 0))
+                row["center_best_score"] = float(proposal_stats.get("best_candidate_score", 0.0))
+                for k in self.center_topk_values:
+                    stats_k = proposal_stats.get("topk", {}).get(k, {})
+                    rec_k = float(stats_k.get("recall", 0.0))
+                    row[f"center_recall_at_{k}"] = rec_k
+                    row[f"center_mean_best_dist_at_{k}"] = float(stats_k.get("mean_best_dist", float("inf")))
+                    center_recall_macro[k].append(rec_k)
+                    source_center_recall[k].setdefault(src_name, []).append(rec_k)
+                    for grp, vals in (stats_k.get("by_group", {}) or {}).items():
+                        bucket = center_recall_by_group[k].setdefault(grp, {"components": 0.0, "hits": 0.0})
+                        bucket["components"] += float(vals.get("components", 0.0))
+                        bucket["hits"] += float(vals.get("hits", 0.0))
+                size_seed_acc = proposal_stats.get("size_seed_acc")
+                row["size_seed_acc"] = float(size_seed_acc) if size_seed_acc is not None else float("nan")
+                if size_seed_acc is not None:
+                    size_seed_acc_all.append(float(size_seed_acc))
+                    source_size_seed_acc.setdefault(src_name, []).append(float(size_seed_acc))
             for grp, vals in comp_recall.items():
                 bucket = lesion_recall_bins.setdefault(grp, {"components": 0.0, "hits": 0.0})
                 bucket["components"] += float(vals.get("components", 0.0))
@@ -2511,6 +3137,11 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
         logs["val_whole_dice_hard_raw"] = val_hard_macro_raw
         logs["val_whole_dice_hard_brainmask_delta"] = float(val_hard_macro_brainmask - val_hard_macro_raw)
         logs["val_whole_dice_hard_postproc_delta"] = float(val_hard_macro - val_hard_macro_raw)
+        if self.use_center_head:
+            for k, vals in sorted(center_recall_macro.items()):
+                logs[f"val_center_recall_at_{int(k)}"] = float(np.mean(vals)) if vals else 0.0
+            if size_seed_acc_all:
+                logs["val_size_seed_acc"] = float(np.mean(size_seed_acc_all))
         hard_sweep_macro = {
             thr: float(np.mean(scores)) if scores else 0.0
             for thr, scores in threshold_case_scores.items()
@@ -2625,6 +3256,18 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
             logger.info("Whole-brain val by source (hard_raw@thr%.2f): %s", self.threshold, per_source_hard_raw)
             logger.info("Whole-brain val by source (hard_brainmask@thr%.2f): %s", self.threshold, per_source_hard_brainmask)
             logger.info("Whole-brain val by source (hard_macro@thr%.2f): %s", self.threshold, per_source_hard)
+            if self.use_center_head:
+                for k, src_vals in sorted(source_center_recall.items()):
+                    logger.info(
+                        "Whole-brain center proposal recall@%d by source: %s",
+                        int(k),
+                        {src: float(np.mean(vals)) for src, vals in sorted(src_vals.items()) if vals},
+                    )
+                if source_size_seed_acc:
+                    logger.info(
+                        "Whole-brain proposal size-seed accuracy by source: %s",
+                        {src: float(np.mean(vals)) for src, vals in sorted(source_size_seed_acc.items()) if vals},
+                    )
         if hard_sweep_macro:
             logger.info(
                 "Whole-brain val threshold sweep (hard_macro): %s",
@@ -2692,6 +3335,31 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
             if tiny["components"] > 0:
                 missed = int(round(float(tiny["components"] - tiny["hits"])))
                 logger.info("Whole-brain tiny-lesion misses: %d / %d", missed, int(round(float(tiny["components"]))))
+        if self.use_center_head and center_recall_macro:
+            logger.info(
+                "Whole-brain center proposal recall: %s",
+                {f"top{k}": round(float(np.mean(vals)), 5) for k, vals in sorted(center_recall_macro.items()) if vals},
+            )
+            center_best_scores = [float(r["center_best_score"]) for r in case_rows if "center_best_score" in r]
+            center_candidate_counts = [float(r["center_candidates_above_threshold"]) for r in case_rows if "center_candidates_above_threshold" in r]
+            if center_best_scores:
+                logger.info(
+                    "Whole-brain center score stats: max_mean=%.5f max_median=%.5f above_thr_mean=%.2f",
+                    float(np.mean(center_best_scores)),
+                    float(np.median(center_best_scores)),
+                    float(np.mean(center_candidate_counts)) if center_candidate_counts else 0.0,
+                )
+            for k, grp_vals in sorted(center_recall_by_group.items()):
+                logger.info(
+                    "Whole-brain center proposal recall@%d by lesion group: %s",
+                    int(k),
+                    {
+                        grp: round(float(vals["hits"] / max(vals["components"], 1.0)), 5)
+                        for grp, vals in sorted(grp_vals.items())
+                    },
+                )
+            if size_seed_acc_all:
+                logger.info("Whole-brain proposal size-seed accuracy: %.5f", float(np.mean(size_seed_acc_all)))
 
         if self.diagnostics_enabled:
             self.out_dir.mkdir(parents=True, exist_ok=True)
@@ -2718,14 +3386,22 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
                 "mask",
                 "tiny_component_hits",
                 "tiny_component_total",
+                "center_candidates",
+                "center_candidates_above_threshold",
+                "center_best_score",
+                "size_seed_acc",
             ]
             thr_fields = []
             for thr in self.threshold_sweep:
                 thr_fields.append(f"hard_dice_thr_{thr:.2f}")
                 thr_fields.append(f"hard_dice_brainmask_thr_{thr:.2f}")
                 thr_fields.append(f"hard_dice_raw_thr_{thr:.2f}")
+            center_fields = []
+            for k in self.center_topk_values:
+                center_fields.append(f"center_recall_at_{int(k)}")
+                center_fields.append(f"center_mean_best_dist_at_{int(k)}")
             with open(csv_path, "w", newline="", encoding="utf-8") as fh:
-                writer = csv.DictWriter(fh, fieldnames=base_fields + thr_fields)
+                writer = csv.DictWriter(fh, fieldnames=base_fields + center_fields + thr_fields)
                 writer.writeheader()
                 for r in case_rows:
                     writer.writerow(r)
@@ -2753,6 +3429,30 @@ class WholeBrainValidationCallback(tf.keras.callbacks.Callback):
                 "source_hard_macro_brainmask": {k: float(np.mean(v)) for k, v in sorted(source_hard_brainmask.items())},
                 "source_hard_macro_raw": {k: float(np.mean(v)) for k, v in sorted(source_hard_raw.items())},
                 "source_hard_macro": {k: float(np.mean(v)) for k, v in sorted(source_hard.items())},
+                "center_recall_macro": {
+                    f"top{k}": float(np.mean(vals)) for k, vals in sorted(center_recall_macro.items()) if vals
+                },
+                "center_recall_by_group": {
+                    f"top{k}": {
+                        grp: {
+                            "components": float(vals["components"]),
+                            "hits": float(vals["hits"]),
+                            "recall": float(vals["hits"] / max(vals["components"], 1.0)),
+                        }
+                        for grp, vals in sorted(grp_vals.items())
+                    }
+                    for k, grp_vals in sorted(center_recall_by_group.items())
+                    if grp_vals
+                },
+                "source_center_recall_macro": {
+                    f"top{k}": {src: float(np.mean(vals)) for src, vals in sorted(src_vals.items()) if vals}
+                    for k, src_vals in sorted(source_center_recall.items())
+                    if src_vals
+                },
+                "size_seed_acc": float(np.mean(size_seed_acc_all)) if size_seed_acc_all else None,
+                "source_size_seed_acc": {
+                    src: float(np.mean(vals)) for src, vals in sorted(source_size_seed_acc.items()) if vals
+                },
                 "pred_true_ratio_summary": {
                     "soft_median": float(np.median(pred_soft_true_ratio)) if pred_soft_true_ratio else 0.0,
                     "soft_p90": float(np.percentile(pred_soft_true_ratio, 90)) if pred_soft_true_ratio else 0.0,
@@ -2890,6 +3590,8 @@ class DynamicDataGenerator(tf.keras.utils.Sequence):
         batch_pairs = self.pairs[idx * self.batch_size:(idx + 1) * self.batch_size]
         batch_x = np.zeros((len(batch_pairs), *self.config.INPUT_SHAPE), dtype=np.float32)
         batch_main = np.zeros((len(batch_pairs), *self.target_shape, 1), dtype=np.float32)
+        batch_center = np.zeros((len(batch_pairs), *self.target_shape, 1), dtype=np.float32) if self.config.USE_CENTER_HEATMAP_HEAD else None
+        batch_size = np.zeros((len(batch_pairs), *self.target_shape), dtype=np.int32) if self.config.USE_SIZE_HEAD else None
         batch_msl = np.zeros((len(batch_pairs), *self.target_shape), dtype=np.int32) if self.config.USE_AUX_MSL_HEAD else None
         batch_dbl = np.zeros((len(batch_pairs), *self.target_shape), dtype=np.int32) if self.config.USE_AUX_DBL_HEAD else None
         
@@ -2904,13 +3606,21 @@ class DynamicDataGenerator(tf.keras.utils.Sequence):
             
             batch_x[i] = _make_input_channels(img, self.config)
             batch_main[i, ..., 0] = (msk > 0.5).astype(np.float32, copy=False)
+            if batch_center is not None:
+                batch_center[i] = build_center_heatmap(msk, sigma=float(getattr(self.config, "CENTER_HEATMAP_SIGMA", 2.0)))
+            if batch_size is not None:
+                batch_size[i] = build_size_head_labels(msk, tuple(self.config.CASE_SIZE_BINS))
             if batch_msl is not None:
                 batch_msl[i] = build_msl_labels(msk, tuple(self.config.MSL_COMPONENT_THRESHOLDS))
             if batch_dbl is not None:
                 batch_dbl[i] = build_dbl_labels(msk)
-        if batch_msl is None and batch_dbl is None:
+        if batch_center is None and batch_size is None and batch_msl is None and batch_dbl is None:
             return batch_x, batch_main
         targets = {"probs": batch_main}
+        if batch_center is not None:
+            targets["center_heatmap"] = batch_center
+        if batch_size is not None:
+            targets["size_head"] = batch_size
         if batch_msl is not None:
             targets["msl_head"] = batch_msl
         if batch_dbl is not None:
@@ -3131,20 +3841,25 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     logger.info(f"🔧 Config: {config.model_path.name}")
     log_memory_usage("start")
     logger.info(
-        "Small-lesion trainer enabled: flip_channel=%s aux_msl=%s aux_dbl=%s topk=%.2f "
-        "lesion_insertion=%.2f component_patch_sampling=%s brainmask_postproc=%s component_postproc=%s "
-        "case_group_probs=%s case_none_prob=%.3f patch_fg_probs=%s",
+        "Small-lesion trainer enabled: flip_channel=%s center_head=%s size_head=%s aux_msl=%s aux_dbl=%s topk=%.2f "
+        "lesion_insertion=%.2f component_patch_sampling=%s tiny_centering=%s brainmask_postproc=%s component_postproc=%s "
+        "case_group_probs=%s case_none_prob=%.3f patch_fg_probs=%s curriculum=%s atlas_finetune=%s",
         bool(getattr(config, "USE_SYMMETRIC_FLIP_CHANNEL", False)),
+        bool(getattr(config, "USE_CENTER_HEATMAP_HEAD", False)),
+        bool(getattr(config, "USE_SIZE_HEAD", False)),
         bool(getattr(config, "USE_AUX_MSL_HEAD", False)),
         bool(getattr(config, "USE_AUX_DBL_HEAD", False)),
         float(getattr(config, "TOPK_VOXEL_FRACTION", 0.0)),
         float(getattr(config, "LESION_INSERTION_PROB", 0.0)),
         bool(getattr(config, "USE_COMPONENT_AWARE_PATCH_SAMPLING", False)),
+        bool(getattr(config, "USE_TINY_COMPONENT_CENTERING", False)),
         bool(getattr(config, "USE_BRAINMASK_POSTPROC", False)),
         bool(getattr(config, "USE_COMPONENT_SCORING_POSTPROC", False)),
         tuple(getattr(config, "CASE_SIZE_GROUP_PROBS", (0.45, 0.25, 0.15, 0.10))),
         float(getattr(config, "CASE_NONE_PROB", 0.05)),
         tuple(getattr(config, "PATCH_FG_PROB_BY_BIN", ())),
+        bool(getattr(config, "USE_SIZE_CURRICULUM", False)),
+        bool(getattr(config, "USE_ATLAS_FINE_TUNE", False)),
     )
 
     if getattr(config, "INPUT_SHAPE", None) in (None, (), []):
@@ -3210,14 +3925,37 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         compile_kwargs = {
             "optimizer": tf.keras.optimizers.Adam(**adam_kwargs),
         }
-        if bool(getattr(config, "USE_AUX_MSL_HEAD", True)) or bool(getattr(config, "USE_AUX_DBL_HEAD", True)):
+        use_multi_output = any(
+            bool(getattr(config, name, False))
+            for name in ("USE_CENTER_HEATMAP_HEAD", "USE_SIZE_HEAD", "USE_AUX_MSL_HEAD", "USE_AUX_DBL_HEAD")
+        )
+        if use_multi_output:
             loss_map = {"probs": loss_obj}
             loss_weights = {"probs": 1.0}
+            if bool(getattr(config, "USE_CENTER_HEATMAP_HEAD", False)):
+                loss_map["center_heatmap"] = GaussianHeatmapFocalLoss(
+                    gamma=float(getattr(config, "CENTER_LOSS_GAMMA", 2.0)),
+                    beta=float(getattr(config, "CENTER_LOSS_BETA", 4.0)),
+                    name="center_heatmap_loss",
+                )
+                loss_weights["center_heatmap"] = float(getattr(config, "AUX_CENTER_WEIGHT", 0.12))
+            if bool(getattr(config, "USE_SIZE_HEAD", False)):
+                loss_map["size_head"] = WeightedSparseCategoricalCrossentropy(
+                    getattr(config, "SIZE_HEAD_CLASS_WEIGHTS", (0.02, 4.0, 2.5, 1.0, 0.6)),
+                    name="size_head_loss",
+                )
+                loss_weights["size_head"] = float(getattr(config, "AUX_SIZE_WEIGHT", 0.05))
             if bool(getattr(config, "USE_AUX_MSL_HEAD", True)):
-                loss_map["msl_head"] = WeightedSparseCategoricalCrossentropy([0.05, 2.5, 1.8, 1.1, 0.8], name="msl_loss")
+                loss_map["msl_head"] = WeightedSparseCategoricalCrossentropy(
+                    getattr(config, "AUX_MSL_CLASS_WEIGHTS", (0.02, 4.0, 2.5, 1.0, 0.6)),
+                    name="msl_loss",
+                )
                 loss_weights["msl_head"] = float(getattr(config, "AUX_MSL_WEIGHT", 0.15))
             if bool(getattr(config, "USE_AUX_DBL_HEAD", True)):
-                loss_map["dbl_head"] = WeightedSparseCategoricalCrossentropy([0.05, 1.1, 1.0], name="dbl_loss")
+                loss_map["dbl_head"] = WeightedSparseCategoricalCrossentropy(
+                    getattr(config, "AUX_DBL_CLASS_WEIGHTS", (0.02, 1.15, 1.0)),
+                    name="dbl_loss",
+                )
                 loss_weights["dbl_head"] = float(getattr(config, "AUX_DBL_WEIGHT", 0.10))
             compile_kwargs["loss"] = loss_map
             compile_kwargs["loss_weights"] = loss_weights
@@ -3426,6 +4164,8 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             idxs = case_sampler.sample_indices(batch_cases) if case_sampler else np.random.choice(len(train_pairs), size=batch_cases, replace=True)
             xs = []
             y_main = []
+            y_center = [] if config.USE_CENTER_HEATMAP_HEAD else None
+            y_size = [] if config.USE_SIZE_HEAD else None
             y_msl = [] if config.USE_AUX_MSL_HEAD else None
             y_dbl = [] if config.USE_AUX_DBL_HEAD else None
             for idx in idxs:
@@ -3453,6 +4193,11 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                         component_records=component_records,
                         case_size_bins=tuple(getattr(config, "CASE_SIZE_BINS", (100, 1000, 10000))),
                         use_component_aware_sampling=bool(getattr(config, "USE_COMPONENT_AWARE_PATCH_SAMPLING", False)),
+                        use_tiny_component_centering=bool(getattr(config, "USE_TINY_COMPONENT_CENTERING", False)),
+                        tiny_component_center_prob=float(getattr(config, "TINY_COMPONENT_CENTER_PROB", 0.95)),
+                        small_component_center_prob=float(getattr(config, "SMALL_COMPONENT_CENTER_PROB", 0.85)),
+                        tiny_component_max_jitter=int(getattr(config, "TINY_COMPONENT_MAX_JITTER", 2)),
+                        small_component_max_jitter=int(getattr(config, "SMALL_COMPONENT_MAX_JITTER", 4)),
                         hemisphere_axis=hemisphere_axis if hemisphere_mode else None,
                         hemisphere_side=hemisphere_side,
                     )
@@ -3470,6 +4215,10 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                     targets = _format_training_targets(patch_y, config)
                     if isinstance(targets, dict):
                         y_main.append(targets["probs"])
+                        if y_center is not None:
+                            y_center.append(targets["center_heatmap"])
+                        if y_size is not None:
+                            y_size.append(targets["size_head"])
                         if y_msl is not None:
                             y_msl.append(targets["msl_head"])
                         if y_dbl is not None:
@@ -3487,10 +4236,14 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                 xb = np.nan_to_num(xb, nan=0.0, posinf=0.0, neginf=0.0)
                 yb_main = np.nan_to_num(yb_main, nan=0.0, posinf=0.0, neginf=0.0)
             yb_main = (yb_main > 0.5).astype(np.float32, copy=False)
-            if y_msl is None and y_dbl is None:
+            if y_center is None and y_size is None and y_msl is None and y_dbl is None:
                 yield xb, yb_main
             else:
                 out_targets = {"probs": yb_main}
+                if y_center is not None:
+                    out_targets["center_heatmap"] = np.stack(y_center, axis=0).astype(np.float32, copy=False)
+                if y_size is not None:
+                    out_targets["size_head"] = np.stack(y_size, axis=0).astype(np.int32, copy=False)
                 if y_msl is not None:
                     out_targets["msl_head"] = np.stack(y_msl, axis=0).astype(np.int32, copy=False)
                 if y_dbl is not None:
@@ -3501,8 +4254,12 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
         tf.TensorSpec(shape=(batch_patches, *patch_size, config.input_channels), dtype=tf.float32),
         tf.TensorSpec(shape=(batch_patches, *patch_size, 1), dtype=tf.float32),
     )
-    if config.USE_AUX_MSL_HEAD or config.USE_AUX_DBL_HEAD:
+    if config.USE_CENTER_HEATMAP_HEAD or config.USE_SIZE_HEAD or config.USE_AUX_MSL_HEAD or config.USE_AUX_DBL_HEAD:
         target_signature = {"probs": tf.TensorSpec(shape=(batch_patches, *patch_size, 1), dtype=tf.float32)}
+        if config.USE_CENTER_HEATMAP_HEAD:
+            target_signature["center_heatmap"] = tf.TensorSpec(shape=(batch_patches, *patch_size, 1), dtype=tf.float32)
+        if config.USE_SIZE_HEAD:
+            target_signature["size_head"] = tf.TensorSpec(shape=(batch_patches, *patch_size), dtype=tf.int32)
         if config.USE_AUX_MSL_HEAD:
             target_signature["msl_head"] = tf.TensorSpec(shape=(batch_patches, *patch_size), dtype=tf.int32)
         if config.USE_AUX_DBL_HEAD:
@@ -3582,6 +4339,10 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             logger.warning(f"Failed to initialize NVML logger: {e}")
 
     sampler_cb = SizeAwareSamplerCallback(case_sampler)
+    sampling_policy_cb = SamplingPolicyController(case_sampler, config, train_source_labels)
+    metric_alias_cb = PrimaryOutputMetricAliasCallback() if (
+        config.USE_CENTER_HEATMAP_HEAD or config.USE_SIZE_HEAD or config.USE_AUX_MSL_HEAD or config.USE_AUX_DBL_HEAD
+    ) else None
     diff_cb = DifficultyAwareCallback(case_sampler, config, train_pairs)
     loss_ramp_cb = LossRampScheduler(loss_obj, config) if isinstance(loss_obj, HybridLoss) else None
     swa_cb = None
@@ -3598,7 +4359,17 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
             logger.warning(f"Unable to enable SWA: {e}")
 
     whole_brain_val_cb = WholeBrainValidationCallback(val_pairs, config) if use_whole_brain_val else None
-    callbacks = [cb for cb in (sampler_cb, diff_cb, loss_ramp_cb, whole_brain_val_cb, epoch_jsonl_cb) if cb is not None]
+    callbacks = [
+        cb for cb in (
+            sampler_cb,
+            sampling_policy_cb,
+            metric_alias_cb,
+            diff_cb,
+            loss_ramp_cb,
+            whole_brain_val_cb,
+            epoch_jsonl_cb,
+        ) if cb is not None
+    ]
     fit_verbose = int(getattr(config, "FIT_VERBOSE", 2))
     if fit_verbose not in (0, 1, 2):
         logger.warning(f"Unsupported FIT_VERBOSE={fit_verbose}; using 2 (epoch-only).")
@@ -3689,26 +4460,28 @@ def _sliding_window_positions(shape: tuple[int, int, int], patch: tuple[int, int
                 yield z, y, x
 
 
-def gaussian_tta_predict(
+def gaussian_tta_predict_outputs(
     model: tf.keras.Model,
     volume: np.ndarray,
     patch_size: tuple[int, int, int],
     overlap: float = 0.5,
     sigma: float = 0.125,
     tta: bool = True,
+    output_names: tuple[str, ...] = ("probs",),
 ):
     patch_size = tuple(int(v) for v in patch_size)
     padded, pads = _pad_volume_to_shape(volume, patch_size)
     weight_patch = _gaussian_patch_weights(patch_size, sigma=sigma)
-    accum = np.zeros_like(padded, dtype=np.float32)
+    output_names = tuple(output_names or ("probs",))
+    accumulators: dict[str, np.ndarray] = {}
     flip_sets = [()]
     if tta:
         flip_sets = [(), (0,), (1,), (2,), (0, 1), (0, 2), (1, 2), (0, 1, 2)]
 
     for axes in flip_sets:
         vol_aug = np.flip(padded, axis=axes) if axes else padded
-        blended = np.zeros_like(padded, dtype=np.float32)
-        weight_accum = np.zeros_like(padded, dtype=np.float32)
+        blended: dict[str, np.ndarray] = {}
+        weight_accum: dict[str, np.ndarray] = {}
         for z0, y0, x0 in _sliding_window_positions(vol_aug.shape, patch_size, overlap):
             z1, y1, x1 = z0 + patch_size[0], y0 + patch_size[1], x0 + patch_size[2]
             patch = vol_aug[z0:z1, y0:y1, x0:x1]
@@ -3721,15 +4494,69 @@ def gaussian_tta_predict(
             else:
                 patch_input = patch[..., np.newaxis][np.newaxis, ...]
             raw_pred = model.predict(patch_input, verbose=0)
-            patch_pred = _binary_output_from_prediction(raw_pred)[0, ..., 0].astype(np.float32)
-            blended[z0:z1, y0:y1, x0:x1] += patch_pred * weight_patch
-            weight_accum[z0:z1, y0:y1, x0:x1] += weight_patch
-        blended = blended / np.maximum(weight_accum, 1e-6)
-        if axes:
-            blended = np.flip(blended, axis=axes)
-        accum += blended
-    blended_avg = accum / float(len(flip_sets))
-    return _crop_from_pad(blended_avg, pads)
+            for output_name in output_names:
+                patch_pred = _prediction_output(raw_pred, model=model, output_name=output_name)[0]
+                patch_pred = np.asarray(patch_pred, dtype=np.float32)
+                if patch_pred.ndim == 3:
+                    patch_pred = patch_pred[..., np.newaxis]
+                if output_name not in blended:
+                    blended[output_name] = np.zeros((*padded.shape, patch_pred.shape[-1]), dtype=np.float32)
+                    weight_accum[output_name] = np.zeros((*padded.shape, patch_pred.shape[-1]), dtype=np.float32)
+                    accumulators.setdefault(output_name, np.zeros((*padded.shape, patch_pred.shape[-1]), dtype=np.float32))
+                blended[output_name][z0:z1, y0:y1, x0:x1] += patch_pred * weight_patch[..., np.newaxis]
+                weight_accum[output_name][z0:z1, y0:y1, x0:x1] += weight_patch[..., np.newaxis]
+        for output_name in output_names:
+            blended_out = blended[output_name] / np.maximum(weight_accum[output_name], 1e-6)
+            if axes:
+                blended_out = np.flip(blended_out, axis=axes)
+            accumulators[output_name] += blended_out
+    outputs = {}
+    for output_name in output_names:
+        blended_avg = accumulators[output_name] / float(len(flip_sets))
+        cropped = _crop_from_pad(blended_avg, pads)
+        if cropped.ndim == 4 and cropped.shape[-1] == 1:
+            cropped = cropped[..., 0]
+        outputs[output_name] = cropped
+    return outputs
+
+
+def gaussian_tta_predict(
+    model: tf.keras.Model,
+    volume: np.ndarray,
+    patch_size: tuple[int, int, int],
+    overlap: float = 0.5,
+    sigma: float = 0.125,
+    tta: bool = True,
+):
+    return gaussian_tta_predict_outputs(
+        model,
+        volume,
+        patch_size=patch_size,
+        overlap=overlap,
+        sigma=sigma,
+        tta=tta,
+        output_names=("probs",),
+    )["probs"]
+
+
+def gaussian_tta_predict_output(
+    model: tf.keras.Model,
+    volume: np.ndarray,
+    patch_size: tuple[int, int, int],
+    overlap: float = 0.5,
+    sigma: float = 0.125,
+    tta: bool = True,
+    output_name: str = "probs",
+):
+    return gaussian_tta_predict_outputs(
+        model,
+        volume,
+        patch_size=patch_size,
+        overlap=overlap,
+        sigma=sigma,
+        tta=tta,
+        output_names=(output_name,),
+    )[output_name]
 
 
 def compute_brain_mask(volume: np.ndarray) -> np.ndarray:

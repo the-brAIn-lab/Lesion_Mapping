@@ -262,7 +262,7 @@ class DynamicTrainingConfig:
     PATCHES_PER_CASE: int = 1
     LOAD_FULL_IMAGE_FOR_PATCHING: bool = True
     FULL_RES_TARGET_SHAPE: tuple[int, int, int] | None = None
-    PATCH_SAMPLING_STRATEGY: str = "random"            # "random" | "hemisphere"
+    PATCH_SAMPLING_STRATEGY: str = "random"            # "random" | "hemisphere" | "three_window"
     HEMISPHERE_AXIS: int = 2                           # RAS x-axis after canonicalization
     HEMISPHERE_BALANCED: bool = True
     MAX_PATCHES_PER_CASE_PER_EPOCH: int = 64
@@ -365,8 +365,8 @@ class DynamicTrainingConfig:
         self.EXTERNAL_VAL_MASKS_DIR = Path(self.EXTERNAL_VAL_MASKS_DIR) if self.EXTERNAL_VAL_MASKS_DIR else None
         self.EXTERNAL_VAL_MANIFEST = Path(self.EXTERNAL_VAL_MANIFEST) if self.EXTERNAL_VAL_MANIFEST else None
         self.PATCH_SAMPLING_STRATEGY = str(self.PATCH_SAMPLING_STRATEGY).strip().lower()
-        if self.PATCH_SAMPLING_STRATEGY not in {"random", "hemisphere"}:
-            raise ValueError("PATCH_SAMPLING_STRATEGY must be 'random' or 'hemisphere'.")
+        if self.PATCH_SAMPLING_STRATEGY not in {"random", "hemisphere", "three_window"}:
+            raise ValueError("PATCH_SAMPLING_STRATEGY must be 'random', 'hemisphere', or 'three_window'.")
         if int(self.HEMISPHERE_AXIS) not in (0, 1, 2):
             raise ValueError("HEMISPHERE_AXIS must be 0, 1, or 2.")
         self.HEMISPHERE_AXIS = int(self.HEMISPHERE_AXIS)
@@ -2404,6 +2404,52 @@ def sample_patch_center(
     z1, y1, x1 = z0 + dz, y0 + dy, x0 + dx
     return z0, z1, y0, y1, x0, x1
 
+
+def fixed_window_bounds(
+    volume_shape,
+    patch_size,
+    axis: int,
+    window_index: int,
+    num_windows: int = 3,
+):
+    """Return deterministic overlapping windows along one axis.
+
+    For the common 3-window case this yields:
+    - left:   start=0
+    - center: start=(dim - patch) // 2
+    - right:  start=dim - patch
+
+    Other axes are centered if the patch is smaller than the volume, or 0 when
+    the patch spans the full axis.
+    """
+    dims = [int(v) for v in volume_shape]
+    patch_dims = [int(v) for v in patch_size]
+    axis = int(axis)
+    if axis not in (0, 1, 2):
+        raise ValueError("axis must be 0, 1, or 2")
+
+    starts = []
+    for dim, p in zip(dims, patch_dims):
+        starts.append(max(0, (dim - p) // 2))
+
+    dim = dims[axis]
+    p = patch_dims[axis]
+    max_start = max(0, dim - p)
+    if num_windows <= 1 or max_start <= 0:
+        starts[axis] = 0
+    elif num_windows == 3:
+        candidates = [0, max_start // 2, max_start]
+        idx = max(0, min(int(window_index), 2))
+        starts[axis] = int(candidates[idx])
+    else:
+        grid = np.linspace(0, max_start, num_windows)
+        idx = max(0, min(int(window_index), num_windows - 1))
+        starts[axis] = int(round(float(grid[idx])))
+
+    z0, y0, x0 = starts
+    dz, dy, dx = patch_dims
+    return z0, z0 + dz, y0, y0 + dy, x0, x0 + dx
+
 class SizeAwareSamplerCallback(tf.keras.callbacks.Callback):
     def __init__(self, sampler: SizeAwareCaseSampler | None):
         super().__init__()
@@ -4145,11 +4191,24 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
     batch_cases = max(config.BATCH_SIZE, 1)
     patch_sampling = str(getattr(config, "PATCH_SAMPLING_STRATEGY", "random")).strip().lower()
     hemisphere_mode = patch_sampling == "hemisphere"
+    three_window_mode = patch_sampling == "three_window"
     hemisphere_axis = int(getattr(config, "HEMISPHERE_AXIS", 2))
     patches_per_case = max(int(config.PATCHES_PER_CASE), 1)
     if hemisphere_mode and bool(getattr(config, "HEMISPHERE_BALANCED", True)):
         patches_per_case = max(patches_per_case, 2)
-    batch_patches = batch_cases * patches_per_case
+    if three_window_mode:
+        patches_per_case = max(patches_per_case, 3)
+    nominal_batch_patches = batch_cases * patches_per_case
+    num_replicas = int(getattr(strategy, "num_replicas_in_sync", 1) or 1)
+    batch_patches = int(math.ceil(nominal_batch_patches / float(num_replicas)) * num_replicas)
+    pad_patches = int(batch_patches - nominal_batch_patches)
+    if pad_patches > 0:
+        logger.warning(
+            "Adjusting effective patch batch from %d to %d so it divides evenly across %d replicas.",
+            nominal_batch_patches,
+            batch_patches,
+            num_replicas,
+        )
     rng = np.random.default_rng(config.RNG_SEED)
     lesion_bank = (
         build_small_lesion_bank(train_pairs, config, target_shape=case_target_shape)
@@ -4185,22 +4244,31 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                     hemisphere_side = None
                     if hemisphere_mode:
                         hemisphere_side = patch_iter % 2 if bool(getattr(config, "HEMISPHERE_BALANCED", True)) else int(rng.integers(0, 2))
-                    z0, z1, y0, y1, x0, x1 = sample_patch_center(
-                        mask_bin,
-                        patch_size,
-                        p_fg,
-                        rng,
-                        component_records=component_records,
-                        case_size_bins=tuple(getattr(config, "CASE_SIZE_BINS", (100, 1000, 10000))),
-                        use_component_aware_sampling=bool(getattr(config, "USE_COMPONENT_AWARE_PATCH_SAMPLING", False)),
-                        use_tiny_component_centering=bool(getattr(config, "USE_TINY_COMPONENT_CENTERING", False)),
-                        tiny_component_center_prob=float(getattr(config, "TINY_COMPONENT_CENTER_PROB", 0.95)),
-                        small_component_center_prob=float(getattr(config, "SMALL_COMPONENT_CENTER_PROB", 0.85)),
-                        tiny_component_max_jitter=int(getattr(config, "TINY_COMPONENT_MAX_JITTER", 2)),
-                        small_component_max_jitter=int(getattr(config, "SMALL_COMPONENT_MAX_JITTER", 4)),
-                        hemisphere_axis=hemisphere_axis if hemisphere_mode else None,
-                        hemisphere_side=hemisphere_side,
-                    )
+                    if three_window_mode:
+                        z0, z1, y0, y1, x0, x1 = fixed_window_bounds(
+                            mask_bin.shape,
+                            patch_size,
+                            axis=hemisphere_axis,
+                            window_index=patch_iter % 3,
+                            num_windows=3,
+                        )
+                    else:
+                        z0, z1, y0, y1, x0, x1 = sample_patch_center(
+                            mask_bin,
+                            patch_size,
+                            p_fg,
+                            rng,
+                            component_records=component_records,
+                            case_size_bins=tuple(getattr(config, "CASE_SIZE_BINS", (100, 1000, 10000))),
+                            use_component_aware_sampling=bool(getattr(config, "USE_COMPONENT_AWARE_PATCH_SAMPLING", False)),
+                            use_tiny_component_centering=bool(getattr(config, "USE_TINY_COMPONENT_CENTERING", False)),
+                            tiny_component_center_prob=float(getattr(config, "TINY_COMPONENT_CENTER_PROB", 0.95)),
+                            small_component_center_prob=float(getattr(config, "SMALL_COMPONENT_CENTER_PROB", 0.85)),
+                            tiny_component_max_jitter=int(getattr(config, "TINY_COMPONENT_MAX_JITTER", 2)),
+                            small_component_max_jitter=int(getattr(config, "SMALL_COMPONENT_MAX_JITTER", 4)),
+                            hemisphere_axis=hemisphere_axis if hemisphere_mode else None,
+                            hemisphere_side=hemisphere_side,
+                        )
                     patch_x = x[z0:z1, y0:y1, x0:x1]
                     patch_y = y[z0:z1, y0:y1, x0:x1]
                     if patch_x.shape != patch_size:
@@ -4227,6 +4295,46 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                         y_main.append(targets)
             xb = np.stack(xs, axis=0).astype(np.float32, copy=False)
             yb_main = np.stack(y_main, axis=0).astype(np.float32, copy=False)
+            if pad_patches > 0:
+                xb = np.concatenate([xb, np.repeat(xb[-1:], pad_patches, axis=0)], axis=0)
+                yb_main = np.concatenate([yb_main, np.repeat(yb_main[-1:], pad_patches, axis=0)], axis=0)
+                if y_center is not None:
+                    y_center_arr = np.stack(y_center, axis=0).astype(np.float32, copy=False)
+                    y_center_arr = np.concatenate(
+                        [y_center_arr, np.repeat(y_center_arr[-1:], pad_patches, axis=0)],
+                        axis=0,
+                    )
+                else:
+                    y_center_arr = None
+                if y_size is not None:
+                    y_size_arr = np.stack(y_size, axis=0).astype(np.int32, copy=False)
+                    y_size_arr = np.concatenate(
+                        [y_size_arr, np.repeat(y_size_arr[-1:], pad_patches, axis=0)],
+                        axis=0,
+                    )
+                else:
+                    y_size_arr = None
+                if y_msl is not None:
+                    y_msl_arr = np.stack(y_msl, axis=0).astype(np.int32, copy=False)
+                    y_msl_arr = np.concatenate(
+                        [y_msl_arr, np.repeat(y_msl_arr[-1:], pad_patches, axis=0)],
+                        axis=0,
+                    )
+                else:
+                    y_msl_arr = None
+                if y_dbl is not None:
+                    y_dbl_arr = np.stack(y_dbl, axis=0).astype(np.int32, copy=False)
+                    y_dbl_arr = np.concatenate(
+                        [y_dbl_arr, np.repeat(y_dbl_arr[-1:], pad_patches, axis=0)],
+                        axis=0,
+                    )
+                else:
+                    y_dbl_arr = None
+            else:
+                y_center_arr = np.stack(y_center, axis=0).astype(np.float32, copy=False) if y_center is not None else None
+                y_size_arr = np.stack(y_size, axis=0).astype(np.int32, copy=False) if y_size is not None else None
+                y_msl_arr = np.stack(y_msl, axis=0).astype(np.int32, copy=False) if y_msl is not None else None
+                y_dbl_arr = np.stack(y_dbl, axis=0).astype(np.int32, copy=False) if y_dbl is not None else None
             if (not np.isfinite(xb).all()) or (not np.isfinite(yb_main).all()):
                 bad_x = int(np.size(xb) - np.isfinite(xb).sum())
                 bad_y = int(np.size(yb_main) - np.isfinite(yb_main).sum())
@@ -4240,14 +4348,14 @@ def train_dynamic_model(config: Optional[DynamicTrainingConfig] = None, **overri
                 yield xb, yb_main
             else:
                 out_targets = {"probs": yb_main}
-                if y_center is not None:
-                    out_targets["center_heatmap"] = np.stack(y_center, axis=0).astype(np.float32, copy=False)
-                if y_size is not None:
-                    out_targets["size_head"] = np.stack(y_size, axis=0).astype(np.int32, copy=False)
-                if y_msl is not None:
-                    out_targets["msl_head"] = np.stack(y_msl, axis=0).astype(np.int32, copy=False)
-                if y_dbl is not None:
-                    out_targets["dbl_head"] = np.stack(y_dbl, axis=0).astype(np.int32, copy=False)
+                if y_center_arr is not None:
+                    out_targets["center_heatmap"] = y_center_arr
+                if y_size_arr is not None:
+                    out_targets["size_head"] = y_size_arr
+                if y_msl_arr is not None:
+                    out_targets["msl_head"] = y_msl_arr
+                if y_dbl_arr is not None:
+                    out_targets["dbl_head"] = y_dbl_arr
                 yield xb, out_targets
 
     output_signature = (

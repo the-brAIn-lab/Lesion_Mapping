@@ -35,7 +35,22 @@
       "Bash(find /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined -name *manifest*.csv)",
       "Bash(nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv,noheader)",
       "Bash(python -c \":*)",
-      "Bash(ls /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v3/Image_Quality_Metrics/image_quality_metrics_all_variants_*.csv)"
+      "Bash(ls /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v3/Image_Quality_Metrics/image_quality_metrics_all_variants_*.csv)",
+      "Bash(/home/rbielski/stroke_cleaned/.venv/bin/python3)",
+      "Bash(/home/rbielski/stroke_cleaned_backup/.venv/bin/python3 -c \"import nibabel; print\\('ok'\\)\")",
+      "Bash(/home/rbielski/miniconda3/envs/segmamba/bin/python3 -c \"import nibabel; print\\('ok'\\)\")",
+      "Bash(/home/rbielski/stroke_cleaned_backup/.venv/bin/python3)",
+      "Bash(/home/rbielski/miniconda3/envs/tf_310/bin/python)",
+      "Bash(/home/rbielski/miniconda3/envs/tf_310/bin/python3 -c ':*)",
+      "Bash(/home/rbielski/miniconda3/envs/tf_310/bin/python3)",
+      "Bash(nvidia-smi --query-gpu=index,name,memory.total --format=csv,noheader)",
+      "Bash(nvidia-smi --query-compute-apps=gpu_uuid,pid,used_memory --format=csv,noheader)",
+      "Bash(nvidia-smi --query-gpu=index,memory.used,memory.free --format=csv,noheader)",
+      "Bash(nohup /home/rbielski/miniconda3/envs/tf_310/bin/python3 retrain_v3_newdata.py)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv,noheader)",
+      "Bash(kill 2188510)",
+      "Bash(python -c ':*)"
     ]
   }
 }

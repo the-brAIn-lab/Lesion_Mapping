@@ -60,7 +60,11 @@
       "Bash(/home/rbielski/miniconda3/envs/tf_310/bin/python3 -c \"import nibabel; print\\('ok'\\)\")",
       "Bash(/home/rbielski/miniconda3/envs/tf_310/bin/python3 -)",
       "Bash(nvidia-smi)",
-      "Bash(kill 2192142 2290215 2421026 2553134)"
+      "Bash(kill 2192142 2290215 2421026 2553134)",
+      "Bash(ls -lh /home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v3/runs/20260410_174944/test_eval/*.png)",
+      "Bash(wc -l *.csv)",
+      "Bash(ls /home/rbielski/Stroke_Dashboard/data/holdout_pred_*.csv)",
+      "Bash(timeout 10 streamlit run app.py --server.headless true --server.port 8501)"
     ]
   }
 }

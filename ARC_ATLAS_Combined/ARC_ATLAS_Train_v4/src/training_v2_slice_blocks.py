@@ -82,6 +82,7 @@ class SliceBlockTrainingConfig:
 
     MODEL_DIR: Path = field(default_factory=lambda: _default_dir("SMARTSOTA_MODEL_DIR", PROJECT_ROOT / "models_slice_blocks"))
     CALLBACKS_DIR: Path = field(default_factory=lambda: _default_dir("SMARTSOTA_CALLBACK_DIR", PROJECT_ROOT / "callbacks_slice_blocks"))
+    INITIAL_WEIGHTS_PATH: Optional[Path] = None
     timestamp: str = field(default_factory=lambda: time.strftime("%Y%m%d_%H%M%S"), init=False)
 
     VALIDATION_SPLIT: float = 0.15
@@ -108,6 +109,11 @@ class SliceBlockTrainingConfig:
     TVERSKY_ALPHA: float = 0.70
     TVERSKY_BETA: float = 0.30
     FOCAL_TVERSKY_GAMMA: float = 1.33
+    LESION_SLICE_WEIGHT: float = 1.0
+    EMPTY_SLICE_WEIGHT: float = 1.0
+    DICE_ON_LESION_SLICES_ONLY: bool = False
+    POSITIVE_TOPK_WEIGHT: float = 0.0
+    POSITIVE_TOPK_FRACTION: float = 0.25
 
     NORMALIZE_NONZERO: bool = True
     NORMALIZE_CLIP_PERCENTILES: tuple[float, float] = (0.5, 99.5)
@@ -150,6 +156,7 @@ class SliceBlockTrainingConfig:
         self.MANIFEST_PATH = Path(self.MANIFEST_PATH).expanduser() if self.MANIFEST_PATH else self.DATA_DIR / "manifest.csv"
         self.MODEL_DIR = Path(self.MODEL_DIR).expanduser()
         self.CALLBACKS_DIR = Path(self.CALLBACKS_DIR).expanduser()
+        self.INITIAL_WEIGHTS_PATH = Path(self.INITIAL_WEIGHTS_PATH).expanduser() if self.INITIAL_WEIGHTS_PATH else None
         self.MODEL_DIR.mkdir(parents=True, exist_ok=True)
         self.CALLBACKS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -168,6 +175,10 @@ class SliceBlockTrainingConfig:
         self.BASE_FILTERS = max(2, int(self.BASE_FILTERS))
         self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS = max(1, int(self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS))
         self.NUM_VAL_PREDICTIONS = max(0, int(self.NUM_VAL_PREDICTIONS))
+        self.LESION_SLICE_WEIGHT = max(0.0, float(self.LESION_SLICE_WEIGHT))
+        self.EMPTY_SLICE_WEIGHT = max(0.0, float(self.EMPTY_SLICE_WEIGHT))
+        self.POSITIVE_TOPK_WEIGHT = max(0.0, float(self.POSITIVE_TOPK_WEIGHT))
+        self.POSITIVE_TOPK_FRACTION = float(np.clip(self.POSITIVE_TOPK_FRACTION, 0.0, 1.0))
         self.VAL_THRESHOLD_SWEEP = tuple(
             sorted({float(np.clip(t, 0.0, 1.0)) for t in self.VAL_THRESHOLD_SWEEP + (self.DECISION_THRESHOLD,)})
         )
@@ -194,7 +205,7 @@ class SliceBlockTrainingConfig:
 
     def _write_config(self) -> None:
         payload = asdict(self)
-        for key in ("DATA_DIR", "IMAGES_DIR", "MASKS_DIR", "MANIFEST_PATH", "MODEL_DIR", "CALLBACKS_DIR"):
+        for key in ("DATA_DIR", "IMAGES_DIR", "MASKS_DIR", "MANIFEST_PATH", "MODEL_DIR", "CALLBACKS_DIR", "INITIAL_WEIGHTS_PATH"):
             payload[key] = str(payload[key]) if payload.get(key) is not None else None
         for key in (
             "TARGET_SHAPE",
@@ -471,6 +482,11 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
         tversky_alpha: float,
         tversky_beta: float,
         focal_tversky_gamma: float,
+        lesion_slice_weight: float = 1.0,
+        empty_slice_weight: float = 1.0,
+        dice_on_lesion_slices_only: bool = False,
+        positive_topk_weight: float = 0.0,
+        positive_topk_fraction: float = 0.25,
         name: str = "weighted_bce_dice_tversky",
     ):
         super().__init__(name=name)
@@ -481,6 +497,11 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
         self.tversky_alpha = float(tversky_alpha)
         self.tversky_beta = float(tversky_beta)
         self.focal_tversky_gamma = float(focal_tversky_gamma)
+        self.lesion_slice_weight = float(lesion_slice_weight)
+        self.empty_slice_weight = float(empty_slice_weight)
+        self.dice_on_lesion_slices_only = bool(dice_on_lesion_slices_only)
+        self.positive_topk_weight = float(positive_topk_weight)
+        self.positive_topk_fraction = float(positive_topk_fraction)
 
     def get_config(self):
         return {
@@ -491,30 +512,80 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
             "tversky_alpha": self.tversky_alpha,
             "tversky_beta": self.tversky_beta,
             "focal_tversky_gamma": self.focal_tversky_gamma,
+            "lesion_slice_weight": self.lesion_slice_weight,
+            "empty_slice_weight": self.empty_slice_weight,
+            "dice_on_lesion_slices_only": self.dice_on_lesion_slices_only,
+            "positive_topk_weight": self.positive_topk_weight,
+            "positive_topk_fraction": self.positive_topk_fraction,
             "name": self.name,
         }
+
+    @staticmethod
+    def _weighted_mean(values, weights):
+        values = tf.cast(values, tf.float32)
+        weights = tf.cast(weights, tf.float32)
+        return tf.math.divide_no_nan(tf.reduce_sum(values * weights), tf.reduce_sum(weights))
+
+    def _positive_topk_loss(self, y_true, y_pred):
+        if self.positive_topk_weight <= 0.0 or self.positive_topk_fraction <= 0.0:
+            return tf.constant(0.0, dtype=tf.float32)
+        positive_errors = tf.boolean_mask(1.0 - y_pred, y_true > 0.5)
+        n_positive = tf.size(positive_errors)
+
+        def non_empty_loss():
+            k = tf.cast(
+                tf.maximum(
+                    1.0,
+                    tf.math.ceil(tf.cast(n_positive, tf.float32) * self.positive_topk_fraction),
+                ),
+                tf.int32,
+            )
+            return tf.reduce_mean(tf.nn.top_k(positive_errors, k=k, sorted=False).values)
+
+        return tf.cond(n_positive > 0, non_empty_loss, lambda: tf.constant(0.0, dtype=tf.float32))
 
     def call(self, y_true, y_pred):
         eps = tf.keras.backend.epsilon()
         y_true = tf.cast(y_true, tf.float32)
         y_pred = tf.clip_by_value(tf.cast(y_pred, tf.float32), eps, 1.0 - eps)
+        slice_has_lesion = tf.reduce_sum(y_true, axis=[1, 2, 3]) > 0.5
+        slice_weights = tf.where(
+            slice_has_lesion,
+            tf.fill(tf.shape(slice_has_lesion), tf.cast(self.lesion_slice_weight, tf.float32)),
+            tf.fill(tf.shape(slice_has_lesion), tf.cast(self.empty_slice_weight, tf.float32)),
+        )
         weights = 1.0 + y_true * (self.positive_weight - 1.0)
         bce = -(y_true * tf.math.log(y_pred) + (1.0 - y_true) * tf.math.log(1.0 - y_pred))
-        bce = tf.reduce_mean(weights * bce)
+        bce_per_slice = tf.reduce_mean(weights * bce, axis=[1, 2, 3])
+        bce = self._weighted_mean(bce_per_slice, slice_weights)
 
-        y = tf.reshape(y_true, [-1])
-        p = tf.reshape(y_pred, [-1])
-        tp = tf.reduce_sum(y * p)
-        fp = tf.reduce_sum((1.0 - y) * p)
-        fn = tf.reduce_sum(y * (1.0 - p))
-        dice = (2.0 * tp + eps) / (tf.reduce_sum(y) + tf.reduce_sum(p) + eps)
-        dice_loss = 1.0 - dice
+        y = tf.reshape(y_true, [tf.shape(y_true)[0], -1])
+        p = tf.reshape(y_pred, [tf.shape(y_pred)[0], -1])
+        tp = tf.reduce_sum(y * p, axis=1)
+        fp = tf.reduce_sum((1.0 - y) * p, axis=1)
+        fn = tf.reduce_sum(y * (1.0 - p), axis=1)
+        y_sum = tf.reduce_sum(y, axis=1)
+        p_sum = tf.reduce_sum(p, axis=1)
+        dice = (2.0 * tp + eps) / (y_sum + p_sum + eps)
+        dice_loss_per_slice = 1.0 - dice
+        dice_weights = tf.where(
+            slice_has_lesion,
+            tf.fill(tf.shape(slice_has_lesion), tf.cast(self.lesion_slice_weight, tf.float32)),
+            (
+                tf.zeros(tf.shape(slice_has_lesion), dtype=tf.float32)
+                if self.dice_on_lesion_slices_only
+                else tf.fill(tf.shape(slice_has_lesion), tf.cast(self.empty_slice_weight, tf.float32))
+            ),
+        )
+        dice_loss = self._weighted_mean(dice_loss_per_slice, dice_weights)
         tversky = (tp + eps) / (tp + self.tversky_alpha * fp + self.tversky_beta * fn + eps)
-        focal_tversky = tf.pow(1.0 - tversky, self.focal_tversky_gamma)
+        focal_tversky = self._weighted_mean(tf.pow(1.0 - tversky, self.focal_tversky_gamma), dice_weights)
+        positive_topk = self._positive_topk_loss(y_true, y_pred)
         return (
             self.bce_weight * bce
             + self.dice_weight * dice_loss
             + self.focal_tversky_weight * focal_tversky
+            + self.positive_topk_weight * positive_topk
         )
 
 
@@ -890,6 +961,11 @@ def compile_model(model: tf.keras.Model, cfg: SliceBlockTrainingConfig) -> None:
         tversky_alpha=cfg.TVERSKY_ALPHA,
         tversky_beta=cfg.TVERSKY_BETA,
         focal_tversky_gamma=cfg.FOCAL_TVERSKY_GAMMA,
+        lesion_slice_weight=cfg.LESION_SLICE_WEIGHT,
+        empty_slice_weight=cfg.EMPTY_SLICE_WEIGHT,
+        dice_on_lesion_slices_only=cfg.DICE_ON_LESION_SLICES_ONLY,
+        positive_topk_weight=cfg.POSITIVE_TOPK_WEIGHT,
+        positive_topk_fraction=cfg.POSITIVE_TOPK_FRACTION,
     )
     model.compile(
         optimizer=optimizer,
@@ -938,6 +1014,11 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
     val_ds = make_tf_dataset(val_cases, cfg, training=False)
 
     model = build_slice_block_model(cfg)
+    if cfg.INITIAL_WEIGHTS_PATH is not None:
+        if not cfg.INITIAL_WEIGHTS_PATH.exists():
+            raise FileNotFoundError(f"Initial weights not found: {cfg.INITIAL_WEIGHTS_PATH}")
+        logger.info("Loading initial weights from %s", cfg.INITIAL_WEIGHTS_PATH)
+        model.load_weights(str(cfg.INITIAL_WEIGHTS_PATH))
     compile_model(model, cfg)
     logger.info("Model built: %s params=%d input=%s", model.name, model.count_params(), cfg.input_shape)
     logger.info(
@@ -947,6 +1028,17 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
         cfg.SLICE_STRIDE,
         train_steps,
         val_steps,
+    )
+    logger.info(
+        "Loss focus: lesion_slice_weight=%.3f empty_slice_weight=%.3f dice_lesion_only=%s positive_topk_weight=%.3f topk_fraction=%.3f tversky=(alpha=%.3f beta=%.3f) threshold=%.3f",
+        cfg.LESION_SLICE_WEIGHT,
+        cfg.EMPTY_SLICE_WEIGHT,
+        cfg.DICE_ON_LESION_SLICES_ONLY,
+        cfg.POSITIVE_TOPK_WEIGHT,
+        cfg.POSITIVE_TOPK_FRACTION,
+        cfg.TVERSKY_ALPHA,
+        cfg.TVERSKY_BETA,
+        cfg.DECISION_THRESHOLD,
     )
 
     callbacks = [
@@ -981,4 +1073,3 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
     )
     write_training_summary(history, cfg)
     return history
-

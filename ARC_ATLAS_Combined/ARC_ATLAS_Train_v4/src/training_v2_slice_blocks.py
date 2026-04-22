@@ -1,11 +1,11 @@
 """
 2.5D full-slice block trainer for ARC/ATLAS T1 lesion segmentation.
 
-This trainer replaces 3D spatial patches with overlapping 3-slice slabs. For
-each brain, the generator creates every adjacent 3-slice block along
+This trainer replaces 3D spatial patches with overlapping full-slice slabs. For
+each brain, the generator creates every adjacent ``BLOCK_DEPTH`` slice block along
 ``SLICE_AXIS`` and yields the whole brain as one Keras batch:
 
-    x.shape == (num_slices, full_x, full_y, 3)
+    x.shape == (num_slices, full_x, full_y, block_depth)
     y.shape == (num_slices, full_x, full_y, 1)
 
 The network predicts the center slice of each slab. Inference stitches the
@@ -21,10 +21,11 @@ import logging
 import math
 import os
 import random
+import shutil
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Sequence
 
 import nibabel as nib
 import numpy as np
@@ -91,6 +92,11 @@ class SliceBlockTrainingConfig:
     INITIAL_EPOCH: int = 0
     STEPS_PER_EPOCH: Optional[int] = None
     VALIDATION_STEPS: Optional[int] = None
+    BALANCED_CASE_SAMPLING: bool = False
+    SOURCE_BALANCED_SAMPLING: bool = True
+    SIZE_AWARE_SAMPLING: bool = False
+    SIZE_BUCKET_EDGES: tuple[int, ...] = (100, 1000, 10000)
+    SIZE_BUCKET_PROBS: tuple[float, ...] = (0.30, 0.30, 0.25, 0.15)
 
     BASE_FILTERS: int = 8
     UNET_DEPTH: int = 4
@@ -101,6 +107,7 @@ class SliceBlockTrainingConfig:
     WEIGHT_DECAY: float = 1e-5
     MAX_GRAD_NORM: float = 1.0
     MIXED_PRECISION: bool = False
+    JIT_COMPILE: bool = False
 
     POSITIVE_WEIGHT: float = 35.0
     BCE_WEIGHT: float = 0.45
@@ -114,6 +121,8 @@ class SliceBlockTrainingConfig:
     DICE_ON_LESION_SLICES_ONLY: bool = False
     POSITIVE_TOPK_WEIGHT: float = 0.0
     POSITIVE_TOPK_FRACTION: float = 0.25
+    SMALL_LESION_BOOST_REFERENCE: float = 0.0
+    SMALL_LESION_BOOST_MAX: float = 1.0
 
     NORMALIZE_NONZERO: bool = True
     NORMALIZE_CLIP_PERCENTILES: tuple[float, float] = (0.5, 99.5)
@@ -127,6 +136,10 @@ class SliceBlockTrainingConfig:
     VAL_THRESHOLD_SWEEP: tuple[float, ...] = (0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.50)
     WHOLE_BRAIN_VAL_EVERY_N_EPOCHS: int = 1
     WHOLE_BRAIN_VAL_MAX_CASES: Optional[int] = None
+    EARLY_STOPPING_PATIENCE: Optional[int] = None
+    EARLY_STOPPING_MIN_DELTA: float = 1e-3
+    RESTORE_BEST_WEIGHTS: bool = True
+    TARGET_WHOLE_DICE: Optional[float] = None
     PREDICT_SLICE_BATCH_SIZE: Optional[int] = None
     SAVE_VAL_PREDICTIONS: bool = True
     NUM_VAL_PREDICTIONS: int = 3
@@ -175,10 +188,25 @@ class SliceBlockTrainingConfig:
         self.BASE_FILTERS = max(2, int(self.BASE_FILTERS))
         self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS = max(1, int(self.WHOLE_BRAIN_VAL_EVERY_N_EPOCHS))
         self.NUM_VAL_PREDICTIONS = max(0, int(self.NUM_VAL_PREDICTIONS))
+        if self.EARLY_STOPPING_PATIENCE is not None:
+            self.EARLY_STOPPING_PATIENCE = max(0, int(self.EARLY_STOPPING_PATIENCE))
+        self.EARLY_STOPPING_MIN_DELTA = max(0.0, float(self.EARLY_STOPPING_MIN_DELTA))
+        if self.TARGET_WHOLE_DICE is not None:
+            self.TARGET_WHOLE_DICE = float(np.clip(self.TARGET_WHOLE_DICE, 0.0, 1.0))
         self.LESION_SLICE_WEIGHT = max(0.0, float(self.LESION_SLICE_WEIGHT))
         self.EMPTY_SLICE_WEIGHT = max(0.0, float(self.EMPTY_SLICE_WEIGHT))
         self.POSITIVE_TOPK_WEIGHT = max(0.0, float(self.POSITIVE_TOPK_WEIGHT))
         self.POSITIVE_TOPK_FRACTION = float(np.clip(self.POSITIVE_TOPK_FRACTION, 0.0, 1.0))
+        self.SMALL_LESION_BOOST_REFERENCE = max(0.0, float(self.SMALL_LESION_BOOST_REFERENCE))
+        self.SMALL_LESION_BOOST_MAX = max(1.0, float(self.SMALL_LESION_BOOST_MAX))
+        self.SIZE_BUCKET_EDGES = tuple(int(v) for v in self.SIZE_BUCKET_EDGES)
+        self.SIZE_BUCKET_PROBS = tuple(float(v) for v in self.SIZE_BUCKET_PROBS)
+        if len(self.SIZE_BUCKET_PROBS) != len(self.SIZE_BUCKET_EDGES) + 1:
+            raise ValueError("SIZE_BUCKET_PROBS must have exactly len(SIZE_BUCKET_EDGES) + 1 values.")
+        prob_sum = float(np.sum(self.SIZE_BUCKET_PROBS))
+        if prob_sum <= 0:
+            raise ValueError("SIZE_BUCKET_PROBS must sum to a positive value.")
+        self.SIZE_BUCKET_PROBS = tuple(float(v) / prob_sum for v in self.SIZE_BUCKET_PROBS)
         self.VAL_THRESHOLD_SWEEP = tuple(
             sorted({float(np.clip(t, 0.0, 1.0)) for t in self.VAL_THRESHOLD_SWEEP + (self.DECISION_THRESHOLD,)})
         )
@@ -210,6 +238,8 @@ class SliceBlockTrainingConfig:
         for key in (
             "TARGET_SHAPE",
             "NORMALIZE_CLIP_PERCENTILES",
+            "SIZE_BUCKET_EDGES",
+            "SIZE_BUCKET_PROBS",
             "VAL_THRESHOLD_SWEEP",
             "IMAGE_SUFFIXES",
             "MASK_SUFFIXES",
@@ -228,6 +258,7 @@ def configure_runtime(cfg: SliceBlockTrainingConfig) -> None:
         tf.keras.mixed_precision.set_global_policy("mixed_float16")
     else:
         tf.keras.mixed_precision.set_global_policy("float32")
+    tf.config.optimizer.set_jit("autoclustering" if cfg.JIT_COMPILE else False)
     for gpu in tf.config.list_physical_devices("GPU"):
         try:
             tf.config.experimental.set_memory_growth(gpu, True)
@@ -487,6 +518,8 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
         dice_on_lesion_slices_only: bool = False,
         positive_topk_weight: float = 0.0,
         positive_topk_fraction: float = 0.25,
+        small_lesion_boost_reference: float = 0.0,
+        small_lesion_boost_max: float = 1.0,
         name: str = "weighted_bce_dice_tversky",
     ):
         super().__init__(name=name)
@@ -502,6 +535,8 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
         self.dice_on_lesion_slices_only = bool(dice_on_lesion_slices_only)
         self.positive_topk_weight = float(positive_topk_weight)
         self.positive_topk_fraction = float(positive_topk_fraction)
+        self.small_lesion_boost_reference = float(small_lesion_boost_reference)
+        self.small_lesion_boost_max = float(small_lesion_boost_max)
 
     def get_config(self):
         return {
@@ -517,6 +552,8 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
             "dice_on_lesion_slices_only": self.dice_on_lesion_slices_only,
             "positive_topk_weight": self.positive_topk_weight,
             "positive_topk_fraction": self.positive_topk_fraction,
+            "small_lesion_boost_reference": self.small_lesion_boost_reference,
+            "small_lesion_boost_max": self.small_lesion_boost_max,
             "name": self.name,
         }
 
@@ -529,29 +566,30 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
     def _positive_topk_loss(self, y_true, y_pred):
         if self.positive_topk_weight <= 0.0 or self.positive_topk_fraction <= 0.0:
             return tf.constant(0.0, dtype=tf.float32)
-        positive_errors = tf.boolean_mask(1.0 - y_pred, y_true > 0.5)
-        n_positive = tf.size(positive_errors)
+        positive = tf.cast(y_true > 0.5, tf.float32)
+        focus_power = max(1.0, 1.0 / max(self.positive_topk_fraction, 1e-3))
+        missed_positive = tf.pow(1.0 - y_pred, focus_power)
+        return tf.math.divide_no_nan(tf.reduce_sum(positive * missed_positive), tf.reduce_sum(positive))
 
-        def non_empty_loss():
-            k = tf.cast(
-                tf.maximum(
-                    1.0,
-                    tf.math.ceil(tf.cast(n_positive, tf.float32) * self.positive_topk_fraction),
-                ),
-                tf.int32,
-            )
-            return tf.reduce_mean(tf.nn.top_k(positive_errors, k=k, sorted=False).values)
-
-        return tf.cond(n_positive > 0, non_empty_loss, lambda: tf.constant(0.0, dtype=tf.float32))
+    def _case_lesion_boost(self, y_true):
+        if self.small_lesion_boost_reference <= 0.0 or self.small_lesion_boost_max <= 1.0:
+            return tf.constant(1.0, dtype=tf.float32)
+        total_positive = tf.reduce_sum(tf.cast(y_true > 0.5, tf.float32))
+        reference = tf.cast(self.small_lesion_boost_reference, tf.float32)
+        boost = tf.sqrt(reference / tf.maximum(total_positive, 1.0))
+        boost = tf.clip_by_value(boost, 1.0, tf.cast(self.small_lesion_boost_max, tf.float32))
+        return tf.where(total_positive > 0.5, boost, tf.constant(1.0, dtype=tf.float32))
 
     def call(self, y_true, y_pred):
         eps = tf.keras.backend.epsilon()
         y_true = tf.cast(y_true, tf.float32)
         y_pred = tf.clip_by_value(tf.cast(y_pred, tf.float32), eps, 1.0 - eps)
         slice_has_lesion = tf.reduce_sum(y_true, axis=[1, 2, 3]) > 0.5
+        lesion_boost = self._case_lesion_boost(y_true)
+        lesion_slice_weight = tf.cast(self.lesion_slice_weight, tf.float32) * lesion_boost
         slice_weights = tf.where(
             slice_has_lesion,
-            tf.fill(tf.shape(slice_has_lesion), tf.cast(self.lesion_slice_weight, tf.float32)),
+            tf.fill(tf.shape(slice_has_lesion), lesion_slice_weight),
             tf.fill(tf.shape(slice_has_lesion), tf.cast(self.empty_slice_weight, tf.float32)),
         )
         weights = 1.0 + y_true * (self.positive_weight - 1.0)
@@ -570,7 +608,7 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
         dice_loss_per_slice = 1.0 - dice
         dice_weights = tf.where(
             slice_has_lesion,
-            tf.fill(tf.shape(slice_has_lesion), tf.cast(self.lesion_slice_weight, tf.float32)),
+            tf.fill(tf.shape(slice_has_lesion), lesion_slice_weight),
             (
                 tf.zeros(tf.shape(slice_has_lesion), dtype=tf.float32)
                 if self.dice_on_lesion_slices_only
@@ -580,7 +618,7 @@ class WeightedBceDiceTversky(tf.keras.losses.Loss):
         dice_loss = self._weighted_mean(dice_loss_per_slice, dice_weights)
         tversky = (tp + eps) / (tp + self.tversky_alpha * fp + self.tversky_beta * fn + eps)
         focal_tversky = self._weighted_mean(tf.pow(1.0 - tversky, self.focal_tversky_gamma), dice_weights)
-        positive_topk = self._positive_topk_loss(y_true, y_pred)
+        positive_topk = lesion_boost * self._positive_topk_loss(y_true, y_pred)
         return (
             self.bce_weight * bce
             + self.dice_weight * dice_loss
@@ -669,17 +707,92 @@ def _dataset_signature(cfg: SliceBlockTrainingConfig):
     )
 
 
+def _case_sampling_weights(
+    cases: Sequence[CaseRecord],
+    lesion_sizes: Sequence[int] | None,
+    cfg: SliceBlockTrainingConfig,
+) -> np.ndarray:
+    n_cases = len(cases)
+    if n_cases == 0:
+        return np.asarray([], dtype=np.float64)
+    weights = np.ones(n_cases, dtype=np.float64)
+    if cfg.SIZE_AWARE_SAMPLING and lesion_sizes is not None and len(lesion_sizes) == n_cases:
+        sizes = np.asarray(lesion_sizes, dtype=np.int64)
+        bins = np.digitize(sizes, np.asarray(cfg.SIZE_BUCKET_EDGES, dtype=np.int64), right=False)
+        weights = np.zeros(n_cases, dtype=np.float64)
+        probs = np.asarray(cfg.SIZE_BUCKET_PROBS, dtype=np.float64)
+        for bucket_idx, bucket_prob in enumerate(probs):
+            idx = np.where(bins == bucket_idx)[0]
+            if idx.size:
+                weights[idx] = float(bucket_prob) / float(idx.size)
+        if not np.any(weights > 0):
+            weights = np.ones(n_cases, dtype=np.float64)
+
+    if cfg.SOURCE_BALANCED_SAMPLING:
+        source_labels = np.asarray([case.source for case in cases], dtype=object)
+        sources = np.unique(source_labels)
+        balanced = np.zeros(n_cases, dtype=np.float64)
+        per_source_mass = 1.0 / max(len(sources), 1)
+        for source in sources:
+            idx = np.where(source_labels == source)[0]
+            if idx.size == 0:
+                continue
+            local = np.clip(weights[idx], 1e-12, None)
+            balanced[idx] = per_source_mass * (local / local.sum())
+        weights = balanced
+
+    weights = np.clip(weights, 1e-12, None)
+    return weights / weights.sum()
+
+
+def write_sampling_diagnostics(
+    cases: Sequence[CaseRecord],
+    lesion_sizes: Sequence[int] | None,
+    weights: np.ndarray,
+    cfg: SliceBlockTrainingConfig,
+) -> None:
+    if not len(cases) or weights.size != len(cases):
+        return
+    diag_dir = cfg.CALLBACKS_DIR / "diagnostics"
+    diag_dir.mkdir(parents=True, exist_ok=True)
+    with (diag_dir / "train_sampling_weights.csv").open("w", newline="") as fh:
+        writer = csv.DictWriter(
+            fh,
+            fieldnames=["source", "case_id", "lesion_voxels", "lesion_group", "sampling_weight", "image", "mask"],
+        )
+        writer.writeheader()
+        for idx, case in enumerate(cases):
+            size = int(lesion_sizes[idx]) if lesion_sizes is not None and len(lesion_sizes) > idx else 0
+            writer.writerow(
+                {
+                    "source": case.source,
+                    "case_id": case.case_id,
+                    "lesion_voxels": size,
+                    "lesion_group": lesion_size_group(size),
+                    "sampling_weight": float(weights[idx]),
+                    "image": str(case.image_path),
+                    "mask": str(case.mask_path),
+                }
+            )
+
+
 def case_batch_generator(
     cases: list[CaseRecord],
     cfg: SliceBlockTrainingConfig,
     training: bool,
+    lesion_sizes: Sequence[int] | None = None,
 ) -> Iterable[tuple[np.ndarray, np.ndarray]]:
     if not cases:
         raise ValueError("Cannot build dataset from an empty case list.")
     rng = random.Random(int(cfg.RNG_SEED) + (1 if training else 10_000))
+    np_rng = np.random.default_rng(int(cfg.RNG_SEED) + (101 if training else 10_100))
+    sampling_weights = _case_sampling_weights(cases, lesion_sizes, cfg) if training and cfg.BALANCED_CASE_SAMPLING else None
     while True:
-        order = list(cases)
-        if training:
+        if training and sampling_weights is not None:
+            order = [cases[int(np_rng.choice(len(cases), p=sampling_weights))] for _ in range(len(cases))]
+        else:
+            order = list(cases)
+        if training and sampling_weights is None:
             rng.shuffle(order)
         for case in order:
             image, mask, _ = load_case_arrays(case, cfg)
@@ -694,9 +807,10 @@ def make_tf_dataset(
     cases: list[CaseRecord],
     cfg: SliceBlockTrainingConfig,
     training: bool,
+    lesion_sizes: Sequence[int] | None = None,
 ) -> tf.data.Dataset:
     ds = tf.data.Dataset.from_generator(
-        lambda: case_batch_generator(cases, cfg, training=training),
+        lambda: case_batch_generator(cases, cfg, training=training, lesion_sizes=lesion_sizes),
         output_signature=_dataset_signature(cfg),
     )
     return ds.prefetch(1)
@@ -835,6 +949,151 @@ def save_case_outputs(
     nib.save(seg_img, str(out_dir / f"{safe_id}_seg_thr_{threshold:.2f}.nii.gz"))
 
 
+def load_slice_block_model(
+    cfg: SliceBlockTrainingConfig,
+    weights_path: str | Path,
+) -> tf.keras.Model:
+    model = build_slice_block_model(cfg)
+    model.load_weights(str(weights_path))
+    return model
+
+
+def predict_ensemble_probability_map(
+    models: Sequence[tf.keras.Model],
+    configs: Sequence[SliceBlockTrainingConfig],
+    case: CaseRecord,
+    weights: Sequence[float] | None = None,
+) -> tuple[np.ndarray, np.ndarray, nib.Nifti1Image]:
+    if len(models) != len(configs):
+        raise ValueError("models and configs must have the same length.")
+    if not models:
+        raise ValueError("At least one model is required for ensemble prediction.")
+    if weights is None:
+        weights_arr = np.ones(len(models), dtype=np.float32) / float(len(models))
+    else:
+        weights_arr = np.asarray(weights, dtype=np.float32)
+        if weights_arr.shape[0] != len(models):
+            raise ValueError("weights must have one value per model.")
+        total = float(np.sum(weights_arr))
+        if total <= 0:
+            raise ValueError("Ensemble weights must sum to a positive value.")
+        weights_arr = weights_arr / total
+
+    probs = []
+    reference_mask = None
+    reference_img = None
+    for model, cfg, weight in zip(models, configs, weights_arr):
+        prob, mask, ref_img = predict_case_probability_map(model, case, cfg)
+        probs.append(prob.astype(np.float32, copy=False) * float(weight))
+        if reference_mask is None:
+            reference_mask = mask
+            reference_img = ref_img
+    ensemble_prob = np.sum(np.stack(probs, axis=0), axis=0)
+    assert reference_mask is not None and reference_img is not None
+    return ensemble_prob.astype(np.float32, copy=False), reference_mask, reference_img
+
+
+def _row_group_mean(rows: Sequence[dict], group_key: str, metric_key: str) -> dict[str, float]:
+    grouped: dict[str, list[float]] = {}
+    for row in rows:
+        grouped.setdefault(str(row.get(group_key, "")), []).append(float(row[metric_key]))
+    return {key: float(np.mean(values)) for key, values in sorted(grouped.items())}
+
+
+def evaluate_slice_block_ensemble(
+    configs: Sequence[SliceBlockTrainingConfig],
+    weights_paths: Sequence[str | Path],
+    cases: Sequence[CaseRecord] | None = None,
+    out_dir: str | Path | None = None,
+    thresholds: Sequence[float] | None = None,
+    decision_threshold: float | None = None,
+    max_cases: int | None = None,
+    save_predictions: int = 3,
+    ensemble_weights: Sequence[float] | None = None,
+) -> dict:
+    if len(configs) != len(weights_paths):
+        raise ValueError("configs and weights_paths must have the same length.")
+    if not configs:
+        raise ValueError("At least one config is required.")
+    cfg0 = configs[0]
+    if cases is None:
+        all_cases = load_cases(cfg0)
+        _, val_cases, _ = split_cases(all_cases, cfg0)
+        cases = val_cases
+    cases = list(cases)
+    if max_cases is not None:
+        cases = cases[: int(max_cases)]
+    if thresholds is None:
+        thresholds = cfg0.VAL_THRESHOLD_SWEEP
+    decision_threshold = float(cfg0.DECISION_THRESHOLD if decision_threshold is None else decision_threshold)
+    thresholds = tuple(sorted({float(np.clip(t, 0.0, 1.0)) for t in tuple(thresholds) + (decision_threshold,)}))
+    out_path = Path(out_dir) if out_dir is not None else cfg0.CALLBACKS_DIR / "ensemble"
+    out_path.mkdir(parents=True, exist_ok=True)
+
+    models = [load_slice_block_model(cfg, weights_path) for cfg, weights_path in zip(configs, weights_paths)]
+    rows = []
+    start = time.time()
+    for idx, case in enumerate(cases, start=1):
+        prob, mask, ref_img = predict_ensemble_probability_map(models, configs, case, weights=ensemble_weights)
+        true_voxels = int(np.sum(mask > 0.5))
+        sweep = {f"{thr:.2f}": hard_dice_np(mask, prob >= thr) for thr in thresholds}
+        best_thr_key, best_thr_score = max(sweep.items(), key=lambda item: item[1])
+        row = {
+            "source": case.source,
+            "case_id": case.case_id,
+            "soft_dice": soft_dice_np(mask, prob),
+            "hard_dice": hard_dice_np(mask, prob >= decision_threshold),
+            "best_threshold": float(best_thr_key),
+            "best_threshold_dice": float(best_thr_score),
+            "true_voxels": true_voxels,
+            "pred_soft_voxels": float(np.sum(prob)),
+            "pred_hard_voxels": int(np.sum(prob >= decision_threshold)),
+            "pred_max": float(np.max(prob)),
+            "pred_mean": float(np.mean(prob)),
+            "lesion_group": lesion_size_group(true_voxels),
+            "image": str(case.image_path),
+            "mask": str(case.mask_path),
+        }
+        row.update({f"dice_thr_{key}": value for key, value in sweep.items()})
+        rows.append(row)
+        if idx % 16 == 0 or idx == len(cases):
+            logger.info("Slice-block ensemble val progress: %d/%d", idx, len(cases))
+        if save_predictions > 0 and idx <= int(save_predictions):
+            save_case_outputs(out_path / "predictions", case, prob, decision_threshold, ref_img)
+
+    if rows:
+        csv_path = out_path / "ensemble_val.csv"
+        with csv_path.open("w", newline="") as fh:
+            writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(rows)
+    summary = {
+        "elapsed_sec": float(time.time() - start),
+        "n_cases": len(rows),
+        "weights_paths": [str(p) for p in weights_paths],
+        "axes": [int(cfg.SLICE_AXIS) for cfg in configs],
+        "block_depths": [int(cfg.BLOCK_DEPTH) for cfg in configs],
+        "decision_threshold": decision_threshold,
+        "val_whole_dice_soft_macro": float(np.mean([row["soft_dice"] for row in rows])) if rows else 0.0,
+        "val_whole_dice_hard": float(np.mean([row["hard_dice"] for row in rows])) if rows else 0.0,
+        "val_whole_dice_hard_best_thr": float(np.median([row["best_threshold"] for row in rows])) if rows else 0.0,
+        "val_whole_dice_hard_best_thr_score": float(np.mean([row["best_threshold_dice"] for row in rows])) if rows else 0.0,
+        "source_best_threshold_dice": _row_group_mean(rows, "source", "best_threshold_dice") if rows else {},
+        "lesion_group_best_threshold_dice": _row_group_mean(rows, "lesion_group", "best_threshold_dice") if rows else {},
+    }
+    with (out_path / "ensemble_val_summary.json").open("w", encoding="utf-8") as fh:
+        json.dump(summary, fh, indent=2)
+    logger.info(
+        "Slice-block ensemble val: soft=%.5f hard@%.2f=%.5f best_thr_med=%.2f best_thr_score=%.5f",
+        summary["val_whole_dice_soft_macro"],
+        decision_threshold,
+        summary["val_whole_dice_hard"],
+        summary["val_whole_dice_hard_best_thr"],
+        summary["val_whole_dice_hard_best_thr_score"],
+    )
+    return summary
+
+
 class WholeBrainSliceBlockValidation(tf.keras.callbacks.Callback):
     def __init__(self, val_cases: list[CaseRecord], cfg: SliceBlockTrainingConfig):
         super().__init__()
@@ -935,6 +1194,28 @@ class WholeBrainSliceBlockValidation(tf.keras.callbacks.Callback):
                     save_case_outputs(out_dir, case, prob, self.cfg.DECISION_THRESHOLD, ref_img)
 
 
+class StopAtWholeDice(tf.keras.callbacks.Callback):
+    def __init__(self, target: float, metric: str = "val_whole_dice_hard_best_thr_score"):
+        super().__init__()
+        self.target = float(target)
+        self.metric = metric
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        value = logs.get(self.metric)
+        if value is None:
+            return
+        if float(value) >= self.target:
+            logger.info(
+                "Target whole-brain Dice reached at epoch %d: %s=%.5f >= %.5f",
+                epoch,
+                self.metric,
+                float(value),
+                self.target,
+            )
+            self.model.stop_training = True
+
+
 def compile_model(model: tf.keras.Model, cfg: SliceBlockTrainingConfig) -> None:
     total_steps = max(1, int((cfg.STEPS_PER_EPOCH or 1) * max(1, cfg.TOTAL_EPOCHS - cfg.INITIAL_EPOCH)))
     lr = tf.keras.optimizers.schedules.CosineDecay(
@@ -966,11 +1247,14 @@ def compile_model(model: tf.keras.Model, cfg: SliceBlockTrainingConfig) -> None:
         dice_on_lesion_slices_only=cfg.DICE_ON_LESION_SLICES_ONLY,
         positive_topk_weight=cfg.POSITIVE_TOPK_WEIGHT,
         positive_topk_fraction=cfg.POSITIVE_TOPK_FRACTION,
+        small_lesion_boost_reference=cfg.SMALL_LESION_BOOST_REFERENCE,
+        small_lesion_boost_max=cfg.SMALL_LESION_BOOST_MAX,
     )
     model.compile(
         optimizer=optimizer,
         loss=loss,
         metrics=[dice_coefficient, hard_dice_metric, foreground_fraction],
+        jit_compile=bool(cfg.JIT_COMPILE),
     )
 
 
@@ -1003,6 +1287,19 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
         raise ValueError(f"No cases found under {cfg.DATA_DIR}")
     train_cases, val_cases, lesion_sizes = split_cases(cases, cfg)
     write_split_diagnostics(train_cases, val_cases, cases, lesion_sizes, cfg)
+    size_by_id = {case.case_id: int(size) for case, size in zip(cases, lesion_sizes)}
+    train_lesion_sizes = [size_by_id.get(case.case_id, 0) for case in train_cases]
+    val_lesion_sizes = [size_by_id.get(case.case_id, 0) for case in val_cases]
+    if cfg.BALANCED_CASE_SAMPLING:
+        sampling_weights = _case_sampling_weights(train_cases, train_lesion_sizes, cfg)
+        write_sampling_diagnostics(train_cases, train_lesion_sizes, sampling_weights, cfg)
+        logger.info(
+            "Balanced case sampling enabled: source_balanced=%s size_aware=%s size_edges=%s size_probs=%s",
+            cfg.SOURCE_BALANCED_SAMPLING,
+            cfg.SIZE_AWARE_SAMPLING,
+            cfg.SIZE_BUCKET_EDGES,
+            tuple(round(v, 4) for v in cfg.SIZE_BUCKET_PROBS),
+        )
 
     train_steps = int(cfg.STEPS_PER_EPOCH or len(train_cases))
     val_steps = int(cfg.VALIDATION_STEPS or max(1, min(len(val_cases), 16)))
@@ -1010,8 +1307,8 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
     cfg.VALIDATION_STEPS = val_steps
     cfg._write_config()
 
-    train_ds = make_tf_dataset(train_cases, cfg, training=True)
-    val_ds = make_tf_dataset(val_cases, cfg, training=False)
+    train_ds = make_tf_dataset(train_cases, cfg, training=True, lesion_sizes=train_lesion_sizes)
+    val_ds = make_tf_dataset(val_cases, cfg, training=False, lesion_sizes=val_lesion_sizes)
 
     model = build_slice_block_model(cfg)
     if cfg.INITIAL_WEIGHTS_PATH is not None:
@@ -1019,6 +1316,10 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
             raise FileNotFoundError(f"Initial weights not found: {cfg.INITIAL_WEIGHTS_PATH}")
         logger.info("Loading initial weights from %s", cfg.INITIAL_WEIGHTS_PATH)
         model.load_weights(str(cfg.INITIAL_WEIGHTS_PATH))
+        baseline_copy = cfg.CALLBACKS_DIR / "baseline_initial.weights.h5"
+        if not baseline_copy.exists():
+            shutil.copy2(cfg.INITIAL_WEIGHTS_PATH, baseline_copy)
+            logger.info("Copied initial weights to %s", baseline_copy)
     compile_model(model, cfg)
     logger.info("Model built: %s params=%d input=%s", model.name, model.count_params(), cfg.input_shape)
     logger.info(
@@ -1030,9 +1331,11 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
         val_steps,
     )
     logger.info(
-        "Loss focus: lesion_slice_weight=%.3f empty_slice_weight=%.3f dice_lesion_only=%s positive_topk_weight=%.3f topk_fraction=%.3f tversky=(alpha=%.3f beta=%.3f) threshold=%.3f",
+        "Loss focus: lesion_slice_weight=%.3f empty_slice_weight=%.3f small_lesion_boost=(ref=%.1f max=%.2f) dice_lesion_only=%s positive_topk_weight=%.3f topk_fraction=%.3f tversky=(alpha=%.3f beta=%.3f) threshold=%.3f",
         cfg.LESION_SLICE_WEIGHT,
         cfg.EMPTY_SLICE_WEIGHT,
+        cfg.SMALL_LESION_BOOST_REFERENCE,
+        cfg.SMALL_LESION_BOOST_MAX,
         cfg.DICE_ON_LESION_SLICES_ONLY,
         cfg.POSITIVE_TOPK_WEIGHT,
         cfg.POSITIVE_TOPK_FRACTION,
@@ -1060,6 +1363,19 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
         tf.keras.callbacks.CSVLogger(str(cfg.CALLBACKS_DIR / "training_log.csv"), append=cfg.INITIAL_EPOCH > 0),
         tf.keras.callbacks.TerminateOnNaN(),
     ]
+    if cfg.EARLY_STOPPING_PATIENCE is not None:
+        callbacks.append(
+            tf.keras.callbacks.EarlyStopping(
+                monitor="val_whole_dice_hard_best_thr_score",
+                mode="max",
+                min_delta=float(cfg.EARLY_STOPPING_MIN_DELTA),
+                patience=int(cfg.EARLY_STOPPING_PATIENCE),
+                restore_best_weights=bool(cfg.RESTORE_BEST_WEIGHTS),
+                verbose=1,
+            )
+        )
+    if cfg.TARGET_WHOLE_DICE is not None:
+        callbacks.append(StopAtWholeDice(float(cfg.TARGET_WHOLE_DICE)))
 
     history = model.fit(
         train_ds,

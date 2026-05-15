@@ -1,0 +1,134 @@
+{
+  "DATA_DIR": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/data/splits/90_10_random/train",
+  "IMAGES_DIR": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/data/splits/90_10_random/train/t1",
+  "MASKS_DIR": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/data/splits/90_10_random/train/masks",
+  "MANIFEST_PATH": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/data/splits/90_10_random/train/manifest.csv",
+  "TARGET_SHAPE": [
+    192,
+    224,
+    192
+  ],
+  "RESAMPLE_TO_TARGET": false,
+  "SLICE_AXIS": 0,
+  "BLOCK_DEPTH": 7,
+  "SLICE_STRIDE": 1,
+  "MODEL_DIR": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/runs/20260430_131608_slice_blocks_resume_atlas_replay_preserve/axis0_sagittal/models",
+  "CALLBACKS_DIR": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/runs/20260430_131608_slice_blocks_resume_atlas_replay_preserve/axis0_sagittal/callbacks",
+  "INITIAL_WEIGHTS_PATH": "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/runs/20260422_171449_slice_blocks_triplanar_goal08/axis0_sagittal/callbacks/best_slice_block.weights.h5",
+  "timestamp": "20260430_131608",
+  "VALIDATION_SPLIT": 0.15,
+  "RNG_SEED": 1234,
+  "TOTAL_EPOCHS": 12,
+  "INITIAL_EPOCH": 0,
+  "STEPS_PER_EPOCH": 360,
+  "VALIDATION_STEPS": 18,
+  "BALANCED_CASE_SAMPLING": true,
+  "SOURCE_BALANCED_SAMPLING": true,
+  "SOURCE_SAMPLING_WEIGHTS": [
+    [
+      "ATLAS-Images-f0d7431e",
+      6.0
+    ],
+    [
+      "ARC-combined-t1-raw-ab0d1794",
+      1.5
+    ],
+    [
+      "Approx-Numeracy-Processed",
+      1.0
+    ]
+  ],
+  "SIZE_AWARE_SAMPLING": true,
+  "SIZE_BUCKET_EDGES": [
+    100,
+    1000,
+    10000
+  ],
+  "SIZE_BUCKET_PROBS": [
+    0.42000000000000004,
+    0.2800000000000001,
+    0.18000000000000002,
+    0.12000000000000001
+  ],
+  "BASE_FILTERS": 12,
+  "UNET_DEPTH": 4,
+  "DROPOUT_RATE": 0.06,
+  "L2_REG": 0.0001,
+  "INITIAL_LR": 3e-06,
+  "MIN_LR": 5e-07,
+  "WEIGHT_DECAY": 5e-06,
+  "MAX_GRAD_NORM": 0.75,
+  "MIXED_PRECISION": false,
+  "JIT_COMPILE": false,
+  "FROZEN_LAYER_PREFIXES": [
+    "enc1_",
+    "enc2_",
+    "enc3_"
+  ],
+  "FREEZE_BATCHNORM": true,
+  "POSITIVE_WEIGHT": 28.0,
+  "BCE_WEIGHT": 0.38,
+  "DICE_WEIGHT": 0.46,
+  "FOCAL_TVERSKY_WEIGHT": 0.16,
+  "TVERSKY_ALPHA": 0.58,
+  "TVERSKY_BETA": 0.42,
+  "FOCAL_TVERSKY_GAMMA": 1.33,
+  "LESION_SLICE_WEIGHT": 1.35,
+  "EMPTY_SLICE_WEIGHT": 0.95,
+  "DICE_ON_LESION_SLICES_ONLY": false,
+  "POSITIVE_TOPK_WEIGHT": 0.03,
+  "POSITIVE_TOPK_FRACTION": 0.2,
+  "SMALL_LESION_BOOST_REFERENCE": 10000.0,
+  "SMALL_LESION_BOOST_MAX": 1.75,
+  "NORMALIZE_NONZERO": true,
+  "NORMALIZE_CLIP_PERCENTILES": [
+    0.5,
+    99.5
+  ],
+  "AUGMENT": true,
+  "AUG_FLIP_PROB": 0.5,
+  "AUG_INTENSITY_SCALE": 0.05,
+  "AUG_INTENSITY_SHIFT": 0.025,
+  "AUG_NOISE_STD": 0.006,
+  "DECISION_THRESHOLD": 0.5,
+  "VAL_THRESHOLD_SWEEP": [
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.8
+  ],
+  "WHOLE_BRAIN_VAL_EVERY_N_EPOCHS": 1,
+  "WHOLE_BRAIN_VAL_MAX_CASES": null,
+  "EARLY_STOPPING_PATIENCE": 4,
+  "EARLY_STOPPING_MIN_DELTA": 0.0005,
+  "RESTORE_BEST_WEIGHTS": true,
+  "TARGET_WHOLE_DICE": null,
+  "PREDICT_SLICE_BATCH_SIZE": null,
+  "SAVE_VAL_PREDICTIONS": true,
+  "NUM_VAL_PREDICTIONS": 4,
+  "FIT_VERBOSE": 2,
+  "IMAGE_SUFFIXES": [
+    "_T1w_MNI_norm",
+    "_T1w_MNI",
+    "_T1w_brain",
+    "_T1w",
+    "_T1"
+  ],
+  "MASK_SUFFIXES": [
+    "_lesion_mask_MNI_clean",
+    "_lesion_mask_MNI",
+    "_lesion_mask",
+    "_desc-lesion_mask",
+    "_mask"
+  ]
+}

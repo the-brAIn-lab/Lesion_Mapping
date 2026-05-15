@@ -1,0 +1,35 @@
+{
+  "elapsed_sec": 574.6492536067963,
+  "n_cases": 129,
+  "weights_paths": [
+    "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/runs/20260422_171449_slice_blocks_triplanar_goal08/axis2_axial/callbacks/best_slice_block.weights.h5",
+    "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/runs/20260422_171449_slice_blocks_triplanar_goal08/axis0_sagittal/callbacks/best_slice_block.weights.h5",
+    "/home/rbielski/stroke_cleaned/ARC_ATLAS_Combined/ARC_ATLAS_Train_v4/runs/20260422_171449_slice_blocks_triplanar_goal08/axis1_coronal/callbacks/best_slice_block.weights.h5"
+  ],
+  "axes": [
+    2,
+    0,
+    1
+  ],
+  "block_depths": [
+    7,
+    7,
+    7
+  ],
+  "decision_threshold": 0.25,
+  "val_whole_dice_soft_macro": 0.2586254336207459,
+  "val_whole_dice_hard": 0.3212723126391323,
+  "val_whole_dice_hard_best_thr": 0.45,
+  "val_whole_dice_hard_best_thr_score": 0.41278368140259375,
+  "source_best_threshold_dice": {
+    "ARC-combined-t1-raw-ab0d1794": 0.6752268834305661,
+    "ATLAS-Images-f0d7431e": 0.3301381666995495,
+    "Approx-Numeracy-Processed": 0.40696796117833745
+  },
+  "lesion_group_best_threshold_dice": {
+    "10000_plus": 0.5517136327489425,
+    "1000_9999": 0.3174791983993799,
+    "100_999": 0.23088035611719915,
+    "1_99": 0.20619030049419962
+  }
+}

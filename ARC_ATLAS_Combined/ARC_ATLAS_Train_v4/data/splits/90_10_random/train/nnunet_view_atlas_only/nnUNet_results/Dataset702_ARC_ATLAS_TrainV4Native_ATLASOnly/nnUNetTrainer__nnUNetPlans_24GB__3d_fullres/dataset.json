@@ -1,0 +1,16 @@
+{
+    "name": "Dataset702_ARC_ATLAS_TrainV4Native_ATLASOnly",
+    "description": "ARC/ATLAS v4 training split, exposed in nnU-Net v2 layout without resampling or target-shape resizing.",
+    "reference": "Local ARC_ATLAS_Train_v4 data/splits/90_10_random/train",
+    "licence": "See source dataset terms.",
+    "release": "local",
+    "channel_names": {
+        "0": "T1"
+    },
+    "labels": {
+        "background": 0,
+        "lesion": 1
+    },
+    "numTraining": 582,
+    "file_ending": ".nii.gz"
+}

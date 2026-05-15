@@ -94,6 +94,7 @@ class SliceBlockTrainingConfig:
     VALIDATION_STEPS: Optional[int] = None
     BALANCED_CASE_SAMPLING: bool = False
     SOURCE_BALANCED_SAMPLING: bool = True
+    SOURCE_SAMPLING_WEIGHTS: tuple[tuple[str, float], ...] = ()
     SIZE_AWARE_SAMPLING: bool = False
     SIZE_BUCKET_EDGES: tuple[int, ...] = (100, 1000, 10000)
     SIZE_BUCKET_PROBS: tuple[float, ...] = (0.30, 0.30, 0.25, 0.15)
@@ -108,6 +109,8 @@ class SliceBlockTrainingConfig:
     MAX_GRAD_NORM: float = 1.0
     MIXED_PRECISION: bool = False
     JIT_COMPILE: bool = False
+    FROZEN_LAYER_PREFIXES: tuple[str, ...] = ()
+    FREEZE_BATCHNORM: bool = False
 
     POSITIVE_WEIGHT: float = 35.0
     BCE_WEIGHT: float = 0.45
@@ -201,6 +204,18 @@ class SliceBlockTrainingConfig:
         self.SMALL_LESION_BOOST_MAX = max(1.0, float(self.SMALL_LESION_BOOST_MAX))
         self.SIZE_BUCKET_EDGES = tuple(int(v) for v in self.SIZE_BUCKET_EDGES)
         self.SIZE_BUCKET_PROBS = tuple(float(v) for v in self.SIZE_BUCKET_PROBS)
+        if isinstance(self.SOURCE_SAMPLING_WEIGHTS, dict):
+            source_items = self.SOURCE_SAMPLING_WEIGHTS.items()
+        else:
+            source_items = self.SOURCE_SAMPLING_WEIGHTS
+        normalized_source_weights = []
+        for source, weight in source_items:
+            source = str(source).strip()
+            weight = float(weight)
+            if source and weight > 0:
+                normalized_source_weights.append((source, weight))
+        self.SOURCE_SAMPLING_WEIGHTS = tuple(normalized_source_weights)
+        self.FROZEN_LAYER_PREFIXES = tuple(str(prefix).strip() for prefix in self.FROZEN_LAYER_PREFIXES if str(prefix).strip())
         if len(self.SIZE_BUCKET_PROBS) != len(self.SIZE_BUCKET_EDGES) + 1:
             raise ValueError("SIZE_BUCKET_PROBS must have exactly len(SIZE_BUCKET_EDGES) + 1 values.")
         prob_sum = float(np.sum(self.SIZE_BUCKET_PROBS))
@@ -241,11 +256,14 @@ class SliceBlockTrainingConfig:
             "SIZE_BUCKET_EDGES",
             "SIZE_BUCKET_PROBS",
             "VAL_THRESHOLD_SWEEP",
+            "FROZEN_LAYER_PREFIXES",
             "IMAGE_SUFFIXES",
             "MASK_SUFFIXES",
         ):
             if payload.get(key) is not None:
                 payload[key] = list(payload[key])
+        if payload.get("SOURCE_SAMPLING_WEIGHTS") is not None:
+            payload["SOURCE_SAMPLING_WEIGHTS"] = [[source, weight] for source, weight in payload["SOURCE_SAMPLING_WEIGHTS"]]
         with (self.MODEL_DIR / "config.json").open("w", encoding="utf-8") as fh:
             json.dump(payload, fh, indent=2)
 
@@ -731,18 +749,49 @@ def _case_sampling_weights(
     if cfg.SOURCE_BALANCED_SAMPLING:
         source_labels = np.asarray([case.source for case in cases], dtype=object)
         sources = np.unique(source_labels)
+        source_weight_overrides = {str(source): float(weight) for source, weight in cfg.SOURCE_SAMPLING_WEIGHTS}
+        source_mass = {
+            str(source): max(1e-12, float(source_weight_overrides.get(str(source), 1.0)))
+            for source in sources
+        }
+        total_source_mass = float(sum(source_mass.values()))
         balanced = np.zeros(n_cases, dtype=np.float64)
-        per_source_mass = 1.0 / max(len(sources), 1)
         for source in sources:
             idx = np.where(source_labels == source)[0]
             if idx.size == 0:
                 continue
             local = np.clip(weights[idx], 1e-12, None)
-            balanced[idx] = per_source_mass * (local / local.sum())
+            balanced[idx] = (source_mass[str(source)] / total_source_mass) * (local / local.sum())
         weights = balanced
 
     weights = np.clip(weights, 1e-12, None)
     return weights / weights.sum()
+
+
+def apply_trainable_policy(model: tf.keras.Model, cfg: SliceBlockTrainingConfig) -> None:
+    freeze_prefixes = tuple(cfg.FROZEN_LAYER_PREFIXES)
+    freeze_batchnorm = bool(cfg.FREEZE_BATCHNORM)
+    if not freeze_prefixes and not freeze_batchnorm:
+        return
+
+    frozen_layers = []
+    for layer in model.layers:
+        should_freeze = False
+        if freeze_batchnorm and isinstance(layer, tf.keras.layers.BatchNormalization):
+            should_freeze = True
+        if freeze_prefixes and any(layer.name.startswith(prefix) for prefix in freeze_prefixes):
+            should_freeze = True
+        if should_freeze:
+            layer.trainable = False
+            frozen_layers.append(layer.name)
+
+    logger.info(
+        "Applied fine-tune freezing: prefixes=%s freeze_batchnorm=%s frozen_layers=%d/%d",
+        freeze_prefixes,
+        freeze_batchnorm,
+        len(frozen_layers),
+        len(model.layers),
+    )
 
 
 def write_sampling_diagnostics(
@@ -1294,8 +1343,9 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
         sampling_weights = _case_sampling_weights(train_cases, train_lesion_sizes, cfg)
         write_sampling_diagnostics(train_cases, train_lesion_sizes, sampling_weights, cfg)
         logger.info(
-            "Balanced case sampling enabled: source_balanced=%s size_aware=%s size_edges=%s size_probs=%s",
+            "Balanced case sampling enabled: source_balanced=%s source_weights=%s size_aware=%s size_edges=%s size_probs=%s",
             cfg.SOURCE_BALANCED_SAMPLING,
+            {source: round(weight, 4) for source, weight in cfg.SOURCE_SAMPLING_WEIGHTS},
             cfg.SIZE_AWARE_SAMPLING,
             cfg.SIZE_BUCKET_EDGES,
             tuple(round(v, 4) for v in cfg.SIZE_BUCKET_PROBS),
@@ -1320,6 +1370,7 @@ def train_slice_block_model(config: Optional[SliceBlockTrainingConfig] = None, *
         if not baseline_copy.exists():
             shutil.copy2(cfg.INITIAL_WEIGHTS_PATH, baseline_copy)
             logger.info("Copied initial weights to %s", baseline_copy)
+    apply_trainable_policy(model, cfg)
     compile_model(model, cfg)
     logger.info("Model built: %s params=%d input=%s", model.name, model.count_params(), cfg.input_shape)
     logger.info(

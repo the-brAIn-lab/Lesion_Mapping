@@ -72,7 +72,16 @@
       "Bash(timeout 10 streamlit run app.py --server.headless true --server.port 8504)",
       "Bash(find /home/rbielski/Stroke_Dashboard -name \"__pycache__\" -type d -exec rm -rf {} +)",
       "Bash(find /home/rbielski/Stroke_Dashboard -name \"*.pyc\" -delete)",
-      "Bash(conda list:*)"
+      "Bash(conda list:*)",
+      "Bash(git init:*)",
+      "Bash(git lfs:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git remote:*)",
+      "Bash(git stash:*)",
+      "Bash(python extract_data.py)",
+      "Bash(python -c 'import ast; ast.parse\\(open\\('\\\\''__TRACKED_VAR__'\\\\''\\).read\\(\\)\\); print\\('\\\\''OK: __TRACKED_VAR__'\\\\''\\)')"
     ]
   }
 }
